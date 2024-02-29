@@ -34,4 +34,12 @@ class Status{
     const KYC_PENDING = 2;
     const KYC_VERIFIED = 1;
 
+    const RIDE_ACTIVE = 1;
+    const RIDE_CLOSE = 0;
+
+    const RIDE = 1;
+    const INTER_CITY = 2;
+    const RENTAL = 3;
+    const RESERVE = 4;
+
 }

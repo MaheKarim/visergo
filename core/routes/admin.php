@@ -105,7 +105,6 @@ Route::middleware('admin')->group(function () {
         });
     });
 
-
     // DEPOSIT SYSTEM
     Route::controller('DepositController')->prefix('deposit')->name('deposit.')->group(function(){
         Route::get('/', 'deposit')->name('list');
@@ -119,7 +118,6 @@ Route::middleware('admin')->group(function () {
         Route::post('approve/{id}', 'approve')->name('approve');
 
     });
-
 
     // WITHDRAW SYSTEM
     Route::name('withdraw.')->prefix('withdraw')->group(function(){
@@ -155,7 +153,6 @@ Route::middleware('admin')->group(function () {
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
     });
 
-
     // Admin Support
     Route::controller('SupportTicketController')->prefix('ticket')->name('ticket.')->group(function(){
         Route::get('/', 'tickets')->name('index');
@@ -168,7 +165,6 @@ Route::middleware('admin')->group(function () {
         Route::get('download/{ticket}', 'ticketDownload')->name('download');
         Route::post('delete/{id}', 'ticketDelete')->name('delete');
     });
-
 
     // Language Manager
     Route::controller('LanguageController')->prefix('language')->name('language.')->group(function(){
@@ -183,6 +179,7 @@ Route::middleware('admin')->group(function () {
         Route::post('update/key/{id}', 'updateLanguageJson')->name('update.key');
         Route::get('get-keys', 'getKeys')->name('get.key');
     });
+
 
     Route::controller('GeneralSettingController')->group(function(){
         // General Setting
@@ -226,7 +223,6 @@ Route::middleware('admin')->group(function () {
         Route::post('schedule/log/flush/{id}', 'logFlush')->name('log.flush');
     });
 
-
     //KYC setting
     Route::controller('KycController')->group(function(){
         Route::get('kyc-setting','setting')->name('kyc.setting');
@@ -260,7 +256,6 @@ Route::middleware('admin')->group(function () {
         Route::post('status/{id}', 'status')->name('status');
     });
 
-
     //System Information
     Route::controller('SystemController')->name('system.')->prefix('system')->group(function(){
         Route::get('info','systemInfo')->name('info');
@@ -271,10 +266,8 @@ Route::middleware('admin')->group(function () {
         Route::post('update-upload','updateUpload')->name('update.upload');
     });
 
-
     // SEO
     Route::get('seo', 'FrontendController@seoEdit')->name('seo');
-
 
     // Frontend
     Route::name('frontend.')->prefix('frontend')->group(function () {
@@ -298,6 +291,13 @@ Route::middleware('admin')->group(function () {
             Route::post('manage-section/{id}', 'manageSectionUpdate')->name('manage.section.update');
         });
 
+    });
+
+    // Vehicle Type
+    Route::controller('VehicleTypeManagementController')->name('vehicle-type.')->prefix('vehicle-type')->group(function(){
+        Route::get('/', 'index')->name('index');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('edit/{id}', 'store')->name('store');
     });
 });
 

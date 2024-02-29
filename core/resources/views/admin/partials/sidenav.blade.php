@@ -346,6 +346,35 @@
 
                 <li class="sidebar__menu-header">@lang('Settings')</li>
 
+                <!-- Vehicle Management Start -->
+
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a href="javascript:void(0)" class="{{menuActive('admin.vehicle-type.*',3)}}">
+                        <i class="menu-icon la la-automobile"></i>
+                        <span class="menu-title">@lang('Vehicle Settings')</span>
+                    </a>
+                    <div class="sidebar-submenu {{menuActive('admin.vehicle-type*',2)}} ">
+                        <ul>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle-type.*')}} ">
+                                <a href="{{route('admin.vehicle-type.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Type')</span>
+                                </a>
+                            </li>
+{{--                            <li class="sidebar-menu-item {{menuActive('admin.vehicle-type.*')}} ">--}}
+{{--                                <a href="{{route('admin.gateway.manual.index')}}" class="nav-link">--}}
+{{--                                    <i class="menu-icon las la-dot-circle"></i>--}}
+{{--                                    <span class="menu-title">@lang('Manual Gateways')</span>--}}
+{{--                                </a>--}}
+{{--                            </li>--}}
+
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Vehicle Management End -->
+
                 <li class="sidebar-menu-item {{menuActive('admin.setting.index')}}">
                     <a href="{{route('admin.setting.index')}}" class="nav-link">
                         <i class="menu-icon las la-life-ring"></i>
