@@ -11,7 +11,7 @@ class VehicleTypeManagementController extends Controller
     public function index()
     {
         $pageTitle = 'Vehicle Type Management';
-        $vehicles = VehicleType::latest()->paginate(getPaginate());
+        $vehicles = VehicleType::latest()->searchable(['name'])->paginate(getPaginate());
 
         return view('admin.vehicle_type.index', compact('pageTitle', 'vehicles'));
     }
@@ -28,11 +28,11 @@ class VehicleTypeManagementController extends Controller
         ]);
 
         if (!$id) {
-            $notification = 'Vehicle type added successfully';
             $vehicle = new VehicleType();
+            $notification = 'Vehicle type added successfully';
         } else{
-            $notification = 'Vehicle type updated successfully';
             $vehicle = VehicleType::findOrFail($id);
+            $notification = 'Vehicle type updated successfully';
         }
 
         $vehicle->name = $request->name;

@@ -299,5 +299,11 @@ Route::middleware('admin')->group(function () {
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
+
+    Route::controller('VehicleClassManagementController')->name('vehicle-class.')->prefix('vehicle-class')->group(function(){
+        Route::get('/', 'index')->name('index');
+        Route::post('edit/{id?}', 'store')->name('store');
+        Route::post('status/{id}', 'status')->name('status');
+    });
 });
 

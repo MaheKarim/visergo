@@ -7,10 +7,9 @@ use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VehicleType extends Model
+class VehicleClass extends Model
 {
     use HasFactory, GlobalStatus, Searchable;
 
     protected $guarded = ['id'];
-
 }

@@ -9,54 +9,39 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Type')</th>
+                                <th>@lang('Class')</th>
                                 <th>@lang('Base Fare')</th>
-                                <th>@lang('Ride Cost / km')</th>
-                                <th>@lang('Intercity / km')</th>
-                                <th>@lang('Rental / km')</th>
-                                <th>@lang('Reserve / km')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @forelse($vehicles as $vehicle)
+                            @forelse($vehicleClasses as $class)
                                 <tr>
                                     <td>
-                                        <span class="fw-bold">{{ __($vehicle->name) }}</span>
+                                        <span class="fw-bold">{{ __($class->name) }}</span>
                                     </td>
                                     <td>
-                                        {{ __(showAmount($vehicle->base_fare)) }} {{ $general->cur_text }}
+                                        {{ __(showAmount($class->class_base_fare)) }} {{ $general->cur_text }}
                                     </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->ride_per_km_cost)) }} {{ $general->cur_text }}
-                                    </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->intercity_per_km_cost)) }} {{ $general->cur_text }}
-                                    </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->rental_per_km_cost)) }} {{ $general->cur_text }}
-                                    </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->reserve_per_km_cost)) }} {{ $general->cur_text }}
-                                    </td>
+
                                     <td>
                                         @php
-                                            echo $vehicle->statusBadge
+                                            echo $class->statusBadge
                                         @endphp
                                     </td>
 
                                     <td>
                                         <div class="button--group">
-                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update')" data-resource="{{ $vehicle }}">
+                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update')" data-resource="{{ $class }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
-                                            @if($vehicle->status == Status::DISABLE)
-                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn" data-question="@lang('Are you sure to enable this vehicle type?')" data-action="{{ route('admin.vehicle-type.status',$vehicle->id) }}">
+                                            @if($class->status == Status::DISABLE)
+                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn" data-question="@lang('Are you sure to enable this vehicle type?')" data-action="{{ route('admin.vehicle-class.status',$class->id) }}">
                                                     <i class="la la-eye"></i> @lang('Enable')
                                                 </button>
                                             @else
-                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn" data-question="@lang('Are you sure to disable this vehicle type?')" data-action="{{ route('admin.vehicle-type.status',$vehicle->id) }}">
+                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn" data-question="@lang('Are you sure to disable this vehicle type?')" data-action="{{ route('admin.vehicle-class.status',$class->id) }}">
                                                     <i class="la la-eye-slash"></i> @lang('Disable')
                                                 </button>
                                             @endif
@@ -74,9 +59,9 @@
                         </table><!-- table end -->
                     </div>
                 </div>
-                @if ($vehicles->hasPages())
+                @if ($vehicleClasses->hasPages())
                     <div class="card-footer py-4">
-                        {{ paginateLinks($vehicles) }}
+                        {{ paginateLinks($vehicleClasses) }}
                     </div>
                 @endif
             </div>
@@ -90,7 +75,7 @@
                             <i class="las la-times"></i>
                         </button>
                     </div>
-                    <form action="{{ route('admin.vehicle-type.store' )}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.vehicle-class.store' )}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
@@ -99,25 +84,8 @@
                             </div>
                             <div class="form-group">
                                 <label>@lang('Base Fare')</label>
-                                <input class="form-control" name="base_fare" type="number" required>
+                                <input class="form-control" name="class_base_fare" type="number" required>
                             </div>
-                            <div class="form-group">
-                                <label>@lang('Ride (Cost / km)')</label>
-                                <input class="form-control" name="ride_per_km_cost" type="number" required>
-                            </div>
-                            <div class="form-group">
-                                <label>@lang('Intercity (Cost / km)')</label>
-                                <input class="form-control" name="intercity_per_km_cost" type="number" required>
-                            </div>
-                            <div class="form-group">
-                                <label>@lang('Rental (Cost / km)')</label>
-                                <input class="form-control" name="rental_per_km_cost" type="number" required>
-                            </div>
-                            <div class="form-group">
-                                <label>@lang('Reserve (Cost / km)')</label>
-                                <input class="form-control" name="reserve_per_km_cost" type="number" required>
-                            </div>
-
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn--primary w-100 h-45" type="submit">@lang('Submit')</button>
@@ -131,6 +99,6 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-search-form placeholder="Vehicle Type" />
+    <x-search-form placeholder="Vehicle Class" />
     <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"  ><i class="las la-plus"></i>@lang('Add New')</button>
 @endpush
