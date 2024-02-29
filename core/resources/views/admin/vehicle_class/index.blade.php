@@ -33,15 +33,20 @@
 
                                     <td>
                                         <div class="button--group">
-                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update')" data-resource="{{ $class }}">
+                                            <button class="btn btn-outline--primary cuModalBtn btn-sm"
+                                                    data-modal_title="@lang('Update')" data-resource="{{ $class }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
                                             @if($class->status == Status::DISABLE)
-                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn" data-question="@lang('Are you sure to enable this vehicle type?')" data-action="{{ route('admin.vehicle-class.status',$class->id) }}">
+                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
+                                                        data-question="@lang('Are you sure to enable this vehicle type?')"
+                                                        data-action="{{ route('admin.vehicle.class.status',$class->id) }}">
                                                     <i class="la la-eye"></i> @lang('Enable')
                                                 </button>
                                             @else
-                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn" data-question="@lang('Are you sure to disable this vehicle type?')" data-action="{{ route('admin.vehicle-class.status',$class->id) }}">
+                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn"
+                                                        data-question="@lang('Are you sure to disable this vehicle type?')"
+                                                        data-action="{{ route('admin.vehicle.class.status',$class->id) }}">
                                                     <i class="la la-eye-slash"></i> @lang('Disable')
                                                 </button>
                                             @endif
@@ -75,7 +80,7 @@
                             <i class="las la-times"></i>
                         </button>
                     </div>
-                    <form action="{{ route('admin.vehicle-class.store' )}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.vehicle.class.store' )}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
@@ -94,11 +99,12 @@
                 </div>
             </div>
         </div>
-        <x-confirmation-modal />
+        <x-confirmation-modal/>
     </div>
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-search-form placeholder="Vehicle Class" />
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"  ><i class="las la-plus"></i>@lang('Add New')</button>
+    <x-search-form placeholder="Vehicle Class"/>
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    </button>
 @endpush
