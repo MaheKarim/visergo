@@ -31,6 +31,7 @@
 <script src="{{asset('assets/global/js/bootstrap.bundle.min.js')}}"></script>
 <script src="{{asset('assets/admin/js/vendor/bootstrap-toggle.min.js')}}"></script>
 <script src="{{asset('assets/admin/js/vendor/jquery.slimscroll.min.js')}}"></script>
+<script src="{{ asset('assets/admin/js/cu-modal.js') }}"></script>
 
 
 @include('partials.notify')
