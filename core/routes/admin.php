@@ -299,8 +299,15 @@ Route::middleware('admin')->group(function () {
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
-
+    // Vehicle Class
     Route::controller('VehicleClassManagementController')->name('vehicle.class.')->prefix('vehicle-class')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('edit/{id?}', 'store')->name('store');
+        Route::post('status/{id}', 'status')->name('status');
+    });
+
+    // Brands
+    Route::controller('BrandManagementController')->name('brands.')->prefix('brands')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');

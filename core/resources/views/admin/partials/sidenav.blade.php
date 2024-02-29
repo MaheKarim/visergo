@@ -369,6 +369,13 @@
                                 </a>
                             </li>
 
+                            <li class="sidebar-menu-item {{menuActive('admin.brands.index')}} ">
+                                <a href="{{route('admin.brands.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Brands')</span>
+                                </a>
+                            </li>
+
                         </ul>
                     </div>
                 </li>
