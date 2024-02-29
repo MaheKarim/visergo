@@ -47,5 +47,8 @@ class VehicleTypeManagementController extends Controller
         return back()->withNotify($notify);
     }
 
-
+    public function status($id)
+    {
+        return VehicleType::changeStatus($id);
+    }
 }

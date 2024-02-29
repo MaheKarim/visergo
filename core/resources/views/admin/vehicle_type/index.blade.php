@@ -41,11 +41,9 @@
                                         {{ __(showAmount($vehicle->reserve_per_km_cost)) }}
                                     </td>
                                     <td>
-                                        @if($vehicle->status == 1)
-                                            <span class="badge badge--success">@lang('Active')</span>
-                                        @else
-                                            <span class="badge badge--danger">@lang('Inactive')</span>
-                                        @endif
+                                        @php
+                                            echo $vehicle->statusBadge
+                                        @endphp
                                     </td>
 
                                     <td>
@@ -53,6 +51,15 @@
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update')" data-resource="{{ $vehicle }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
+                                            @if($vehicle->status == Status::DISABLE)
+                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn" data-question="@lang('Are you sure to enable this vehicle type?')" data-action="{{ route('admin.vehicle-type.status',$vehicle->id) }}">
+                                                    <i class="la la-eye"></i> @lang('Enable')
+                                                </button>
+                                            @else
+                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn" data-question="@lang('Are you sure to disable this vehicle type?')" data-action="{{ route('admin.vehicle-type.status',$vehicle->id) }}">
+                                                    <i class="la la-eye-slash"></i> @lang('Disable')
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
 
@@ -119,7 +126,7 @@
                 </div>
             </div>
         </div>
-
+        <x-confirmation-modal />
     </div>
 @endsection
 
