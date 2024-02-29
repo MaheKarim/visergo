@@ -369,7 +369,7 @@
                                 </a>
                             </li>
 
-                            <li class="sidebar-menu-item {{menuActive('admin.brands.index')}} ">
+                            <li class="sidebar-menu-item {{menuActive('admin.brands.*')}} ">
                                 <a href="{{route('admin.brands.index')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">@lang('Brands')</span>
@@ -380,6 +380,13 @@
                                 <a href="{{route('admin.vehicle.color.index')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">@lang('Vehicle Color')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.model.*')}} ">
+                                <a href="{{route('admin.model.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Model Management')</span>
                                 </a>
                             </li>
 

@@ -305,16 +305,20 @@ Route::middleware('admin')->group(function () {
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
-
     // Vehicle Color
     Route::controller('VehicleColorManagementController')->name('vehicle.color.')->prefix('vehicle-color')->group(function (){
         Route::get('/', 'index')->name('index');
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id?}', 'status')->name('status');
     });
-
     // Brands
     Route::controller('BrandManagementController')->name('brands.')->prefix('brands')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('edit/{id?}', 'store')->name('store');
+        Route::post('status/{id}', 'status')->name('status');
+    });
+    // Model Management
+    Route::controller('ModelManagementController')->name('model.')->prefix('model')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
