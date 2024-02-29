@@ -10,6 +10,7 @@
                             <thead>
                             <tr>
                                 <th>@lang('Type')</th>
+                                <th>@lang('Base Fare')</th>
                                 <th>@lang('Ride Cost / km')</th>
                                 <th>@lang('Intercity / km')</th>
                                 <th>@lang('Rental / km')</th>
@@ -23,6 +24,9 @@
                                 <tr>
                                     <td>
                                         <span class="fw-bold">{{ __($vehicle->name) }}</span>
+                                    </td>
+                                    <td>
+                                        {{ __(showAmount($vehicle->base_fare)) }}
                                     </td>
                                     <td>
                                         {{ __(showAmount($vehicle->ride_per_km_cost)) }}
@@ -46,9 +50,9 @@
 
                                     <td>
                                         <div class="button--group">
-                                            <a href="{{ route('admin.vehicle-type.edit', $vehicle->id) }}" class="btn btn-sm btn-outline--primary">
-                                                <i class="las la-desktop"></i> @lang('Edit')
-                                            </a>
+                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update')" data-resource="{{ $vehicle }}">
+                                                <i class="las la-pen"></i>@lang('Edit')
+                                            </button>
                                         </div>
                                     </td>
 
@@ -70,11 +74,56 @@
                 @endif
             </div>
         </div>
+        <div class="modal fade" id="cuModal" role="dialog" tabindex="-1">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"></h5>
+                        <button class="close" data-bs-dismiss="modal" type="button" aria-label="Close">
+                            <i class="las la-times"></i>
+                        </button>
+                    </div>
+                    <form action="{{ route('admin.vehicle-type.store' )}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>@lang('Vehicle type')</label>
+                                <input class="form-control" name="name" type="text" required>
+                            </div>
+                            <div class="form-group">
+                                <label>@lang('Base Fare')</label>
+                                <input class="form-control" name="base_fare" type="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label>@lang('Ride (Cost / km)')</label>
+                                <input class="form-control" name="ride_per_km_cost" type="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label>@lang('Intercity (Cost / km)')</label>
+                                <input class="form-control" name="intercity_per_km_cost" type="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label>@lang('Rental (Cost / km)')</label>
+                                <input class="form-control" name="rental_per_km_cost" type="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label>@lang('Reserve (Cost / km)')</label>
+                                <input class="form-control" name="reserve_per_km_cost" type="number" required>
+                            </div>
 
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn--primary w-100 h-45" type="submit">@lang('Submit')</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
     </div>
 @endsection
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Vehicle Type" />
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"  ><i class="las la-plus"></i>@lang('Add New')</button>
 @endpush
