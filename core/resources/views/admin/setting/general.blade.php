@@ -62,6 +62,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
+                                <label>@lang('Cancellation Reason')</label>
                                     <select name="cancellation_reason" class="form-control">
                                         <option value="rider"
                                                 @if(@$general->cancellation_reason->name->rider == "rider") selected @endif>@lang('Rider')</option>
