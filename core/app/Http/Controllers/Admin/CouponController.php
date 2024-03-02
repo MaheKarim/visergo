@@ -33,7 +33,8 @@ class CouponController extends Controller
             ],
             'discount_value' => 'required|numeric|gt:0|lt:100',
             'discount_type' => 'required',
-            'expire_at' => 'required|date|after_or_equal:'.Carbon::now()->format('Y-m-d'),
+            'start_at' => 'required|date|after_or_equal:'.Carbon::now()->format('Y-m-d'),
+            'expire_at' => 'required|date|after:start_at|after_or_equal:'.Carbon::now()->format('Y-m-d'),
         ]);
 
         if(!$id) {
@@ -46,6 +47,7 @@ class CouponController extends Controller
         $coupon->name = strtoupper($request->name);
         $coupon->discount_value = $request->discount_value;
         $coupon->discount_type = $request->discount_type;
+        $coupon->start_at = $request->start_at;
         $coupon->expire_at = $request->expire_at;
         $coupon->description = $request->description;
         $coupon->save();

@@ -12,6 +12,7 @@
                                 <th>@lang('Coupon')</th>
                                 <th>@lang('Discount Value')</th>
                                 <th>@lang('Discount Type')</th>
+                                <th>@lang('Start Date')</th>
                                 <th>@lang('Expire Date')</th>
                                 <th>@lang('Description')</th>
                                 <th>@lang('Action')</th>
@@ -38,6 +39,7 @@
                                             @lang('Fixed')
                                         @endif
                                     </td>
+                                    <td>{{ __(date($coupon->start_at)) }}</td>
                                     <td>{{ __(date($coupon->expire_at)) }}</td>
                                     <td>{{ __(strLimit($coupon->description, 15)) }} </td>
                                     <td>
@@ -92,6 +94,10 @@
                                     <option value="{{ Status::PERCENTAGE }}">@lang('Percent')</option>
                                 </select>
 
+                            </div>
+                            <div class="form-group">
+                                <label>@lang('Start at')</label>
+                                <input class="form-control" name="start_at" type="date" required>
                             </div>
                             <div class="form-group">
                                 <label>@lang('Expire at')</label>
