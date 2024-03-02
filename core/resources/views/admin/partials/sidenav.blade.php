@@ -343,6 +343,14 @@
                     </a>
                 </li>
 
+                <li class="sidebar-menu-item  {{menuActive('admin.coupon.*')}}">
+                    <a href="{{route('admin.coupon.index')}}" class="nav-link"
+                       data-default-url="{{ route('admin.coupon.index') }}">
+                        <i class="menu-icon las la-tag"></i>
+                        <span class="menu-title">@lang('Coupon') </span>
+                    </a>
+                </li>
+
 
                 <li class="sidebar__menu-header">@lang('Settings')</li>
 

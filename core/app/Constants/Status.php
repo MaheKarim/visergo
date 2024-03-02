@@ -42,4 +42,7 @@ class Status{
     const RENTAL = 3;
     const RESERVE = 4;
 
+    const FIXED = 1;
+    const PERCENTAGE = 2;
+
 }

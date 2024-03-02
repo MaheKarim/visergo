@@ -323,5 +323,10 @@ Route::middleware('admin')->group(function () {
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
+    // Coupon Management
+    Route::controller('CouponController')->name('coupon.')->prefix('coupon')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('edit/{id?}', 'store')->name('store');
+    });
 });
 
