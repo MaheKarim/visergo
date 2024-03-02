@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GeneralSetting extends Model
 {
-    protected $casts = ['mail_config' => 'object','sms_config' => 'object','global_shortcodes' => 'object', 'cancellation_reason' => 'object'];
+    protected $casts = ['mail_config' => 'object','sms_config' => 'object','global_shortcodes' => 'object', 'tips' => 'array'];
 
     protected $hidden = ['email_template','mail_config','sms_config','system_info'];
 

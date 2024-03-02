@@ -59,50 +59,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                <label>@lang('Cancellation Reason')</label>
-                                    <select name="cancellation_reason" class="form-control">
-                                        <option value="rider"
-                                                @if(@$general->cancellation_reason->name->rider == "rider") selected @endif>@lang('Rider')</option>
-                                        <option value="driver"
-                                                @if(@$general->cancellation_reason->name->driver == "driver") selected @endif>@lang('Driver')</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row mt-4 d-none configForm" id="rider">
-                                <div class="col-md-12">
-                                    <h6 class="mb-2">@lang('Rider Reason')</h6>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>@lang('Reason') </label>
-                                        @foreach(@$general->cancellation_reason->rider  as $reason)
-                                            <input type="text" class="form-control" placeholder="@lang('Reason List')"
-                                                   name="reason" value="{{ $reason }}"/> <br>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="row mt-4 d-none configForm" id="driver">
-                                <div class="col-md-12">
-                                    <h6 class="mb-2">@lang('Driver Reason')</h6>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>@lang('Reason') </label>
-                                        @foreach(@$general->cancellation_reason->driver  as $reason)
-                                            <input type="text" class="form-control" placeholder="@lang('Reason List')"
-                                                   name="reason" value="{{ $reason }}"/> <br>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
 
                         <div class="form-group">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
@@ -134,26 +92,6 @@
     <script>
         (function ($) {
             "use strict";
-
-            var method = '{{ @$general->cancellation_reason->name }}';
-
-            if (!method) {
-                method = 'driver';
-            }
-
-            cancelReason(method);
-            $('select[name=cancellation_reason]').on('change', function () {
-                var method = $(this).val();
-                cancelReason(method);
-            });
-
-            function cancelReason(method) {
-                $('.configForm').addClass('d-none');
-                if (method != 'php') {
-                    $(`#${method}`).removeClass('d-none');
-                }
-            }
-
 
             $('.colorPicker').spectrum({
                 color: $(this).data('color'),
