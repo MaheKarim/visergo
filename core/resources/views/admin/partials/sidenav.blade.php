@@ -391,7 +391,7 @@
                                 </a>
                             </li>
 
-                            <li class="sidebar-menu-item {{menuActive('admin.model.*')}} ">
+                            <li class="sidebar-menu-item {{menuActive('admin.model.index')}} ">
                                 <a href="{{route('admin.model.index')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">@lang('Model Management')</span>
@@ -402,6 +402,12 @@
                     </div>
                 </li>
 
+                <li class="sidebar-menu-item {{menuActive('admin.cancellation.index')}} ">
+                    <a href="{{route('admin.cancellation.index')}}" class="nav-link">
+                        <i class="menu-icon las la-window-close"></i>
+                        <span class="menu-title">@lang('Cancellation Reason')</span>
+                    </a>
+                </li>
                 <!-- Vehicle Management End -->
 
                 <li class="sidebar-menu-item {{menuActive('admin.setting.index')}}">

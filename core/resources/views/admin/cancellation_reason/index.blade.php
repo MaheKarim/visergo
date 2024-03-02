@@ -9,37 +9,47 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Coupon')</th>
-                                <th>@lang('Discount Value')</th>
-                                <th>@lang('Discount Type')</th>
-                                <th>@lang('Start Date')</th>
-                                <th>@lang('Expire Date')</th>
-                                <th>@lang('Description')</th>
+                                <th>@lang('For')</th>
+                                <th>@lang('Reason')</th>
+                                <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @forelse($coupons as $coupon)
+                            @forelse($reasons as $reason)
                                 <tr>
                                     <td>
-                                        <span class="fw-bold">{{ __($coupon->name) }}</span>
+                                        <span class="fw-bold">{{ $reason->for == Status::DRIVER ? 'Driver' : 'Rider' }}</span>
                                     </td>
                                     <td>
-                                        {{ __(showAmount($coupon->discount_value)) }}
-                                        {{ $coupon->discount_type == Status::PERCENTAGE ? __('%') : $general->cur_text }}
+                                        {{ __($reason->reason) }}
                                     </td>
+
                                     <td>
-                                        {{ $coupon->discount_type == Status::PERCENTAGE ? __('Percent (%)') : __('Fixed') }}
+                                        @php
+                                            echo $reason->statusBadge
+                                        @endphp
                                     </td>
-                                    <td>{{ __(date($coupon->start_at)) }}</td>
-                                    <td>{{ __(date($coupon->expire_at)) }}</td>
-                                    <td>{{ __(strLimit($coupon->description)) }} </td>
+
                                     <td>
                                         <div class="button--group">
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
-                                                    data-modal_title="@lang('Update')" data-resource="{{ $coupon }}">
+                                                    data-modal_title="@lang('Update')" data-resource="{{ $reason }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
+                                            @if($reason->status == Status::DISABLE)
+                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
+                                                        data-question="@lang('Are you sure to enable this cancellation reason?')"
+                                                        data-action="{{ route('admin.cancellation.status',$reason->id) }}">
+                                                    <i class="la la-eye"></i> @lang('Enable')
+                                                </button>
+                                            @else
+                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn"
+                                                        data-question="@lang('Are you sure to disable this cancellation reason?')"
+                                                        data-action="{{ route('admin.cancellation.status',$reason->id) }}">
+                                                    <i class="la la-eye-slash"></i> @lang('Disable')
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -52,9 +62,9 @@
                         </table><!-- table end -->
                     </div>
                 </div>
-                @if ($coupons->hasPages())
+                @if ($reasons->hasPages())
                     <div class="card-footer py-4">
-                        {{ paginateLinks($coupons) }}
+                        {{ paginateLinks($reasons) }}
                     </div>
                 @endif
             </div>
@@ -68,39 +78,20 @@
                             <i class="las la-times"></i>
                         </button>
                     </div>
-                    <form action="{{ route('admin.coupon.store' )}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.cancellation.store' )}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>@lang('Coupon Name')</label>
-                                <input class="form-control" name="name" type="text" required>
-                            </div>
-                            <div class="form-group">
-                                <label>@lang('Discount Value')</label>
-                                <input class="form-control" name="discount_value" type="number" required>
-                            </div>
-                            <div class="form-group">
-                                <label>@lang('Discount Type')</label>
-                                <select class="form-control" name="discount_type" required>
-                                    <option value="{{ Status::FIXED }}">@lang('Fixed')</option>
-                                    <option value="{{ Status::PERCENTAGE }}">@lang('Percent')</option>
+                                <label>@lang('Reason For')</label>
+                                <select class="form-control" name="for" required>
+                                    <option value="{{ Status::RIDER }}">@lang('Rider')</option>
+                                    <option value="{{ Status::DRIVER }}">@lang('Driver')</option>
                                 </select>
-
                             </div>
-                            <div class="form-group">
-                                <label>@lang('Start at')</label>
-                                <input class="form-control" name="start_at" type="date" required>
+                            <div class="from-group">
+                                <label>@lang('Reason')</label>
+                                <input class="form-control" name="reason" type="text" required>
                             </div>
-                            <div class="form-group">
-                                <label>@lang('Expire at')</label>
-                                <input class="form-control" name="expire_at" type="date" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>@lang('Description')</label>
-                                <input class="form-control" name="description" type="text">
-                            </div>
-
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn--primary w-100 h-45" type="submit">@lang('Submit')</button>
@@ -114,7 +105,6 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-search-form placeholder="Coupon"/>
     <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

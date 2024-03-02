@@ -328,5 +328,11 @@ Route::middleware('admin')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('edit/{id?}', 'store')->name('store');
     });
+    // Cancellation Reason
+    Route::controller('CancellationReasonController')->name('cancellation.')->prefix('cancellation')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('edit/{id?}', 'store')->name('store');
+        Route::post('status/{id}', 'status')->name('status');
+    });
 });
 

@@ -45,4 +45,7 @@ class Status{
     const FIXED = 1;
     const PERCENTAGE = 2;
 
+    const RIDER = 1;
+    const DRIVER = 2;
+
 }
