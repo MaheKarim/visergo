@@ -13,6 +13,7 @@
                                 <th>@lang('Discount Value')</th>
                                 <th>@lang('Discount Type')</th>
                                 <th>@lang('Expire Date')</th>
+                                <th>@lang('Description')</th>
                                 <th>@lang('Action')</th>
                             </tr>
                             </thead>
@@ -38,6 +39,7 @@
                                         @endif
                                     </td>
                                     <td>{{ __(date($coupon->expire_at)) }}</td>
+                                    <td>{{ __(strLimit($coupon->description, 15)) }} </td>
                                     <td>
                                         <div class="button--group">
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
@@ -94,6 +96,11 @@
                             <div class="form-group">
                                 <label>@lang('Expire at')</label>
                                 <input class="form-control" name="expire_at" type="date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>@lang('Description')</label>
+                                <input class="form-control" name="description" type="text">
                             </div>
 
                         </div>
