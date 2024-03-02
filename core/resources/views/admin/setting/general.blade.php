@@ -10,26 +10,29 @@
                             <div class="col-md-4 col-sm-6">
                                 <div class="form-group ">
                                     <label> @lang('Site Title')</label>
-                                    <input class="form-control" type="text" name="site_name" required value="{{$general->site_name}}">
+                                    <input class="form-control" type="text" name="site_name" required
+                                           value="{{$general->site_name}}">
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-6">
                                 <div class="form-group ">
                                     <label>@lang('Currency')</label>
-                                    <input class="form-control" type="text" name="cur_text" required value="{{$general->cur_text}}">
+                                    <input class="form-control" type="text" name="cur_text" required
+                                           value="{{$general->cur_text}}">
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-6">
                                 <div class="form-group ">
                                     <label>@lang('Currency Symbol')</label>
-                                    <input class="form-control" type="text" name="cur_sym" required value="{{$general->cur_sym}}">
+                                    <input class="form-control" type="text" name="cur_sym" required
+                                           value="{{$general->cur_sym}}">
                                 </div>
                             </div>
                             <div class="form-group col-md-4 col-sm-6">
                                 <label> @lang('Timezone')</label>
                                 <select class="select2-basic" name="timezone">
                                     @foreach($timezones as $key => $timezone)
-                                    <option value="{{ @$key}}">{{ __($timezone) }}</option>
+                                        <option value="{{ @$key}}">{{ __($timezone) }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -37,18 +40,65 @@
                                 <label> @lang('Site Base Color')</label>
                                 <div class="input-group">
                                     <span class="input-group-text p-0 border-0">
-                                        <input type='text' class="form-control colorPicker" value="{{$general->base_color}}"/>
+                                        <input type='text' class="form-control colorPicker"
+                                               value="{{$general->base_color}}"/>
                                     </span>
-                                    <input type="text" class="form-control colorCode" name="base_color" value="{{ $general->base_color }}"/>
+                                    <input type="text" class="form-control colorCode" name="base_color"
+                                           value="{{ $general->base_color }}"/>
                                 </div>
                             </div>
                             <div class="form-group col-md-4 col-sm-6">
                                 <label> @lang('Site Secondary Color')</label>
                                 <div class="input-group">
                                     <span class="input-group-text p-0 border-0">
-                                        <input type='text' class="form-control colorPicker" value="{{$general->secondary_color}}"/>
+                                        <input type='text' class="form-control colorPicker"
+                                               value="{{$general->secondary_color}}"/>
                                     </span>
-                                    <input type="text" class="form-control colorCode" name="secondary_color" value="{{ $general->secondary_color }}"/>
+                                    <input type="text" class="form-control colorCode" name="secondary_color"
+                                           value="{{ $general->secondary_color }}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <select name="cancellation_reason" class="form-control">
+                                        <option value="rider"
+                                                @if(@$general->cancellation_reason->name->rider == "rider") selected @endif>@lang('Rider')</option>
+                                        <option value="driver"
+                                                @if(@$general->cancellation_reason->name->driver == "driver") selected @endif>@lang('Driver')</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row mt-4 d-none configForm" id="rider">
+                                <div class="col-md-12">
+                                    <h6 class="mb-2">@lang('Rider Reason')</h6>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@lang('Reason') </label>
+                                        @foreach(@$general->cancellation_reason->rider  as $reason)
+                                            <input type="text" class="form-control" placeholder="@lang('Reason List')"
+                                                   name="reason" value="{{ $reason }}"/> <br>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4 d-none configForm" id="driver">
+                                <div class="col-md-12">
+                                    <h6 class="mb-2">@lang('Driver Reason')</h6>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>@lang('Reason') </label>
+                                        @foreach(@$general->cancellation_reason->driver  as $reason)
+                                            <input type="text" class="form-control" placeholder="@lang('Reason List')"
+                                                   name="reason" value="{{ $reason }}"/> <br>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -56,7 +106,6 @@
                         <div class="form-group">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -65,11 +114,11 @@
 @endsection
 
 @push('style')
-<style>
-    .select2-container {
-        z-index: 0 !important;
-    }
-</style>
+    <style>
+        .select2-container {
+            z-index: 0 !important;
+        }
+    </style>
 @endpush
 
 @push('script-lib')
@@ -84,6 +133,27 @@
     <script>
         (function ($) {
             "use strict";
+
+            var method = '{{ @$general->cancellation_reason->name }}';
+
+            if (!method) {
+                method = 'driver';
+            }
+
+            cancelReason(method);
+            $('select[name=cancellation_reason]').on('change', function () {
+                var method = $(this).val();
+                cancelReason(method);
+            });
+
+            function cancelReason(method) {
+                $('.configForm').addClass('d-none');
+                if (method != 'php') {
+                    $(`#${method}`).removeClass('d-none');
+                }
+            }
+
+
             $('.colorPicker').spectrum({
                 color: $(this).data('color'),
                 change: function (color) {
@@ -100,7 +170,7 @@
 
             $('select[name=timezone]').val("{{ $currentTimezone }}").select2();
             $('.select2-basic').select2({
-                dropdownParent:$('.card-body')
+                dropdownParent: $('.card-body')
             });
         })(jQuery);
 
