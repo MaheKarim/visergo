@@ -27,7 +27,8 @@ class CouponController extends Controller
                 'max:40',
                 'min:3',
                 Rule::unique('coupons')->where(function ($query) {
-                    return $query->where('expire_at', '>=', Carbon::now()->format('Y-m-d'));
+                    return $query->where('expire_at', '>=', Carbon::now()->format('Y-m-d'))
+                        ->where('id', '!=', request()->id);
                 })
             ],
             'discount_value' => 'required|numeric|gt:0|lt:100',
