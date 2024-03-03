@@ -127,6 +127,14 @@ Route::namespace('Api')->name('api.')->group(function(){
                     Route::post('deposit/manual', 'manualDepositUpdate')->name('deposit.manual.update');
                 });
 
+                // User Address Management
+                Route::controller('UserAddressController')->group(function(){
+                    Route::get('address', 'address')->name('address');
+                    Route::post('address/insert', 'addressInsert')->name('address.insert');
+                    Route::post('address/update/{id}', 'addressUpdate')->name('address.update');
+                    Route::post('address/delete/{id}', 'addressDelete')->name('address.delete');
+                });
+
             });
         });
 

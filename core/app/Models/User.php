@@ -34,6 +34,10 @@ class User extends Authenticatable
         'ver_code_send_at' => 'datetime'
     ];
 
+    public function address()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
 
     public function loginLogs()
     {
