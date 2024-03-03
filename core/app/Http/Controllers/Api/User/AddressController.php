@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class UserAddressController extends Controller
+class AddressController extends Controller
 {
     public function addressInsert(Request $request)
     {
@@ -124,6 +124,5 @@ class UserAddressController extends Controller
             'message'=>['success'=>$notify],
         ]);
     }
-
 
 }

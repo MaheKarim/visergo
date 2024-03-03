@@ -128,13 +128,19 @@ Route::namespace('Api')->name('api.')->group(function(){
                 });
 
                 // User Address Management
-                Route::controller('UserAddressController')->group(function(){
+                Route::controller('AddressController')->group(function(){
                     Route::get('address', 'address')->name('address');
                     Route::post('address/insert', 'addressInsert')->name('address.insert');
                     Route::post('address/update/{id}', 'addressUpdate')->name('address.update');
                     Route::post('address/delete/{id}', 'addressDelete')->name('address.delete');
                 });
-
+                // Contact List Management
+                Route::controller('ContactListController')->group(function(){
+                    Route::get('contact', 'contact')->name('contact');
+                    Route::post('contact/insert', 'contactInsert')->name('contact.insert');
+                    Route::post('contact/update/{id}', 'contactUpdate')->name('contact.update');
+                    Route::post('contact/delete/{id}', 'contactDelete')->name('contact.delete');
+                });
             });
         });
 
