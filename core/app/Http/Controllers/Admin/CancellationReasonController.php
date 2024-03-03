@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\CancellationReason;
 use Illuminate\Http\Request;
@@ -10,10 +11,18 @@ class CancellationReasonController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Cancellation Reason';
-        $reasons = CancellationReason::latest()->paginate(getPaginate());
+        $pageTitle = 'Rider Cancellation Reason';
+        $reasons = CancellationReason::where('for', Status::RIDER)->latest()->paginate(getPaginate());
 
-        return view('admin.cancellation_reason.index', compact('pageTitle', 'reasons'));
+        return view('admin.cancellation_reason.rider', compact('pageTitle', 'reasons'));
+    }
+
+    public function driver()
+    {
+        $pageTitle = 'Driver Cancellation Reason';
+        $reasons = CancellationReason::where('for', Status::DRIVER)->latest()->paginate(getPaginate());
+
+        return view('admin.cancellation_reason.driver', compact('pageTitle', 'reasons'));
     }
 
     public function store(Request $request, $id = 0)

@@ -403,13 +403,6 @@
 
                 <!-- Vehicle Management Start -->
 
-
-                <li class="sidebar-menu-item {{menuActive(['admin.cancellation.*'],3)}} ">
-                    <a href="{{route('admin.cancellation.rider.index')}}" class="nav-link">
-                        <i class="menu-icon las la-window-close"></i>
-                        <span class="menu-title">@lang('Cancellation Reason')</span>
-                    </a>
-                </li>
                 <!-- Vehicle Management End -->
 
                 <li class="sidebar-menu-item {{menuActive('admin.setting.index')}}">
@@ -417,6 +410,34 @@
                         <i class="menu-icon las la-life-ring"></i>
                         <span class="menu-title">@lang('General Setting')</span>
                     </a>
+                </li>
+
+
+
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a href="javascript:void(0)" class="{{menuActive('admin.cancellation.*',3)}}">
+                        <i class="menu-icon la la-list"></i>
+                        <span class="menu-title">@lang('Cancellation') </span>
+                    </a>
+                    <div class="sidebar-submenu {{menuActive(['admin.cancellation.rider.*', 'admin.cancellation.driver.*'],2)}} ">
+                        <ul>
+
+                            <li class="sidebar-menu-item {{menuActive(['admin.cancellation.rider.index'])}} ">
+                                <a href="{{route('admin.cancellation.rider.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-window-close"></i>
+                                    <span class="menu-title">@lang('Rider Reason')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive(['admin.cancellation.driver.index'])}} ">
+                                <a href="{{route('admin.cancellation.driver.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-window-close"></i>
+                                    <span class="menu-title">@lang('Driver Reason')</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
                 </li>
 
                 <li class="sidebar-menu-item {{ menuActive('admin.cron*') }}">

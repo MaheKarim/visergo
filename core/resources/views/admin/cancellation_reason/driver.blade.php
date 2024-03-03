@@ -9,63 +9,61 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Color Name')</th>
-                                <th>@lang('Color Code')</th>
+                                <th>@lang('For')</th>
+                                <th>@lang('Reason')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @forelse($vehicleColors as $color)
+                            @forelse($reasons as $reason)
                                 <tr>
                                     <td>
-                                        <span class="fw-bold">{{ __($color->name) }}</span>
+                                        <span class="fw-bold">{{ $reason->for == Status::DRIVER ? 'Driver' : 'Rider' }}</span>
                                     </td>
                                     <td>
-                                      {{ __($color->color) }}
+                                        {{ __($reason->reason) }}
                                     </td>
+
                                     <td>
                                         @php
-                                            echo $color->statusBadge
+                                            echo $reason->statusBadge
                                         @endphp
                                     </td>
-
                                     <td>
                                         <div class="button--group">
-                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update Color')" data-resource="{{ $color }}">
+                                            <button class="btn btn-outline--primary cuModalBtn btn-sm"
+                                                    data-modal_title="@lang('Update')" data-resource="{{ $reason }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
-
-                                            @if($color->status == Status::DISABLE)
+                                            @if($reason->status == Status::DISABLE)
                                                 <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
-                                                        data-question="@lang('Are you sure to enable this vehicle type?')"
-                                                        data-action="{{ route('admin.vehicle.color.status',$color->id) }}">
+                                                        data-question="@lang('Are you sure to enable this cancellation reason?')"
+                                                        data-action="{{ route('admin.cancellation.status',$reason->id) }}">
                                                     <i class="la la-eye"></i> @lang('Enable')
                                                 </button>
                                             @else
                                                 <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn"
-                                                        data-question="@lang('Are you sure to disable this vehicle type?')"
-                                                        data-action="{{ route('admin.vehicle.color.status',$color->id) }}">
+                                                        data-question="@lang('Are you sure to disable this cancellation reason?')"
+                                                        data-action="{{ route('admin.cancellation.status',$reason->id) }}">
                                                     <i class="la la-eye-slash"></i> @lang('Disable')
                                                 </button>
                                             @endif
                                         </div>
                                     </td>
-
                                 </tr>
                             @empty
                                 <tr>
                                     <td class="text-muted text-center" colspan="100%">{{ __($emptyMessage) }}</td>
                                 </tr>
                             @endforelse
-
                             </tbody>
                         </table><!-- table end -->
                     </div>
                 </div>
-                @if ($vehicleColors->hasPages())
+                @if ($reasons->hasPages())
                     <div class="card-footer py-4">
-                        {{ paginateLinks($vehicleColors) }}
+                        {{ paginateLinks($reasons) }}
                     </div>
                 @endif
             </div>
@@ -79,19 +77,13 @@
                             <i class="las la-times"></i>
                         </button>
                     </div>
-                    <form action="{{ route('admin.vehicle.color.store' )}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.cancellation.store' )}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
-                            <div class="form-group">
-                                <label>@lang('Name')</label>
-                                <input class="form-control" name="name" type="text" required>
-                            </div>
-                            <label> @lang('Color')</label>
-                            <div class="input-group">
-                                    <span class="input-group-text p-0 border-0">
-                                        <input type='text' class="form-control colorPicker"/>
-                                    </span>
-                                <input type="text" class="form-control colorCode" name="color"/>
+                            <input type="hidden" name="for" value="{{ Status::DRIVER }}">
+                            <div class="from-group">
+                                <label>@lang('Reason')</label>
+                                <input class="form-control" name="reason" type="text" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -105,40 +97,7 @@
     </div>
 @endsection
 
-@push('script-lib')
-    <script src="{{ asset('assets/admin/js/spectrum.js') }}"></script>
-@endpush
-
-@push('style-lib')
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/spectrum.css') }}">
-@endpush
-
 @push('breadcrumb-plugins')
-    <x-search-form placeholder="Vehicle Color"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Color')"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Reason')"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush
-
-@push('script')
-    <script>
-        (function ($) {
-            "use strict";
-
-            $('.colorPicker').spectrum({
-                color: $(this).data('color'),
-                change: function (color) {
-                    $(this).parent().siblings('.colorCode').val(color.toHexString().replace(/^#?/, ''));
-                }
-            });
-
-            $('.colorCode').on('input', function () {
-                var clr = $(this).val();
-                $(this).parents('.input-group').find('.colorPicker').spectrum({
-                    color: clr,
-                });
-            });
-        })(jQuery);
-
-    </script>
-@endpush
-

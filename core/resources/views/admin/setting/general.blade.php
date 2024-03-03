@@ -60,8 +60,6 @@
                             </div>
                         </div>
 
-
-
                         <div class="form-group">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
                         </div>

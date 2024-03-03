@@ -80,13 +80,7 @@
                     <form action="{{ route('admin.cancellation.store' )}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
-                            <div class="form-group">
-                                <label>@lang('Reason For')</label>
-                                <select class="form-control" name="for" required>
-                                    <option value="{{ Status::RIDER }}">@lang('Rider')</option>
-                                    <option value="{{ Status::DRIVER }}">@lang('Driver')</option>
-                                </select>
-                            </div>
+                            <input type="hidden" name="for" value="{{ Status::RIDER }}">
                             <div class="from-group">
                                 <label>@lang('Reason')</label>
                                 <input class="form-control" name="reason" type="text" required>

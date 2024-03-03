@@ -20,6 +20,7 @@ class VehicleColorController extends Controller
     {
         $request->validate([
             'name' => 'required|max:40',
+            'color' => 'nullable|regex:/^[a-f0-9]{6}$/i',
         ]);
 
         if (!$id) {
@@ -31,6 +32,7 @@ class VehicleColorController extends Controller
         }
 
         $color->name = $request->name;
+        $color->color = str_replace('#','',$request->color);;
         $color->save();
 
         $notify[] = ['success', $notification];
