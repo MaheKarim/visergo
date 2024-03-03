@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 
-class BrandManagementController extends Controller
+class BrandController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Brand Management';
+        $pageTitle = 'All Brands';
 
         $brands = Brand::latest()->searchable(['name'])->paginate(getPaginate());
         return view('admin.brand.index', compact('pageTitle', 'brands'));
@@ -24,7 +24,7 @@ class BrandManagementController extends Controller
     public function store(Request $request, $id = 0)
     {
         $request->validate([
-           'name' => 'required|max:40|min:3',
+           'name' => 'required|max:40',
         ]);
 
         if(!$id) {

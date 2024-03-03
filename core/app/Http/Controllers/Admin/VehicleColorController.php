@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\VehicleColor;
 use Illuminate\Http\Request;
 
-class VehicleColorManagementController extends Controller
+class VehicleColorController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Vehicle Color Management';
+        $pageTitle = 'All Vehicle Colors';
         $vehicleColors = VehicleColor::latest()->searchable(['name'])->paginate(getPaginate());
 
         return view('admin.vehicle_color.index', compact('pageTitle', 'vehicleColors'));
@@ -19,7 +19,7 @@ class VehicleColorManagementController extends Controller
     public function store(Request $request, $id = 0)
     {
         $request->validate([
-            'name' => 'required|max:40|min:0',
+            'name' => 'required|max:40',
         ]);
 
         if (!$id) {

@@ -10,28 +10,29 @@ use App\Models\VehicleModel;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
 
-class ModelManagementController extends Controller
+class VehicleModelController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Model Management';
-        $models =  VehicleModel::latest()->with(['vehicleType', 'vehicleClass', 'brand', 'colors'])
-            ->searchable(['model'])->paginate(getPaginate());
-        $types = VehicleType::active()->get();
-        $brands = Brand::active()->get();
-        $classes = VehicleClass::active()->get();
-        $colors = VehicleColor::active()->get();
+        $pageTitle = 'All Models';
+        $models =  VehicleModel::latest()->with(['vehicleType', 'vehicleClass', 'brand', 'colors'])->searchable(['name'])->paginate(getPaginate());
+        $types = VehicleType::get();
+        $brands = Brand::get();
+        $classes = VehicleClass::get();
+        $colors = VehicleColor::get();
 
-        return view('admin.model.index', compact('pageTitle', 'models', 'types', 'brands', 'classes', 'colors'));
+        return view('admin.vehicle_model.index', compact('pageTitle', 'models', 'types', 'brands', 'classes', 'colors'));
     }
+
+
 
     public function store(Request $request, $id = 0)
     {
        $request->validate([
+           'name' => 'required',
            'vehicle_type_id' => 'required',
            'vehicle_class_id' => 'required',
            'brand_id' => 'required',
-           'model' => 'required',
            'year' => 'required',
        ]);
 
@@ -46,7 +47,7 @@ class ModelManagementController extends Controller
        $model->vehicle_type_id = $request->vehicle_type_id;
        $model->vehicle_class_id = $request->vehicle_class_id;
        $model->brand_id = $request->brand_id;
-       $model->model = $request->model;
+       $model->name = $request->name;
        $model->year = $request->year;
 
        $model->save();

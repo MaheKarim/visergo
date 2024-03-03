@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\VehicleClass;
 use Illuminate\Http\Request;
 
-class VehicleClassManagementController extends Controller
+class VehicleClassController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Vehicle Class Management';
+        $pageTitle = 'All Vehicle Class';
         $vehicleClasses = VehicleClass::latest()->searchable(['name'])->paginate(getPaginate());
 
         return view('admin.vehicle_class.index', compact('pageTitle', 'vehicleClasses'));
@@ -19,8 +19,8 @@ class VehicleClassManagementController extends Controller
     public function store(Request $request, $id = 0)
     {
         $request->validate([
-            'name' => 'required|max:40|min:0',
-            'class_base_fare' => 'required|numeric|gte:0',
+            'name' => 'required|max:40',
+            'base_fare' => 'required|numeric|gte:0',
         ]);
 
         if (!$id) {
@@ -32,7 +32,7 @@ class VehicleClassManagementController extends Controller
         }
 
         $class->name = $request->name;
-        $class->class_base_fare = $request->class_base_fare;
+        $class->base_fare = $request->base_fare;
         $class->save();
 
         $notify[] = ['success', $notification];

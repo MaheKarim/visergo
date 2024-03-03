@@ -9,7 +9,7 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Class')</th>
+                                <th>@lang('Class Name')</th>
                                 <th>@lang('Base Fare')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
@@ -22,7 +22,7 @@
                                         <span class="fw-bold">{{ __($class->name) }}</span>
                                     </td>
                                     <td>
-                                        {{ __(showAmount($class->class_base_fare)) }} {{ $general->cur_text }}
+                                        {{ __(showAmount($class->base_fare)) }} {{ $general->cur_text }}
                                     </td>
 
                                     <td>
@@ -33,10 +33,10 @@
 
                                     <td>
                                         <div class="button--group">
-                                            <button class="btn btn-outline--primary cuModalBtn btn-sm"
-                                                    data-modal_title="@lang('Update')" data-resource="{{ $class }}">
+                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update Vehcile Class')" data-resource="{{ $class }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
+
                                             @if($class->status == Status::DISABLE)
                                                 <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
                                                         data-question="@lang('Are you sure to enable this vehicle type?')"
@@ -84,12 +84,16 @@
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>@lang('Vehicle type')</label>
+                                <label>@lang('Name')</label>
                                 <input class="form-control" name="name" type="text" required>
                             </div>
+
                             <div class="form-group">
                                 <label>@lang('Base Fare')</label>
-                                <input class="form-control" name="class_base_fare" type="number" required>
+                                <div class="input-group">
+                                    <input class="form-control" name="base_fare" type="number" required>
+                                    <span class="input-group-text">{{__($general->cur_text)}}</span>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -105,6 +109,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Vehicle Class"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Vehicle Class')"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

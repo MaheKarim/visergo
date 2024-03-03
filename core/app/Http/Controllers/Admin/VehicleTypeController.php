@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
 
-class VehicleTypeManagementController extends Controller
+class VehicleTypeController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Vehicle Type Management';
+        $pageTitle = 'All Vehicle Types';
         $vehicles = VehicleType::latest()->searchable(['name'])->paginate(getPaginate());
 
         return view('admin.vehicle_type.index', compact('pageTitle', 'vehicles'));
@@ -21,10 +21,10 @@ class VehicleTypeManagementController extends Controller
         $request->validate([
             'name' => 'required',
             'base_fare' => 'required|numeric|min:0',
-            'ride_per_km_cost' => 'required|numeric|min:0',
-            'intercity_per_km_cost' => 'required|numeric|min:0',
-            'rental_per_km_cost' => 'required|numeric|min:0',
-            'reserve_per_km_cost' => 'required|numeric|min:0',
+            'ride_fare_per_km' => 'required|numeric|min:0',
+            'intercity_fare_per_km' => 'required|numeric|min:0',
+            'rental_fare_per_km' => 'required|numeric|min:0',
+            'reserve_fare_per_km' => 'required|numeric|min:0',
         ]);
 
         if (!$id) {
@@ -37,10 +37,10 @@ class VehicleTypeManagementController extends Controller
 
         $vehicle->name = $request->name;
         $vehicle->base_fare = $request->base_fare;
-        $vehicle->ride_per_km_cost = $request->ride_per_km_cost;
-        $vehicle->intercity_per_km_cost = $request->intercity_per_km_cost;
-        $vehicle->rental_per_km_cost = $request->rental_per_km_cost;
-        $vehicle->reserve_per_km_cost = $request->reserve_per_km_cost;
+        $vehicle->ride_fare_per_km = $request->ride_fare_per_km;
+        $vehicle->intercity_fare_per_km = $request->intercity_fare_per_km;
+        $vehicle->rental_fare_per_km = $request->rental_fare_per_km;
+        $vehicle->reserve_fare_per_km = $request->reserve_fare_per_km;
         $vehicle->save();
 
         $notify[] = ['success', $notification];

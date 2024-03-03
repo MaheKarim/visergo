@@ -112,6 +112,53 @@
                 </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
+                    <a href="javascript:void(0)" class="{{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],3)}}">
+                        <i class="menu-icon la la-automobile"></i>
+                        <span class="menu-title">@lang('Vehicle Settings')</span>
+                    </a>
+                    <div class="sidebar-submenu {{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],2)}} ">
+                        <ul>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.type.*')}} ">
+                                <a href="{{route('admin.vehicle.type.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Type')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.class.*')}} ">
+                                <a href="{{route('admin.vehicle.class.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Class')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.brands.*')}} ">
+                                <a href="{{route('admin.brands.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Brands')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.color.*')}} ">
+                                <a href="{{route('admin.vehicle.color.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Color')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.model.index')}} ">
+                                <a href="{{route('admin.model.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Model Management')</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
+
+                <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{menuActive('admin.gateway*',3)}}">
                         <i class="menu-icon las la-credit-card"></i>
                         <span class="menu-title">@lang('Payment Gateways')</span>
@@ -356,51 +403,6 @@
 
                 <!-- Vehicle Management Start -->
 
-                <li class="sidebar-menu-item sidebar-dropdown">
-                    <a href="javascript:void(0)" class="{{menuActive('admin.vehicle.*',2)}}">
-                        <i class="menu-icon la la-automobile"></i>
-                        <span class="menu-title">@lang('Vehicle Settings')</span>
-                    </a>
-                    <div class="sidebar-submenu {{menuActive('admin.vehicle.*',2)}} ">
-                        <ul>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.type.*')}} ">
-                                <a href="{{route('admin.vehicle.type.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Type')</span>
-                                </a>
-                            </li>
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.class.*')}} ">
-                                <a href="{{route('admin.vehicle.class.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Class')</span>
-                                </a>
-                            </li>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.brands.*')}} ">
-                                <a href="{{route('admin.brands.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Brands')</span>
-                                </a>
-                            </li>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.color.*')}} ">
-                                <a href="{{route('admin.vehicle.color.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Color')</span>
-                                </a>
-                            </li>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.model.index')}} ">
-                                <a href="{{route('admin.model.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Model Management')</span>
-                                </a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </li>
 
                 <li class="sidebar-menu-item {{menuActive('admin.cancellation.index')}} ">
                     <a href="{{route('admin.cancellation.index')}}" class="nav-link">

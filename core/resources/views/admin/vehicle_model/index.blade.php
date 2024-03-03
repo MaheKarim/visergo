@@ -9,10 +9,10 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
+                                <th>@lang('Model Name')</th>
                                 <th>@lang('Vehicle Type')</th>
                                 <th>@lang('Vehicle Class')</th>
                                 <th>@lang('Brand')</th>
-                                <th>@lang('Model')</th>
                                 <th>@lang('Year')</th>
                                 <th>@lang('Color')</th>
                                 <th>@lang('Status')</th>
@@ -23,24 +23,25 @@
                             @forelse($models as $model)
                                 <tr>
                                     <td>
-                                        <span class="fw-bold"> {{ __($model->vehicleType->name) }} </span>
+                                        {{ __($model->name) }}
+                                    </td>
+
+                                    <td>
+                                         {{ __($model->vehicleType->name) }}
                                     </td>
                                     <td>
-                                        <span class="fw-bold"> {{ __($model->vehicleClass->name) }} </span>
+                                         {{ __($model->vehicleClass->name) }}
                                     </td>
                                     <td>
-                                        <span class="fw-bold">{{ __($model->brand->name) }}</span>
+                                        {{ __($model->brand->name) }}
                                     </td>
-                                    <td>
-                                        <span class="fw-bold">{{ __($model->model) }}</span>
-                                    </td>
-                                    <td>
-                                        @foreach($model->colors as $color)
-                                        {{ __($color->name) }}
-                                        @endforeach
-                                    </td>
+
                                     <td>
                                         {{ __($model->year) }}
+                                    </td>
+
+                                    <td>
+                                        {{implode(',', $model->colors->pluck('name')->toArray())}}
                                     </td>
 
                                     <td>
@@ -52,7 +53,7 @@
                                     <td>
                                         <div class="button--group">
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
-                                                    data-modal_title="@lang('Update')" data-resource="{{ $model }}">
+                                                    data-modal_title="@lang('Update Vehicle Model')" data-resource="{{ $model }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
                                             @if($model->status == Status::DISABLE)
@@ -129,7 +130,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>@lang('Model')</label>
+                                <label>@lang('Model Name')</label>
                                 <input class="form-control" name="model" type="text" required>
                             </div>
 
@@ -162,6 +163,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Year"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="Add new vehicle model"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

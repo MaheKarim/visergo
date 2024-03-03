@@ -9,7 +9,7 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Color')</th>
+                                <th>@lang('Color Name')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
@@ -29,10 +29,10 @@
 
                                     <td>
                                         <div class="button--group">
-                                            <button class="btn btn-outline--primary cuModalBtn btn-sm"
-                                                    data-modal_title="@lang('Update')" data-resource="{{ $color }}">
+                                            <button class="btn btn-outline--primary cuModalBtn btn-sm" data-modal_title="@lang('Update Color')" data-resource="{{ $color }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
+
                                             @if($color->status == Status::DISABLE)
                                                 <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
                                                         data-question="@lang('Are you sure to enable this vehicle type?')"
@@ -80,7 +80,7 @@
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>@lang('Vehicle type')</label>
+                                <label>@lang('Name')</label>
                                 <input class="form-control" name="name" type="text" required>
                             </div>
 
@@ -98,6 +98,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Vehicle Color"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Color')"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

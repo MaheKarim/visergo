@@ -9,7 +9,7 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Type')</th>
+                                <th>@lang('Type Name')</th>
                                 <th>@lang('Base Fare')</th>
                                 <th>@lang('Ride Cost / km')</th>
                                 <th>@lang('Intercity / km')</th>
@@ -29,16 +29,16 @@
                                         {{ __(showAmount($vehicle->base_fare)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
-                                        {{ __(showAmount($vehicle->ride_per_km_cost)) }} {{ $general->cur_text }}
+                                        {{ __(showAmount($vehicle->ride_fare_per_km)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
-                                        {{ __(showAmount($vehicle->intercity_per_km_cost)) }} {{ $general->cur_text }}
+                                        {{ __(showAmount($vehicle->intercity_fare_per_km)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
-                                        {{ __(showAmount($vehicle->rental_per_km_cost)) }} {{ $general->cur_text }}
+                                        {{ __(showAmount($vehicle->rental_fare_per_km)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
-                                        {{ __(showAmount($vehicle->reserve_per_km_cost)) }} {{ $general->cur_text }}
+                                        {{ __(showAmount($vehicle->reserve_fare_per_km)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
                                         @php
@@ -49,9 +49,10 @@
                                     <td>
                                         <div class="button--group">
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
-                                                    data-modal_title="@lang('Update')" data-resource="{{ $vehicle }}">
+                                                    data-modal_title="@lang('Update Vehicle Type')" data-resource="{{ $vehicle }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
+
                                             @if($vehicle->status == Status::DISABLE)
                                                 <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
                                                         data-question="@lang('Are you sure to enable this vehicle type?')"
@@ -99,7 +100,7 @@
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>@lang('Vehicle type')</label>
+                                <label>@lang('Type Name')</label>
                                 <input class="form-control" name="name" type="text" required>
                             </div>
                             <div class="form-group">
@@ -107,20 +108,20 @@
                                 <input class="form-control" name="base_fare" type="number" required>
                             </div>
                             <div class="form-group">
-                                <label>@lang('Ride (Cost / km)')</label>
-                                <input class="form-control" name="ride_per_km_cost" type="number" required>
+                                <label>@lang('Ride Fare /km')</label>
+                                <input class="form-control" name="ride_fare_per_km" type="number" required>
                             </div>
                             <div class="form-group">
-                                <label>@lang('Intercity (Cost / km)')</label>
-                                <input class="form-control" name="intercity_per_km_cost" type="number" required>
+                                <label>@lang('Intercity Fare /km')</label>
+                                <input class="form-control" name="intercity_fare_per_km" type="number" required>
                             </div>
                             <div class="form-group">
-                                <label>@lang('Rental (Cost / km)')</label>
-                                <input class="form-control" name="rental_per_km_cost" type="number" required>
+                                <label>@lang('Rental Fare /km')</label>
+                                <input class="form-control" name="rental_fare_per_km" type="number" required>
                             </div>
                             <div class="form-group">
-                                <label>@lang('Reserve (Cost / km)')</label>
-                                <input class="form-control" name="reserve_per_km_cost" type="number" required>
+                                <label>@lang('Reserve Fare /km')</label>
+                                <input class="form-control" name="reserve_fare_per_km" type="number" required>
                             </div>
 
                         </div>
@@ -136,7 +137,6 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-search-form placeholder="Vehicle Type"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
-    </button>
+    <x-search-form placeholder="Type Name"/>
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Vehicle Type')"><i class="las la-plus"></i>@lang('Add New')</button>
 @endpush
