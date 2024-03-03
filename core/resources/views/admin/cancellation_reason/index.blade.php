@@ -30,7 +30,6 @@
                                             echo $reason->statusBadge
                                         @endphp
                                     </td>
-
                                     <td>
                                         <div class="button--group">
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
@@ -105,6 +104,6 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Reason')"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

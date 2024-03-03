@@ -49,7 +49,8 @@
                                     <td>
                                         <div class="button--group">
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
-                                                    data-modal_title="@lang('Update Vehicle Type')" data-resource="{{ $vehicle }}">
+                                                    data-modal_title="@lang('Update Vehicle Type')"
+                                                    data-resource="{{ $vehicle }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
                                             </button>
 
@@ -105,23 +106,37 @@
                             </div>
                             <div class="form-group">
                                 <label>@lang('Base Fare')</label>
-                                <input class="form-control" name="base_fare" type="number" required>
+                                <div class="input-group">
+                                    <input class="form-control" name="base_fare" type="number" required>
+                                    <span class="input-group-text">{{ $general->cur_text }}</span>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>@lang('Ride Fare /km')</label>
-                                <input class="form-control" name="ride_fare_per_km" type="number" required>
+                                <div class="input-group">
+                                    <input class="form-control" name="ride_fare_per_km" type="number" required>
+                                    <span class="input-group-text">{{ $general->cur_text }}</span>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>@lang('Intercity Fare /km')</label>
+                                <div class="input-group">
                                 <input class="form-control" name="intercity_fare_per_km" type="number" required>
+                                    <span class="input-group-text">{{ $general->cur_text }}</span>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>@lang('Rental Fare /km')</label>
+                                <div class="input-group">
                                 <input class="form-control" name="rental_fare_per_km" type="number" required>
+                                    <span class="input-group-text">{{ $general->cur_text }}</span></div>
                             </div>
                             <div class="form-group">
                                 <label>@lang('Reserve Fare /km')</label>
-                                <input class="form-control" name="reserve_fare_per_km" type="number" required>
+                                <div class="input-group">
+                                    <input class="form-control" name="reserve_fare_per_km" type="number" required>
+                                    <span class="input-group-text">{{ $general->cur_text }}</span>
+                                </div>
                             </div>
 
                         </div>
@@ -138,5 +153,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Type Name"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Vehicle Type')"><i class="las la-plus"></i>@lang('Add New')</button>
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"
+            data-modal_title="@lang('Add New Vehicle Type')"><i class="las la-plus"></i>@lang('Add New')</button>
 @endpush

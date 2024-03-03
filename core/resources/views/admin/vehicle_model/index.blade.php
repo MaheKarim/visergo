@@ -131,7 +131,7 @@
 
                             <div class="form-group">
                                 <label>@lang('Model Name')</label>
-                                <input class="form-control" name="model" type="text" required>
+                                <input class="form-control" name="name" type="text" required>
                             </div>
 
                             <div class="form-group">
