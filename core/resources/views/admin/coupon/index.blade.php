@@ -32,7 +32,7 @@
                                         {{ $coupon->discount_type == Status::PERCENTAGE ? __('Percent (%)') : __('Fixed') }}
                                     </td>
                                     <td>{{ __(date($coupon->start_at)) }}</td>
-                                    <td>{{ __(date($coupon->expire_at)) }}</td>
+                                    <td>{{ __(date($coupon->expired_at)) }}</td>
                                     <td>{{ __(strLimit($coupon->description)) }} </td>
                                     <td>
                                         <div class="button--group">
@@ -93,7 +93,7 @@
                             </div>
                             <div class="form-group">
                                 <label>@lang('Expire at')</label>
-                                <input class="form-control" name="expire_at" type="date" required>
+                                <input class="form-control" name="expired_at" type="date" required>
                             </div>
 
                             <div class="form-group">

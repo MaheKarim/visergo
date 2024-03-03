@@ -404,8 +404,8 @@
                 <!-- Vehicle Management Start -->
 
 
-                <li class="sidebar-menu-item {{menuActive('admin.cancellation.index')}} ">
-                    <a href="{{route('admin.cancellation.index')}}" class="nav-link">
+                <li class="sidebar-menu-item {{menuActive(['admin.cancellation.*'],3)}} ">
+                    <a href="{{route('admin.cancellation.rider.index')}}" class="nav-link">
                         <i class="menu-icon las la-window-close"></i>
                         <span class="menu-title">@lang('Cancellation Reason')</span>
                     </a>

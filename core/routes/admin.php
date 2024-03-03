@@ -330,7 +330,8 @@ Route::middleware('admin')->group(function () {
     });
     // Cancellation Reason
     Route::controller('CancellationReasonController')->name('cancellation.')->prefix('cancellation')->group(function () {
-        Route::get('/', 'index')->name('index');
+        Route::get('/rider', 'index')->name('rider.index');
+        Route::get('/driver', 'driver')->name('driver.index');
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
