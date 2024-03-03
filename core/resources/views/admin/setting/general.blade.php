@@ -59,6 +59,25 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>@lang('Reward Per Cost')</label>
+                                <div class="form-group">
+                                   <div class="input-group">
+                                       <input class="form-control" type="number" name="spend_amount_for_reward" required min="0" value="{{ showAmount($general->spend_amount_for_reward) }}" placeholder="Reward amount per cost">
+                                       <span class="input-group-text">{{ $general->cur_text }}</span>
+                                   </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>@lang('Point')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="reward_point" required min="0" value="{{ showAmount($general->reward_point) }}" placeholder="Reward point">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="form-group">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
