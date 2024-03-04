@@ -74,7 +74,7 @@ class ZoneController extends Controller
         $zone->save();
 
         $notify[] = ['success', $notification];
-        return back()->withNotify($notify);
+        return to_route('admin.zone.index')->withNotify($notify);
     }
 
     public function status($id)
