@@ -335,5 +335,14 @@ Route::middleware('admin')->group(function () {
         Route::post('edit/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
+    // Zone Controller
+    Route::controller('ZoneController')->name('zone.')->prefix('zone')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('create/{id?}', 'create')->name('create');
+        Route::post('save/{id?}', 'save')->name('save');
+        Route::post('status/{id}', 'status')->name('status');
+    });
+
+
 });
 

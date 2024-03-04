@@ -18,6 +18,7 @@
         "laravel/tinker": "^2.7",
         "laravel/ui": "^3.4",
         "mailjet/mailjet-apiv3-php": "^1.4",
+        "matanyadaev/laravel-eloquent-spatial": "^2.1",
         "messagebird/php-rest-api": "^1.20",
         "mollie/laravel-mollie": "^2.14",
         "phpmailer/phpmailer": "^6.2",

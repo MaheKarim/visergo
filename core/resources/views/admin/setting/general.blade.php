@@ -79,6 +79,16 @@
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-12">
+                            <label>@lang('Google Location API Key')</label>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" name="location_api" required
+                                           value="{{$general->location_api}}">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
                         </div>

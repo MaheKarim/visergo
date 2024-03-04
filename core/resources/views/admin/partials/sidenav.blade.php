@@ -157,6 +157,13 @@
                     </div>
                 </li>
 
+                <li class="sidebar-menu-item  {{menuActive('admin.zone.*')}}">
+                    <a href="{{route('admin.zone.index')}}" class="nav-link"
+                       data-default-url="{{ route('admin.zone.index') }}">
+                        <i class="menu-icon las la-map"></i>
+                        <span class="menu-title">@lang('Zone') </span>
+                    </a>
+                </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{menuActive('admin.gateway*',3)}}">
