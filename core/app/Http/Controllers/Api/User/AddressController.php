@@ -49,14 +49,6 @@ class AddressController extends Controller
     {
         $addresses = UserAddress::where('user_id',auth()->user()->id)->get();
 
-        if ($addresses->isEmpty()) {
-            $notify[] = 'No address found';
-            return response()->json([
-                'remark'=>'no_address',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
-            ]);
-        }
         return response()->json([
             'remark'=>'address',
             'status'=>'success',
