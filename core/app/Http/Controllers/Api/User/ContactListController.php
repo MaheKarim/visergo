@@ -53,7 +53,7 @@ class ContactListController extends Controller
         }
 
         $contact = new ContactList();
-        $contact->user_id = auth()->user()->id();
+        $contact->user_id = auth()->id();
         $contact->name = $request->name;
         $contact->mobile = $request->mobile;
         $contact->save();

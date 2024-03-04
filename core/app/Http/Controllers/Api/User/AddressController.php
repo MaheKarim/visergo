@@ -28,7 +28,7 @@ class AddressController extends Controller
         }
 
         $address = new UserAddress();
-        $address->user_id = auth()->user()->id();
+        $address->user_id = auth()->id();
         $address->address = $request->address;
         $address->title = strtoupper($request->title);
         $address->longitude = $request->longitude;
