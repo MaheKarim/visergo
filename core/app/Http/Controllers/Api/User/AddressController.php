@@ -27,10 +27,8 @@ class AddressController extends Controller
             ]);
         }
 
-        $user = auth()->user();
-
         $address = new UserAddress();
-        $address->user_id = $user->id;
+        $address->user_id = auth()->user()->id();
         $address->address = $request->address;
         $address->title = strtoupper($request->title);
         $address->longitude = $request->longitude;
@@ -68,7 +66,14 @@ class AddressController extends Controller
 
     public function addressUpdate(Request $request, $id)
     {
-
+        $address = UserAddress::where('user_id', auth()->user()->id)->find($id);
+        if (!$address) {
+            return response()->json([
+                'remark' => 'address_not_found',
+                'status' => 'error',
+                'message' => ['error' => 'Address not found'],
+            ]);
+        }
         $validator = Validator::make($request->all(), [
             'address'=>'required',
             'title'=>'required',
@@ -84,7 +89,6 @@ class AddressController extends Controller
             ]);
         }
 
-        $address = UserAddress::find($id);
         $address->address = $request->address;
         $address->title = strtoupper($request->title);
         $address->longitude = $request->longitude;
@@ -102,9 +106,8 @@ class AddressController extends Controller
 
     public function addressDelete($id)
     {
-        $user = auth()->user();
 
-        $address = UserAddress::where('user_id', $user->id)->find($id);
+        $address = UserAddress::where('user_id', auth()->user()->id)->find($id);
 
         if(!$address) {
             return response()->json([

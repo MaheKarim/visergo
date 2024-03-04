@@ -38,6 +38,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserAddress::class);
     }
+    public function contactList()
+    {
+        return $this->hasMany(ContactList::class);
+    }
 
     public function loginLogs()
     {
