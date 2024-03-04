@@ -35,7 +35,9 @@ class Status{
     const KYC_VERIFIED = 1;
 
     const RIDE_ACTIVE = 1;
-    const RIDE_CLOSE = 0;
+    const RIDE_INITIATED = 2;
+    const RIDE_CLOSE = 3;
+    const RIDE_COMPLETED = 4;
 
     const RIDE = 1;
     const INTER_CITY = 2;

@@ -142,6 +142,11 @@ Route::namespace('Api')->name('api.')->group(function(){
                        Route::post('contact/update/{id}', 'contactUpdate')->name('contact.update');
                        Route::post('contact/delete/{id}', 'contactDelete')->name('contact.delete');
                    });
+                   // Ride Request Controller
+                   Route::controller('RideController')->name('ride.')->group(function(){
+                       Route::get('ride', 'ride')->name('ride');
+                       Route::post('ride/create', 'rideRequest')->name('ride.insert');
+                   });
                });
             });
         });
