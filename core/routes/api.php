@@ -165,7 +165,7 @@ Route::namespace('Api')->name('api.')->group(function(){
         Route::post('driver/login', 'DriverLoginController@login')->name('driver.login');  // WIP
         Route::post('driver/register', 'DriverRegisterController@register');
 
-        // NOT WORKING RIGHT NOW
+                                        // NOT WORKING RIGHT NOW
         Route::controller('DriverForgotPasswordController')->name('driver.')->group(function(){
             Route::post('password/email', 'sendResetCodeEmail')->name('password.email');
             Route::post('password/verify-code', 'verifyCode')->name('password.verify.code');
