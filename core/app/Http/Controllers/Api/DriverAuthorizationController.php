@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Validator;
 
 class DriverAuthorizationController extends Controller
 {
-    protected function checkCodeValidity($user,$addMin = 2){
-        if (!$user->ver_code_send_at){
+    protected function checkCodeValidity($user, $addMin = 2)
+    {
+        if (!$user->ver_code_send_at) {
             return false;
         }
         if ($user->ver_code_send_at->addMinutes($addMin) < Carbon::now()) {
@@ -71,7 +72,7 @@ class DriverAuthorizationController extends Controller
 
     public function sendVerifyCode($type)
     {
-        $user = auth()->guard('driver')->user();
+        $user = auth()->user();
 
         if ($this->checkCodeValidity($user)) {
             $targetTime = $user->ver_code_send_at->addMinutes(2)->timestamp;

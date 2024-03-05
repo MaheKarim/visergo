@@ -62,7 +62,7 @@ class DriverController extends Controller
 
     public function kycForm()
     {
-        if (auth()->guard('driver')->user()->kv == 2) {
+        if (auth()->user()->kv == 2) {
             $notify[] = 'Your KYC is under review';
             return response()->json([
                 'remark'=>'under_review',
@@ -70,7 +70,7 @@ class DriverController extends Controller
                 'message'=>['error'=>$notify],
             ]);
         }
-        if (auth()->guard('driver')->user()->kv == 1) {
+        if (auth()->user()->kv == 1) {
             $notify[] = 'You are already KYC verified';
             return response()->json([
                 'remark'=>'already_verified',
@@ -108,7 +108,7 @@ class DriverController extends Controller
         }
 
         $userData = $formProcessor->processFormData($request, $formData);
-        $user = auth()->guard('driver')->user();
+        $user = auth()->user();
         $user->kyc_data = $userData;
         $user->kv = 2;
         $user->save();
@@ -189,7 +189,7 @@ class DriverController extends Controller
             ]);
         }
 
-        $user = auth()->guard('driver')->user();
+        $user = auth()->user();
 
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
