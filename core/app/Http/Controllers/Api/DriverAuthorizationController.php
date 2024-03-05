@@ -21,24 +21,32 @@ class DriverAuthorizationController extends Controller
 
     public function authorization()
     {
-        $user = auth()->guard('driver')->user();
-        dd($user->status);
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json([
+                'remark' => 'user_not_found',
+                'status' => 'error',
+                'message' => ['error' => 'User not found or not authenticated'],
+            ]);
+        }
+
         if (!$user->status) {
             $type = 'ban';
-        }elseif(!$user->ev) {
+        } elseif (!$user->ev) {
             $type = 'email';
             $notifyTemplate = 'EVER_CODE';
-        }elseif (!$user->sv) {
+        } elseif (!$user->sv) {
             $type = 'sms';
             $notifyTemplate = 'SVER_CODE';
-        }elseif (!$user->tv) {
+        } elseif (!$user->tv) {
             $type = '2fa';
-        }else{
+        } else {
             $notify[] = 'You are already verified';
             return response()->json([
-                'remark'=>'already_verified',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
+                'remark' => 'already_verified',
+                'status' => 'error',
+                'message' => ['error' => $notify],
             ]);
         }
 
@@ -48,14 +56,14 @@ class DriverAuthorizationController extends Controller
             $user->save();
             notify($user, $notifyTemplate, [
                 'code' => $user->ver_code
-            ],[$type]);
+            ], [$type]);
         }
 
         $notify[] = 'Verify your account';
         return response()->json([
-            'remark'=>'code_sent',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
+            'remark' => 'code_sent',
+            'status' => 'success',
+            'message' => ['success' => $notify],
         ]);
 
     }
@@ -65,16 +73,15 @@ class DriverAuthorizationController extends Controller
     {
         $user = auth()->guard('driver')->user();
 
-
         if ($this->checkCodeValidity($user)) {
             $targetTime = $user->ver_code_send_at->addMinutes(2)->timestamp;
             $delay = $targetTime - time();
 
             $notify[] = 'Please try after ' . $delay . ' seconds';
             return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $notify],
             ]);
         }
 
@@ -92,13 +99,13 @@ class DriverAuthorizationController extends Controller
 
         notify($user, $notifyTemplate, [
             'code' => $user->ver_code
-        ],[$type]);
+        ], [$type]);
 
         $notify[] = 'Verification code sent successfully';
         return response()->json([
-            'remark'=>'code_sent',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
+            'remark' => 'code_sent',
+            'status' => 'success',
+            'message' => ['success' => $notify],
         ]);
     }
 
@@ -110,9 +117,9 @@ class DriverAuthorizationController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $validator->errors()->all()],
             ]);
         }
 
@@ -125,17 +132,17 @@ class DriverAuthorizationController extends Controller
             $user->save();
             $notify[] = 'Email verified successfully';
             return response()->json([
-                'remark'=>'email_verified',
-                'status'=>'success',
-                'message'=>['success'=>$notify],
+                'remark' => 'email_verified',
+                'status' => 'success',
+                'message' => ['success' => $notify],
             ]);
         }
 
         $notify[] = 'Verification code doesn\'t match';
         return response()->json([
-            'remark'=>'validation_error',
-            'status'=>'error',
-            'message'=>['error'=>$notify],
+            'remark' => 'validation_error',
+            'status' => 'error',
+            'message' => ['error' => $notify],
         ]);
     }
 
@@ -147,14 +154,13 @@ class DriverAuthorizationController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $validator->errors()->all()],
             ]);
         }
 
-
-        $user = auth()->guard('driver')->user();
+        $user = auth()->user();
         if ($user->ver_code == $request->code) {
             $user->sv = 1;
             $user->ver_code = null;
@@ -162,16 +168,16 @@ class DriverAuthorizationController extends Controller
             $user->save();
             $notify[] = 'Mobile verified successfully';
             return response()->json([
-                'remark'=>'mobile_verified',
-                'status'=>'success',
-                'message'=>['success'=>$notify],
+                'remark' => 'mobile_verified',
+                'status' => 'success',
+                'message' => ['success' => $notify],
             ]);
         }
         $notify[] = 'Verification code doesn\'t match';
         return response()->json([
-            'remark'=>'validation_error',
-            'status'=>'error',
-            'message'=>['error'=>$notify],
+            'remark' => 'validation_error',
+            'status' => 'error',
+            'message' => ['error' => $notify],
         ]);
     }
 
@@ -183,26 +189,26 @@ class DriverAuthorizationController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $validator->errors()->all()],
             ]);
         }
-        $user = auth()->guard('driver')->user();
-        $response = verifyG2fa($user,$request->code);
+        $user = auth()->user();
+        $response = verifyG2fa($user, $request->code);
         if ($response) {
             $notify[] = 'Verification successful';
             return response()->json([
-                'remark'=>'twofa_verified',
-                'status'=>'success',
-                'message'=>['success'=>$notify],
+                'remark' => 'twofa_verified',
+                'status' => 'success',
+                'message' => ['success' => $notify],
             ]);
-        }else{
+        } else {
             $notify[] = 'Wrong verification code';
             return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $notify],
             ]);
         }
     }

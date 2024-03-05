@@ -59,8 +59,8 @@ class DriverLoginController extends Controller
                 'message'=>['error'=>$validator->errors()->all()],
             ]);
         }
-        Auth::shouldUse('driver');
         $credentials = request([$this->username, 'password']);
+        Auth::shouldUse('driver');
         if(!Auth::attempt($credentials)){
             $response[] = 'Unauthorized driver';
             return response()->json([
@@ -70,7 +70,7 @@ class DriverLoginController extends Controller
             ]);
         }
 
-        $user = $request->user();
+        $user = auth()->user();
         $tokenResult = $user->createToken('auth_token')->plainTextToken;
         $this->authenticated($request,$user);
         $response[] = 'Login Successful';

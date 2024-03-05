@@ -182,8 +182,6 @@ Route::namespace('Api')->name('api.')->group(function(){
                 'status'=>'success',
                 'message'=>['success'=>$notify],
                 'data'=>[
-//                    'user'=>auth()->check() ? auth()->user() : null
-//                    'user'=> auth()->guard('driver')->user()
                     'user'=> auth()->user()
                 ]
             ]);
@@ -192,7 +190,7 @@ Route::namespace('Api')->name('api.')->group(function(){
         Route::controller('DriverAuthorizationController')->name('driver.')->prefix('driver')->group(function(){
             Route::get('authorization', 'authorization')->name('authorization');
             Route::get('resend-verify/{type}', 'sendVerifyCode')->name('send.verify.code');
-            Route::post('verify-email', 'emailVerification')->name('verify.email'); // WIP - Working
+            Route::post('verify-email', 'emailVerification')->name('verify.email');
             Route::post('verify-mobile', 'mobileVerification')->name('verify.mobile');
             Route::post('verify-g2fa', 'g2faVerification')->name('go2fa.verify');
         });
