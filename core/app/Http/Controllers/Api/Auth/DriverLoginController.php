@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\DriverLogin;
 use App\Models\UserLogin;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Constants\Status;
 
-class LoginController extends Controller
+class DriverLoginController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -58,10 +59,10 @@ class LoginController extends Controller
                 'message'=>['error'=>$validator->errors()->all()],
             ]);
         }
-
+        Auth::shouldUse('driver');
         $credentials = request([$this->username, 'password']);
         if(!Auth::attempt($credentials)){
-            $response[] = 'Unauthorized user';
+            $response[] = 'Unauthorized driver';
             return response()->json([
                 'remark'=>'validation_error',
                 'status'=>'error',
@@ -83,8 +84,6 @@ class LoginController extends Controller
                 'token_type'=>'Bearer'
             ]
         ]);
-
-
     }
 
     public function findUsername()
@@ -130,8 +129,8 @@ class LoginController extends Controller
         $user->tv = $user->ts == Status::VERIFIED ? Status::UNVERIFIED : Status::VERIFIED;
         $user->save();
         $ip = getRealIP();
-        $exist = UserLogin::where('user_ip',$ip)->first();
-        $userLogin = new UserLogin();
+        $exist = DriverLogin::where('driver_ip',$ip)->first();
+        $userLogin = new DriverLogin();
         if ($exist) {
             $userLogin->longitude =  $exist->longitude;
             $userLogin->latitude =  $exist->latitude;
@@ -148,8 +147,8 @@ class LoginController extends Controller
         }
 
         $userAgent = osBrowser();
-        $userLogin->user_id = $user->id;
-        $userLogin->user_ip =  $ip;
+        $userLogin->driver_id = $user->id;
+        $userLogin->driver_ip =  $ip;
 
         $userLogin->browser = @$userAgent['browser'];
         $userLogin->os = @$userAgent['os_platform'];

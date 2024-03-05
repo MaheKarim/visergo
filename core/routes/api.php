@@ -153,4 +153,55 @@ Route::namespace('Api')->name('api.')->group(function(){
 
         Route::get('logout', 'Auth\LoginController@logout');
     });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    |                           Driver API Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::namespace('Auth')->group(function(){
+        Route::post('driver/login', 'DriverLoginController@login')->name('driver.login');  // WIP
+        Route::post('driver/register', 'DriverRegisterController@register');
+
+        // NOT WORKING RIGHT NOW
+        Route::controller('DriverForgotPasswordController')->name('driver.')->group(function(){
+            Route::post('password/email', 'sendResetCodeEmail')->name('password.email');
+            Route::post('password/verify-code', 'verifyCode')->name('password.verify.code');
+            Route::post('password/reset', 'reset')->name('password.update');
+        });
+    });
+
+    Route::middleware('auth:sanctum')->group(function(){
+
+        Route::get('driver-info',function(){
+            $notify[] = 'Driver information';
+            return response()->json([
+                'remark'=>'user_info',
+                'status'=>'success',
+                'message'=>['success'=>$notify],
+                'data'=>[
+//                    'user'=>auth()->check() ? auth()->user() : null
+//                    'user'=> auth()->guard('driver')->user()
+                    'user'=> auth()->user()
+                ]
+            ]);
+        });
+        // Authorization
+        Route::controller('DriverAuthorizationController')->name('driver.')->prefix('driver')->group(function(){
+            Route::get('authorization', 'authorization')->name('authorization');
+            Route::get('resend-verify/{type}', 'sendVerifyCode')->name('send.verify.code');
+            Route::post('verify-email', 'emailVerification')->name('verify.email'); // WIP - Working
+            Route::post('verify-mobile', 'mobileVerification')->name('verify.mobile');
+            Route::post('verify-g2fa', 'g2faVerification')->name('go2fa.verify');
+        });
+
+        Route::middleware(['driver.check.status'])->group(function () {
+            Route::post('driver-data-submit', 'DriverController@driverDataSubmit')->name('driver.data.submit');
+        });
+
+
+        Route::get('driver/logout', 'Auth\DriverLoginController@logout');
+    });
 });
