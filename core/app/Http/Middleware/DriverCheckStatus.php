@@ -17,8 +17,8 @@ class DriverCheckStatus
     public function handle($request, Closure $next)
     {
         if (Auth::check()) {
-            $user = auth()->user();
-            if ($user->status  && $user->ev  && $user->sv  && $user->tv) {
+            $driver = auth()->user();
+            if ($driver->status  && $driver->ev  && $driver->sv  && $driver->tv) {
                 return $next($request);
             } else {
                 if ($request->is('api/*')) {
@@ -28,10 +28,10 @@ class DriverCheckStatus
                         'status'=>'error',
                         'message'=>['error'=>$notify],
                         'data'=>[
-                            'is_ban'=>$user->status,
-                            'email_verified'=>$user->ev,
-                            'mobile_verified'=>$user->sv,
-                            'twofa_verified'=>$user->tv,
+                            'is_ban'=>$driver->status,
+                            'email_verified'=>$driver->ev,
+                            'mobile_verified'=>$driver->sv,
+                            'twofa_verified'=>$driver->tv,
                         ],
                     ]);
                 }else{

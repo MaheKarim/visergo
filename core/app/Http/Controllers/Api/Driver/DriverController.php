@@ -62,8 +62,8 @@ class DriverController extends Controller
 
     public function verificationForm()
     {
-        if (auth()->user()->kv == 2) {
-            $notify[] = 'Your KYC is under review';
+        if (auth()->user()->dv == 2) {
+            $notify[] = 'Your verification is under review';
             return response()->json([
                 'remark'=>'under_review',
                 'status'=>'error',

@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\DriverVerificationStatus;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -79,6 +80,7 @@ class Kernel extends HttpKernel
         'driver' => \App\Http\Middleware\RedirectIfNotDriver::class,
         'driver.guest' => \App\Http\Middleware\RedirectIfDriver::class,
         'driver.check.status' => \App\Http\Middleware\DriverCheckStatus::class,
+        'driver.verification' => DriverVerificationStatus::class
 
     ];
 }
