@@ -34,10 +34,11 @@ class Status{
     const KYC_PENDING = 2;
     const KYC_VERIFIED = 1;
 
-    const RIDE_ACTIVE = 1;
-    const RIDE_INITIATED = 2;
-    const RIDE_CLOSE = 3;
+    const RIDE_INITIATED = 1;
+    const RIDE_ACTIVE = 2;
+    const RIDE_ONGOING = 3;
     const RIDE_COMPLETED = 4;
+    const RIDE_CLOSE = 5;
 
     const RIDE = 1;
     const INTER_CITY = 2;

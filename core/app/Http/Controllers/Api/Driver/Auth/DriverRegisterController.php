@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\Driver\Auth;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Models\AdminNotification;
 use App\Models\Driver;
 use App\Models\DriverLogin;
 use App\Models\GeneralSetting;
-use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -156,7 +154,8 @@ class DriverRegisterController extends Controller
             'country' => isset($data['country']) ? $data['country'] : null,
             'city' => ''
         ];
-        $driver->kv = $general->kv ? Status::UNVERIFIED : Status::VERIFIED;
+        $driver->dv = $general->dv ? Status::UNVERIFIED : Status::VERIFIED;
+        $driver->vv = $general->vv ? Status::UNVERIFIED : Status::VERIFIED;
         $driver->ev = $general->ev ? Status::UNVERIFIED : Status::VERIFIED;
         $driver->sv = $general->sv ? Status::UNVERIFIED : Status::VERIFIED;
         $driver->ts = 0;

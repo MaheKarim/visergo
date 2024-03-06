@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Driver;
 
 use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
@@ -60,7 +60,7 @@ class DriverController extends Controller
         ]);
     }
 
-    public function kycForm()
+    public function verificationForm()
     {
         if (auth()->user()->kv == 2) {
             $notify[] = 'Your KYC is under review';
@@ -70,16 +70,16 @@ class DriverController extends Controller
                 'message'=>['error'=>$notify],
             ]);
         }
-        if (auth()->user()->kv == 1) {
-            $notify[] = 'You are already KYC verified';
+        if (auth()->user()->dv == 1) {
+            $notify[] = 'You are already verified';
             return response()->json([
                 'remark'=>'already_verified',
                 'status'=>'error',
                 'message'=>['error'=>$notify],
             ]);
         }
-        $form = Form::where('act','kyc')->first();
-        $notify[] = 'KYC field is below';
+        $form = Form::where('act','driver_kyc')->first();
+        $notify[] = 'Verification field is below';
         return response()->json([
             'remark'=>'kyc_form',
             'status'=>'success',
@@ -90,9 +90,9 @@ class DriverController extends Controller
         ]);
     }
 
-    public function kycSubmit(Request $request)
+    public function verificationFormSubmit(Request $request)
     {
-        $form = Form::where('act','kyc')->first();
+        $form = Form::where('act','driver_kyc')->first();
         $formData = $form->form_data;
         $formProcessor = new FormProcessor();
         $validationRule = $formProcessor->valueValidation($formData);
@@ -109,11 +109,11 @@ class DriverController extends Controller
 
         $userData = $formProcessor->processFormData($request, $formData);
         $user = auth()->user();
-        $user->kyc_data = $userData;
-        $user->kv = 2;
+        $user->driver_verification = $userData;
+        $user->dv = 2;
         $user->save();
 
-        $notify[] = 'KYC data submitted successfully';
+        $notify[] = 'Driver Verification data submitted successfully';
         return response()->json([
             'remark'=>'kyc_submitted',
             'status'=>'success',
@@ -124,7 +124,7 @@ class DriverController extends Controller
 
     public function depositHistory(Request $request)
     {
-        $deposits = auth()->guard('driver')->user()->deposits();
+        $deposits = auth()->user()->deposits();
         if ($request->search) {
             $deposits = $deposits->where('trx',$request->search);
         }
@@ -231,11 +231,11 @@ class DriverController extends Controller
             ]);
         }
 
-        $user = auth()->guard('driver')->user();
-        if (Hash::check($request->current_password, $user->password)) {
+        $driver = auth()->user();
+        if (Hash::check($request->current_password, $driver->password)) {
             $password = Hash::make($request->password);
-            $user->password = $password;
-            $user->save();
+            $driver->password = $password;
+            $driver->save();
             $notify[] = 'Password changed successfully';
             return response()->json([
                 'remark'=>'password_changed',

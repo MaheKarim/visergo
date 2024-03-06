@@ -114,17 +114,17 @@ class ManageDriversController extends Controller
     public function kycDetails($id)
     {
         $pageTitle = 'KYC Details';
-        $user = Driver::findOrFail($id);
-        return view('admin.drivers.kyc_detail', compact('pageTitle','user'));
+        $driver = Driver::findOrFail($id);
+        return view('admin.drivers.kyc_detail', compact('pageTitle','driver'));
     }
 
     public function kycApprove($id)
     {
-        $user = Driver::findOrFail($id);
-        $user->kv = 1;
-        $user->save();
+        $driver = Driver::findOrFail($id);
+        $driver->kv = 1;
+        $driver->save();
 
-        notify($user,'KYC_APPROVE',[]);
+        notify($driver,'KYC_APPROVE',[]);
 
         $notify[] = ['success','KYC approved successfully'];
         return to_route('admin.drivers.kyc.pending')->withNotify($notify);
@@ -132,17 +132,17 @@ class ManageDriversController extends Controller
 
     public function kycReject($id)
     {
-        $user = Driver::findOrFail($id);
-        foreach ($user->kyc_data as $kycData) {
+        $driver = Driver::findOrFail($id);
+        foreach ($driver->kyc_data as $kycData) {
             if ($kycData->type == 'file') {
                 fileManager()->removeFile(getFilePath('verify').'/'.$kycData->value);
             }
         }
-        $user->kv = 0;
-        $user->kyc_data = null;
-        $user->save();
+        $driver->kv = 0;
+        $driver->kyc_data = null;
+        $driver->save();
 
-        notify($user,'KYC_REJECT',[]);
+        notify($driver,'KYC_REJECT',[]);
 
         $notify[] = ['success','KYC rejected successfully'];
         return to_route('admin.drivers.kyc.pending')->withNotify($notify);
@@ -261,7 +261,7 @@ class ManageDriversController extends Controller
 
     public function login($id){
         Auth::loginUsingId($id);
-        return to_route('driver.home');
+        return "We are working under water, Please search on Sky!";
     }
 
     public function status(Request $request,$id)

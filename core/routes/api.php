@@ -161,7 +161,7 @@ Route::namespace('Api')->name('api.')->group(function(){
     |--------------------------------------------------------------------------
     */
 
-    Route::namespace('Auth')->group(function(){
+    Route::namespace('Driver\Auth')->group(function(){
         Route::post('driver/login', 'DriverLoginController@login')->name('driver.login');  // WIP
         Route::post('driver/register', 'DriverRegisterController@register');
 
@@ -173,7 +173,7 @@ Route::namespace('Api')->name('api.')->group(function(){
         });
     });
 
-    Route::middleware('auth:sanctum')->group(function(){
+    Route::middleware('auth:sanctum')->namespace('Driver')->group(function(){
 
         Route::get('driver-info',function(){
             $notify[] = 'Driver information';
@@ -196,7 +196,21 @@ Route::namespace('Api')->name('api.')->group(function(){
         });
 
         Route::middleware(['driver.check.status'])->group(function () {
-            Route::post('driver-data-submit', 'ManageDriversController@driverDataSubmit')->name('driver.data.submit');
+            // Profile Complete
+            Route::post('driver-data-submit', 'DriverController@driverDataSubmit')->name('driver.data.submit');
+
+            Route::controller('DriverController')->prefix('driver')->group(function(){
+                //KYC
+                Route::get('kyc-form','verificationForm')->name('kyc.form');
+                Route::post('kyc-submit','verificationFormSubmit')->name('kyc.submit');
+
+                // Ekhane VV & DV Middleware Bosbbe
+                //Report
+                Route::any('deposit/history', 'depositHistory')->name('deposit.history');
+                Route::get('transactions','transactions')->name('transactions');
+
+            });
+
         });
 
 

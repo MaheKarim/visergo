@@ -62,12 +62,12 @@ class Driver extends Authenticatable
 
     public function scopeKycUnverified($query)
     {
-        return $query->where('kv', Status::KYC_UNVERIFIED);
+        return $query->where('vv', Status::KYC_UNVERIFIED);
     }
 
     public function scopeKycPending($query)
     {
-        return $query->where('kv', Status::KYC_PENDING);
+        return $query->where('vv', Status::KYC_PENDING);
     }
 
     public function scopeEmailVerified($query)

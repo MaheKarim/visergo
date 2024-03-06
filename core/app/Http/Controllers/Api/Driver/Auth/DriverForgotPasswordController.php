@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\Driver\Auth;
 
+use App\Http\Controllers\Api\Auth\User;
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
 use App\Models\GeneralSetting;
 use App\Models\PasswordReset;
-use App\Models\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;

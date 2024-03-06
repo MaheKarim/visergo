@@ -17,7 +17,7 @@ class DriverCheckStatus
     public function handle($request, Closure $next)
     {
         if (Auth::check()) {
-            $user = auth()->guard('driver')->user();
+            $user = auth()->user();
             if ($user->status  && $user->ev  && $user->sv  && $user->tv) {
                 return $next($request);
             } else {

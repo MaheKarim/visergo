@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\Driver\Auth;
 
+use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\DriverLogin;
-use App\Models\UserLogin;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Constants\Status;
 
 class DriverLoginController extends Controller
 {
