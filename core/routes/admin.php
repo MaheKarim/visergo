@@ -225,8 +225,8 @@ Route::middleware('admin')->group(function () {
 
     //KYC setting
     Route::controller('KycController')->group(function () {
-        Route::get('kyc-setting', 'setting')->name('kyc.setting');
-        Route::post('kyc-setting', 'settingUpdate');
+        Route::get('kyc-setting/{act?}', 'setting')->name('kyc.setting');
+        Route::post('kyc-setting/{act?}', 'settingUpdate')->name('settingUpdate');
     });
 
     //Notification Setting
@@ -342,9 +342,7 @@ Route::middleware('admin')->group(function () {
         Route::post('save/{id?}', 'save')->name('save');
         Route::post('status/{id}', 'status')->name('status');
     });
-
     // Manage Drivers
-
     Route::controller('ManageDriversController')->name('drivers.')->prefix('drivers')->group(function () {
         Route::get('/', 'allDrivers')->name('all');
         Route::get('active', 'activeDrivers')->name('active');
@@ -373,8 +371,6 @@ Route::middleware('admin')->group(function () {
         Route::get('list', 'list')->name('list');
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
     });
-
-
 
 });
 

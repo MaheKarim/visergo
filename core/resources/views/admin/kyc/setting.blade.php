@@ -4,11 +4,11 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header bg--primary d-flex justify-content-between">
-                    <h5 class="text-white">@lang('KYC Form for User')</h5>
+                    <h5 class="text-white">{{ $formTitle }}</h5>
                     <button type="button" class="btn btn-sm btn-outline-light float-end form-generate-btn"> <i class="la la-fw la-plus"></i>@lang('Add New')</button>
                 </div>
                 <div class="card-body">
-                    <form action="" method="post">
+                    <form action="{{ route('admin.settingUpdate', $act)}}" method="post">
                         @csrf
                         <div class="row addedField">
                             @if($form)

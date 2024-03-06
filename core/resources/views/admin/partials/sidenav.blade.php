@@ -580,11 +580,35 @@
                     </a>
                 </li>
 
-                <li class="sidebar-menu-item {{menuActive('admin.kyc.setting')}}">
-                    <a href="{{route('admin.kyc.setting')}}" class="nav-link">
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a href="javascript:void(0)" class="{{menuActive('admin.kyc.setting*',3)}}">
                         <i class="menu-icon las la-user-check"></i>
-                        <span class="menu-title">@lang('KYC Setting')</span>
+                        <span class="menu-title">@lang('Verification Form')</span>
                     </a>
+                    <div class="sidebar-submenu {{menuActive('admin.kyc.setting*', 2)}} ">
+                        <ul>
+                            <li class="sidebar-menu-item {{menuActive('admin.kyc.setting', ['act'=> 'kyc'])}} ">
+                                <a href="{{route('admin.kyc.setting', ['act'=> 'kyc']) }}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Rider Verification Form')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.kyc.setting', ['act'=> 'driver_kyc'])}} ">
+                                <a href="{{route('admin.kyc.setting', ['act'=> 'driver_kyc']) }}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Driver Verification Form')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.kyc.setting', ['act'=> 'vehicle_kyc'])}} ">
+                                <a href="{{route('admin.kyc.setting', ['act'=> 'vehicle_kyc']) }}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Verification Form')</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
 
