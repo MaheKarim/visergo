@@ -112,6 +112,103 @@
                 </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
+                    <a href="javascript:void(0)" class="{{menuActive('admin.drivers*',3)}}">
+                        <i class="menu-icon las la-user-friends"></i>
+                        <span class="menu-title">@lang('Manage Drivers')</span>
+
+                        @if($bannedDriversCount > 0 || $emailUnverifiedDriversCount > 0 || $mobileUnverifiedDriversCount > 0 || $kycUnverifiedDriversCount > 0 || $kycPendingDriversCount > 0)
+                            <span class="menu-badge pill bg--danger ms-auto">
+                                <i class="fa fa-exclamation"></i>
+                            </span>
+                        @endif
+                    </a>
+                    <div class="sidebar-submenu {{menuActive('admin.drivers*',2)}} ">
+                        <ul>
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.active')}} ">
+                                <a href="{{route('admin.drivers.active')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Active Drivers')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.banned')}} ">
+                                <a href="{{route('admin.drivers.banned')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Banned Drivers')</span>
+                                    @if($bannedDriversCount)
+                                        <span class="menu-badge pill bg--danger ms-auto">{{$bannedDriversCount}}</span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item  {{menuActive('admin.drivers.email.unverified')}}">
+                                <a href="{{route('admin.drivers.email.unverified')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Email Unverified')</span>
+
+                                    @if($emailUnverifiedDriversCount)
+                                        <span class="menu-badge pill bg--danger ms-auto">{{$emailUnverifiedDriversCount}}</span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.mobile.unverified')}}">
+                                <a href="{{route('admin.drivers.mobile.unverified')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Mobile Unverified')</span>
+                                    @if($mobileUnverifiedDriversCount)
+                                        <span
+                                            class="menu-badge pill bg--danger ms-auto">{{$mobileUnverifiedDriversCount}}</span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.kyc.unverified')}}">
+                                <a href="{{route('admin.drivers.kyc.unverified')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('KYC Unverified')</span>
+                                    @if($kycUnverifiedDriversCount)
+                                        <span class="menu-badge pill bg--danger ms-auto">{{$kycUnverifiedDriversCount}}</span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.kyc.pending')}}">
+                                <a href="{{route('admin.drivers.kyc.pending')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('KYC Pending')</span>
+                                    @if($kycPendingDriversCount)
+                                        <span class="menu-badge pill bg--danger ms-auto">{{$kycPendingDriversCount}}</span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.with.balance')}}">
+                                <a href="{{route('admin.drivers.with.balance')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('With Balance')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.all')}} ">
+                                <a href="{{route('admin.drivers.all')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('All Drivers')</span>
+                                </a>
+                            </li>
+
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.notification.all')}}">
+                                <a href="{{route('admin.drivers.notification.all')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Notification to All')</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],3)}}">
                         <i class="menu-icon la la-automobile"></i>
                         <span class="menu-title">@lang('Vehicle Settings')</span>
@@ -355,7 +452,6 @@
                     </div>
                 </li>
 
-
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{menuActive('admin.report*',3)}}">
                         <i class="menu-icon la la-list"></i>
@@ -388,7 +484,6 @@
                     </div>
                 </li>
 
-
                 <li class="sidebar-menu-item  {{menuActive('admin.subscriber.*')}}">
                     <a href="{{route('admin.subscriber.index')}}" class="nav-link"
                        data-default-url="{{ route('admin.subscriber.index') }}">
@@ -405,12 +500,7 @@
                     </a>
                 </li>
 
-
                 <li class="sidebar__menu-header">@lang('Settings')</li>
-
-                <!-- Vehicle Management Start -->
-
-                <!-- Vehicle Management End -->
 
                 <li class="sidebar-menu-item {{menuActive('admin.setting.index')}}">
                     <a href="{{route('admin.setting.index')}}" class="nav-link">

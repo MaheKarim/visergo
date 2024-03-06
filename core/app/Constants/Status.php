@@ -50,4 +50,7 @@ class Status{
     const RIDER = 1;
     const DRIVER = 2;
 
+    const DRIVER_ACTIVE = 1;
+    const DRIVER_BAN = 0;
+
 }

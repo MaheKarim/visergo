@@ -24,6 +24,11 @@ class Withdrawal extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class);
+    }
+
     public function method()
     {
         return $this->belongsTo(WithdrawMethod::class, 'method_id');

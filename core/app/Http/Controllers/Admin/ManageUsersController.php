@@ -149,7 +149,6 @@ class ManageUsersController extends Controller
         return to_route('admin.users.kyc.pending')->withNotify($notify);
     }
 
-
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -285,7 +284,6 @@ class ManageUsersController extends Controller
         return back()->withNotify($notify);
 
     }
-
 
     public function showNotificationSingleForm($id)
     {

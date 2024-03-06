@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Constants\Status;
 use App\Models\AdminNotification;
 use App\Models\Deposit;
+use App\Models\Driver;
 use App\Models\Frontend;
 use App\Models\SupportTicket;
 use App\Models\User;
@@ -21,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        
+
     }
 
     /**
@@ -59,6 +60,13 @@ class AppServiceProvider extends ServiceProvider
                 'mobileUnverifiedUsersCount'   => User::mobileUnverified()->count(),
                 'kycUnverifiedUsersCount'   => User::kycUnverified()->count(),
                 'kycPendingUsersCount'   => User::kycPending()->count(),
+
+                'bannedDriversCount'           => Driver::banned()->count(),
+                'emailUnverifiedDriversCount' => Driver::emailUnverified()->count(),
+                'mobileUnverifiedDriversCount'   => Driver::mobileUnverified()->count(),
+                'kycUnverifiedDriversCount'   => Driver::kycUnverified()->count(),
+                'kycPendingDriversCount'   => Driver::kycPending()->count(),
+
                 'pendingTicketCount'         => SupportTicket::whereIN('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),
                 'pendingDepositsCount'    => Deposit::pending()->count(),
                 'pendingWithdrawCount'    => Withdrawal::pending()->count(),

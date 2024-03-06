@@ -13,5 +13,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class);
+    }
+
 }

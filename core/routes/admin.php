@@ -343,6 +343,38 @@ Route::middleware('admin')->group(function () {
         Route::post('status/{id}', 'status')->name('status');
     });
 
+    // Manage Drivers
+
+    Route::controller('ManageDriversController')->name('drivers.')->prefix('drivers')->group(function () {
+        Route::get('/', 'allDrivers')->name('all');
+        Route::get('active', 'activeDrivers')->name('active');
+        Route::get('banned', 'bannedDrivers')->name('banned');
+        Route::get('email-verified', 'emailVerifiedDrivers')->name('email.verified');
+        Route::get('email-unverified', 'emailUnverifiedDrivers')->name('email.unverified');
+        Route::get('mobile-unverified', 'mobileUnverifiedDrivers')->name('mobile.unverified');
+        Route::get('kyc-unverified', 'kycUnverifiedDrivers')->name('kyc.unverified');
+        Route::get('kyc-pending', 'kycPendingDrivers')->name('kyc.pending');
+        Route::get('mobile-verified', 'mobileVerifiedDrivers')->name('mobile.verified');
+        Route::get('with-balance', 'driversWithBalance')->name('with.balance');
+
+        Route::get('detail/{id}', 'detail')->name('detail');
+        Route::get('kyc-data/{id}', 'kycDetails')->name('kyc.details');
+        Route::post('kyc-approve/{id}', 'kycApprove')->name('kyc.approve');
+        Route::post('kyc-reject/{id}', 'kycReject')->name('kyc.reject');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::post('add-sub-balance/{id}', 'addSubBalance')->name('add.sub.balance');
+        Route::get('send-notification/{id}', 'showNotificationSingleForm')->name('notification.single');
+        Route::post('send-notification/{id}', 'sendNotificationSingle')->name('notification.single');
+        Route::get('login/{id}', 'login')->name('login');
+        Route::post('status/{id}', 'status')->name('status');
+
+        Route::get('send-notification', 'showNotificationAllForm')->name('notification.all');
+        Route::post('send-notification', 'sendNotificationAll')->name('notification.all.send');
+        Route::get('list', 'list')->name('list');
+        Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
+    });
+
+
 
 });
 

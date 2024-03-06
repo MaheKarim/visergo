@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Constants\Status;
+use App\Traits\DriverNotify;
+use App\Traits\Searchable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Driver extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, Searchable, DriverNotify;
 
     protected $guarded=['id'];
     /**
@@ -34,5 +37,51 @@ class Driver extends Authenticatable
     public function loginLogs()
     {
         return $this->hasMany(DriverLogin::class);
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', Status::USER_ACTIVE)->where('ev',Status::VERIFIED)->where('sv',Status::VERIFIED);
+    }
+
+    public function scopeBanned($query)
+    {
+        return $query->where('status', Status::USER_BAN);
+    }
+
+    public function scopeEmailUnverified($query)
+    {
+        return $query->where('ev', Status::UNVERIFIED);
+    }
+
+    public function scopeMobileUnverified($query)
+    {
+        return $query->where('sv', Status::UNVERIFIED);
+    }
+
+    public function scopeKycUnverified($query)
+    {
+        return $query->where('kv', Status::KYC_UNVERIFIED);
+    }
+
+    public function scopeKycPending($query)
+    {
+        return $query->where('kv', Status::KYC_PENDING);
+    }
+
+    public function scopeEmailVerified($query)
+    {
+        return $query->where('ev', Status::VERIFIED);
+    }
+
+    public function scopeMobileVerified($query)
+    {
+        return $query->where('sv', Status::VERIFIED);
+    }
+
+    public function scopeWithBalance($query)
+    {
+        return $query->where('balance','>', 0);
     }
 }

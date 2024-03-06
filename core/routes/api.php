@@ -196,7 +196,7 @@ Route::namespace('Api')->name('api.')->group(function(){
         });
 
         Route::middleware(['driver.check.status'])->group(function () {
-            Route::post('driver-data-submit', 'DriverController@driverDataSubmit')->name('driver.data.submit');
+            Route::post('driver-data-submit', 'ManageDriversController@driverDataSubmit')->name('driver.data.submit');
         });
 
 
