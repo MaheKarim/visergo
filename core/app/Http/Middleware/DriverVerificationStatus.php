@@ -20,7 +20,7 @@ class DriverVerificationStatus
         if (Auth::check()) {
             $driver = auth()->user();
             $general = gs();
-            if (($general->dv == Status::ENABLE || $general->vv == Status::ENABLE)
+            if (($general->dv == Status::KYC_UNVERIFIED || $general->dv == Status::KYC_PENDING) || ($general->vv == Status::KYC_UNVERIFIED || $general->vv == Status::KYC_PENDING)
                 && $request->is('api/*')
                 && ($driver->dv == 0 || $driver->dv == 2)
                 && ($driver->vv == 0 || $driver->vv == 2)

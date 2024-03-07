@@ -190,17 +190,19 @@ Route::namespace('Api')->name('api.')->group(function () {
 
             Route::controller('DriverController')->prefix('driver')->group(function () {
                 //KYC
-                Route::get('kyc-form', 'verificationForm')->name('kyc.form');
-                Route::post('kyc-submit', 'verificationFormSubmit')->name('kyc.submit');
+                Route::get('verification-form', 'verificationForm')->name('kyc.form');
+                Route::post('verificationForm-submit', 'verificationFormSubmit')->name('kyc.submit');
+                // Vehicle Verification
 
-                // Ekhane VV & DV Middleware Bosbbe
-                //Report
-                Route::any('deposit/history', 'depositHistory')->name('deposit.history');
-                Route::get('transactions', 'transactions')->name('transactions');
             });
 
             // Driver License & Vehicle Registration Verification Middleware
             Route::middleware('driver.verification')->group(function () {
+                // Deposit & Transactions
+                Route::controller('DriverController')->prefix('driver')->group(function () {
+                    Route::any('deposit/history', 'depositHistory')->name('deposit.history');
+                    Route::get('transactions', 'transactions')->name('transactions');
+                });
 
                 Route::get('driver-info', function () {
                     $notify[] = 'Driver information';
