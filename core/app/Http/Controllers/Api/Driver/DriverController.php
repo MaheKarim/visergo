@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Driver;
 
+use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
 use App\Models\Form;
@@ -93,64 +94,72 @@ class DriverController extends Controller
 
     public function verificationFormSubmit(Request $request)
     {
-        $form = Form::where('act','driver_kyc')->first();
-        $formData = $form->form_data;
-        $formProcessor = new FormProcessor();
-        $validationRule = $formProcessor->valueValidation($formData);
+        if (auth()->user()->dv != Status::KYC_VERIFIED && auth()->user()->dv != Status::KYC_PENDING)
+        {
+            $form = Form::where('act','driver_kyc')->first();
+            $formData = $form->form_data;
+            $formProcessor = new FormProcessor();
+            $validationRule = $formProcessor->valueValidation($formData);
 
-        $validator = Validator::make($request->all(), $validationRule);
+            $validator = Validator::make($request->all(), $validationRule);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
-            ]);
-        }
+            if ($validator->fails()) {
+                return response()->json([
+                    'remark'=>'validation_error',
+                    'status'=>'error',
+                    'message'=>['error'=>$validator->errors()->all()],
+                ]);
+            }
 
-        $driverData = $formProcessor->processFormData($request, $formData);
-        $driver = auth()->user();
-        $driver->driver_verification = $driverData;
-        $driver->dv = 2;
+            $driverData = $formProcessor->processFormData($request, $formData);
+            $driver = auth()->user();
+            $driver->driver_verification = $driverData;
+            $driver->dv = 2;
 
-        // Add validation rule for license_image field
-        $validationRule['license_image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'; // Adjust max file size as needed
-        $validationRule['license_number'] = 'required|string';
-        $validationRule['license_expire'] = ['required', 'date', 'after:today'];
-        $validator = Validator::make($request->all(), $validationRule);
-        if ($validator->fails()) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
-        }
-
-        if ($request->hasFile('license_image')) {
-            try {
-                $old = $driver->license_image;
-                $driver->license_image = fileUploader($request->license_image, getFilePath('licenseImage'),getFileSize('licenseImage'), $old);
-            } catch (\Exception $exp) {
-                $notify[] = ['error', 'Couldn\'t upload your image'];
+            $validationRule['license_image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
+            $validationRule['license_number'] = 'required|string';
+            $validationRule['license_expire'] = ['required', 'date', 'after:today'];
+            $validator = Validator::make($request->all(), $validationRule);
+            if ($validator->fails()) {
                 return response()->json([
                     'remark' => 'validation_error',
                     'status' => 'error',
-                    'message' => ['error' => $notify],
+                    'message' => ['error' => $validator->errors()->all()],
                 ]);
             }
+
+            if ($request->hasFile('license_image')) {
+                try {
+                    $old = $driver->license_image;
+                    $driver->license_image = fileUploader($request->license_image, getFilePath('licenseImage'),getFileSize('licenseImage'), $old);
+                } catch (\Exception $exp) {
+                    $notify[] = ['error', 'Couldn\'t upload your image'];
+                    return response()->json([
+                        'remark' => 'validation_error',
+                        'status' => 'error',
+                        'message' => ['error' => $notify],
+                    ]);
+                }
+            }
+
+            $driver->license_number = $request->license_number;
+            $driver->license_expire = $request->license_expire;
+            $driver->save();
+
+            $notify[] = 'Driver verification data submitted successfully';
+            return response()->json([
+                'remark'=>'kyc_submitted',
+                'status'=>'success',
+                'message'=>['success'=>$notify],
+            ]);
+        } else {
+            $notify[] = 'You are already verified';
+            return response()->json([
+                'remark'=>'already_verified',
+                'status'=>'error',
+                'message'=>['error'=>$notify],
+            ]);
         }
-
-
-        $driver->license_number = $request->license_number;
-        $driver->license_expire = $request->license_expire;
-        $driver->save();
-
-        $notify[] = 'Driver verification data submitted successfully';
-        return response()->json([
-            'remark'=>'kyc_submitted',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
-        ]);
 
     }
 
