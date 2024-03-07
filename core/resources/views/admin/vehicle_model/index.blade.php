@@ -141,7 +141,7 @@
 
                             <div class="form-group">
                                 <label>@lang('Vehicle color')</label>
-                                <select class="form-control" name="color_id" required>
+                                <select class="form-select" multiple name="color_id[]" required>
                                     @foreach($colors as $color)
                                         <option value="{{ $color->id }}">{{ $color->name }}</option>
                                     @endforeach
