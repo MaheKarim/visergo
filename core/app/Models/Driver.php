@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Constants\Status;
 use App\Traits\DriverNotify;
+use App\Traits\GlobalStatus;
 use App\Traits\Searchable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -19,7 +20,7 @@ class Driver extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','ver_code','balance','kyc_data'
+        'password', 'remember_token','ver_code','balance'
     ];
 
     /**
