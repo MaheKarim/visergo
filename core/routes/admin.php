@@ -350,8 +350,14 @@ Route::middleware('admin')->group(function () {
         Route::get('email-verified', 'emailVerifiedDrivers')->name('email.verified');
         Route::get('email-unverified', 'emailUnverifiedDrivers')->name('email.unverified');
         Route::get('mobile-unverified', 'mobileUnverifiedDrivers')->name('mobile.unverified');
-        Route::get('kyc-unverified', 'kycUnverifiedDrivers')->name('kyc.unverified');
-        Route::get('kyc-pending', 'kycPendingDrivers')->name('kyc.pending');
+        Route::get('verification-unverified', 'verificationUnverifiedDrivers')->name('verification.unverified');
+        Route::get('verification-pending', 'verificationPendingDrivers')->name('verification.pending');
+
+
+        Route::get('vehicle-pending', 'vehiclePendingDrivers')->name('vehicle.pending');
+        Route::get('vehicle-data/{id}', 'vehicleDetails')->name('vehicle.details');
+
+
         Route::get('mobile-verified', 'mobileVerifiedDrivers')->name('mobile.verified');
         Route::get('with-balance', 'driversWithBalance')->name('with.balance');
 

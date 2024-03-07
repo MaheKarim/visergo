@@ -43,9 +43,9 @@ class ManageDriversController extends Controller
         return view('admin.drivers.list', compact('pageTitle', 'drivers'));
     }
 
-    public function kycUnverifiedDrivers()
+    public function verificationUnverifiedDrivers()
     {
-        $pageTitle = 'KYC Unverified Drivers';
+        $pageTitle = 'Unverified Drivers';
         $drivers = $this->driverData('vehicleUnverified');
         return view('admin.drivers.list', compact('pageTitle', 'drivers'));
     }
@@ -57,10 +57,17 @@ class ManageDriversController extends Controller
         return view('admin.drivers.list', compact('pageTitle', 'drivers'));
     }
 
-    public function kycPendingDrivers()
+    public function verificationPendingDrivers()
     {
-        $pageTitle = 'KYC Unverified Drivers';
+        $pageTitle = 'Verification Unverified Drivers';
         $drivers = $this->driverData('kycPending');
+        return view('admin.drivers.list', compact('pageTitle', 'drivers'));
+    }
+
+    public function vehiclePendingDrivers()
+    {
+        $pageTitle = 'Vehicle Pending Drivers';
+        $drivers = $this->driverData('vehiclePending');
         return view('admin.drivers.list', compact('pageTitle', 'drivers'));
     }
 
@@ -118,6 +125,13 @@ class ManageDriversController extends Controller
         return view('admin.drivers.kyc_detail', compact('pageTitle','driver'));
     }
 
+    public function vehicleDetails($id)
+    {
+        $pageTitle = 'Vehicle Details';
+        $driver = Driver::with('vehicle')->findOrFail($id);
+        return view('admin.drivers.vehicle_verification', compact('pageTitle','driver'));
+    }
+
     public function kycApprove($id)
     {
         $driver = Driver::findOrFail($id);
@@ -127,7 +141,7 @@ class ManageDriversController extends Controller
         notify($driver,'KYC_APPROVE',[]);
 
         $notify[] = ['success','Driver verified successfully'];
-        return to_route('admin.drivers.kyc.pending')->withNotify($notify);
+        return to_route('admin.drivers.verification.pending')->withNotify($notify);
     }
 
     public function kycReject($id)

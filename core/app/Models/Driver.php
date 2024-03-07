@@ -70,6 +70,10 @@ class Driver extends Authenticatable
     {
         return $query->where('vv', Status::KYC_UNVERIFIED);
     }
+    public function scopeVehiclePending($query)
+    {
+        return $query->where('vv', Status::KYC_PENDING);
+    }
 
     public function scopeKycPending($query)
     {

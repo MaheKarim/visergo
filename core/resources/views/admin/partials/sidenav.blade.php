@@ -116,7 +116,7 @@
                         <i class="menu-icon las la-user-friends"></i>
                         <span class="menu-title">@lang('Manage Drivers')</span>
 
-                        @if($bannedDriversCount > 0 || $emailUnverifiedDriversCount > 0 || $mobileUnverifiedDriversCount > 0 || $vehicleUnverifiedDriversCount > 0 || $kycPendingDriversCount > 0)
+                        @if($bannedDriversCount > 0 || $emailUnverifiedDriversCount > 0 || $mobileUnverifiedDriversCount > 0 || $vehicleUnverifiedDriversCount > 0 || $kycPendingDriversCount > 0 || $vehiclePendingDriversCount > 0)
                             <span class="menu-badge pill bg--danger ms-auto">
                                 <i class="fa fa-exclamation"></i>
                             </span>
@@ -162,8 +162,8 @@
                                 </a>
                             </li>
 
-                            <li class="sidebar-menu-item {{menuActive('admin.drivers.kyc.unverified')}}">
-                                <a href="{{route('admin.drivers.kyc.unverified')}}" class="nav-link">
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.verification.unverified')}}">
+                                <a href="{{route('admin.drivers.verification.unverified')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">@lang('Vehicle Unverified')</span>
                                     @if($vehicleUnverifiedDriversCount)
@@ -172,8 +172,18 @@
                                 </a>
                             </li>
 
-                            <li class="sidebar-menu-item {{menuActive('admin.drivers.kyc.pending')}}">
-                                <a href="{{route('admin.drivers.kyc.pending')}}" class="nav-link">
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.vehicle.pending')}}">
+                                <a href="{{route('admin.drivers.vehicle.pending')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Pending')</span>
+                                    @if($vehiclePendingDriversCount)
+                                        <span class="menu-badge pill bg--danger ms-auto">{{$vehiclePendingDriversCount}}</span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.drivers.verification.pending')}}">
+                                <a href="{{route('admin.drivers.verification.pending')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">@lang('Verification Pending')</span>
                                     @if($kycPendingDriversCount)

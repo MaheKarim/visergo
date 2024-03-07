@@ -54,10 +54,15 @@
                                         <a href="{{ route('admin.drivers.detail', $driver->id) }}" class="btn btn-sm btn-outline--primary">
                                             <i class="las la-desktop"></i> @lang('Details')
                                         </a>
-                                        @if (request()->routeIs('admin.drivers.kyc.pending'))
+                                        @if (request()->routeIs('admin.drivers.verification.pending'))
                                         <a href="{{ route('admin.drivers.kyc.details', $driver->id) }}" target="_blank" class="btn btn-sm btn-outline--dark">
                                             <i class="las la-user-check"></i>@lang('KYC Data')
                                         </a>
+                                        @endif
+                                        @if (request()->routeIs('admin.drivers.vehicle.pending'))
+                                            <a href="{{ route('admin.drivers.vehicle.details', $driver->id) }}" target="_blank" class="btn btn-sm btn-outline--dark">
+                                                <i class="las la-user-check"></i>@lang('Vehicle Data')
+                                            </a>
                                         @endif
                                     </div>
                                 </td>
