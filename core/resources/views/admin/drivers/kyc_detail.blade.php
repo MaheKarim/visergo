@@ -30,7 +30,7 @@
                         <h5 class="text-center">@lang('Driver Verification data not found')</h5>
                     @endif
 
-                    @if($driver->kv == 2)
+                    @if($driver->dv == 2)
                     <div class="d-flex flex-wrap justify-content-end mt-3">
                         <button class="btn btn-outline--danger me-3 confirmationBtn" data-question="@lang('Are you sure to reject this documents?')" data-action="{{ route('admin.drivers.kyc.reject', $driver->id) }}"><i class="las la-ban"></i>@lang('Reject')</button>
                         <button class="btn btn-outline--success confirmationBtn" data-question="@lang('Are you sure to approve this documents?')" data-action="{{ route('admin.drivers.kyc.approve', $driver->id) }}"><i class="las la-check"></i>@lang('Approve')</button>

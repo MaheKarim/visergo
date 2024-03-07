@@ -28,9 +28,9 @@ class Driver extends Authenticatable
      * @var array
      */
     protected $casts = [
-//        'email_verified_at' => 'datetime',
         'address' => 'object',
-        'kyc_data' => 'object',
+        'driver_verification' => 'object',
+        'vehicle_verification' => 'object',
         'ver_code_send_at' => 'datetime'
     ];
 
@@ -67,7 +67,7 @@ class Driver extends Authenticatable
 
     public function scopeKycPending($query)
     {
-        return $query->where('vv', Status::KYC_PENDING);
+        return $query->where('dv', Status::KYC_PENDING);
     }
 
     public function scopeEmailVerified($query)

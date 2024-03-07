@@ -121,12 +121,12 @@ class ManageDriversController extends Controller
     public function kycApprove($id)
     {
         $driver = Driver::findOrFail($id);
-        $driver->kv = 1;
+        $driver->dv = 1;
         $driver->save();
 
         notify($driver,'KYC_APPROVE',[]);
 
-        $notify[] = ['success','KYC approved successfully'];
+        $notify[] = ['success','Driver verified successfully'];
         return to_route('admin.drivers.kyc.pending')->withNotify($notify);
     }
 
@@ -138,8 +138,8 @@ class ManageDriversController extends Controller
                 fileManager()->removeFile(getFilePath('verify').'/'.$kycData->value);
             }
         }
-        $driver->kv = 0;
-        $driver->kyc_data = null;
+        $driver->dv = 0;
+        $driver->driver_verification = null;
         $driver->save();
 
         notify($driver,'KYC_REJECT',[]);
@@ -181,18 +181,18 @@ class ManageDriversController extends Controller
         $driver->ev = $request->ev ? Status::VERIFIED : Status::UNVERIFIED;
         $driver->sv = $request->sv ? Status::VERIFIED : Status::UNVERIFIED;
         $driver->ts = $request->ts ? Status::ENABLE : Status::DISABLE;
-        if (!$request->kv) {
-            $driver->kv = 0;
-            if ($driver->kyc_data) {
-                foreach ($driver->kyc_data as $kycData) {
+        if (!$request->dv) {
+            $driver->dv = 0;
+            if ($driver->driver_verification) {
+                foreach ($driver->driver_verification as $kycData) {
                     if ($kycData->type == 'file') {
                         fileManager()->removeFile(getFilePath('verify').'/'.$kycData->value);
                     }
                 }
             }
-            $driver->kyc_data = null;
+            $driver->driver_verification = null;
         }else{
-            $driver->kv = 1;
+            $driver->dv = 1;
         }
         $driver->save();
 
