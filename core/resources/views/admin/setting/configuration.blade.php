@@ -67,6 +67,30 @@
 
                         <li class="list-group-item d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
                             <div>
+                                <p class="fw-bold mb-0">@lang('Driver Verification')</p>
+                                <p class="mb-0">
+                                    <small>@lang('If you enable') <span class="fw-bold">@lang('Driver Verification')</span> @lang('module, drivers must have to submit') <a href="{{ route('admin.kyc.setting', ['act' => 'driver_kyc']) }}">@lang('the required data')</a>. @lang('Otherwise, ride related service will be prevented by this system.')</small>
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" data-width="100%" data-size="large" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-height="35" data-on="@lang('Enable')" data-off="@lang('Disable')" name="dv" @if($general->dv) checked @endif>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+                            <div>
+                                <p class="fw-bold mb-0">@lang('Vehicle Verification')</p>
+                                <p class="mb-0">
+                                    <small>@lang('If you enable') <span class="fw-bold">@lang('Vehicle Verification')</span> @lang('module, drivers must have to submit for their vehicle') <a href="{{ route('admin.kyc.setting', ['act' => 'vehicle_kyc']) }}">@lang('the required data')</a>. @lang('Otherwise, ride related service will be prevented by this system.')</small>
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" data-width="100%" data-size="large" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-height="35" data-on="@lang('Enable')" data-off="@lang('Disable')" name="vv" @if($general->vv) checked @endif>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+                            <div>
                                 <p class="fw-bold mb-0">@lang('Email Verification')</p>
                                 <p class="mb-0">
                                     <small>

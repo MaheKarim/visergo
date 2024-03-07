@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Constants\Status;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,15 +11,20 @@ class DriverVerificationStatus
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
         if (Auth::check()) {
             $driver = auth()->user();
-            if ($request->is('api/*') && ($driver->dv == 0 || $driver->dv == 2) && ($driver->vv == 0 || $driver->vv == 2)) {
+            $general = gs();
+            if (($general->dv == Status::ENABLE || $general->vv == Status::ENABLE)
+                && $request->is('api/*')
+                && ($driver->dv == 0 || $driver->dv == 2)
+                && ($driver->vv == 0 || $driver->vv == 2)
+            ) {
                 $notify = [];
                 if ($driver->dv == 0) {
                     $notify[] = 'Verify your driving licence';
@@ -43,8 +49,10 @@ class DriverVerificationStatus
                     ],
                 ]);
             }
+
             return $next($request);
         }
         abort(403);
     }
 }
+
