@@ -64,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
                 'bannedDriversCount'           => Driver::banned()->count(),
                 'emailUnverifiedDriversCount' => Driver::emailUnverified()->count(),
                 'mobileUnverifiedDriversCount'   => Driver::mobileUnverified()->count(),
-                'kycUnverifiedDriversCount'   => Driver::kycUnverified()->count(),
+                'vehicleUnverifiedDriversCount'   => Driver::vehicleUnverified()->count(),
                 'kycPendingDriversCount'   => Driver::kycPending()->count(),
 
                 'pendingTicketCount'         => SupportTicket::whereIN('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count(),

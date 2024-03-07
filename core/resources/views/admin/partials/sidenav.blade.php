@@ -116,7 +116,7 @@
                         <i class="menu-icon las la-user-friends"></i>
                         <span class="menu-title">@lang('Manage Drivers')</span>
 
-                        @if($bannedDriversCount > 0 || $emailUnverifiedDriversCount > 0 || $mobileUnverifiedDriversCount > 0 || $kycUnverifiedDriversCount > 0 || $kycPendingDriversCount > 0)
+                        @if($bannedDriversCount > 0 || $emailUnverifiedDriversCount > 0 || $mobileUnverifiedDriversCount > 0 || $vehicleUnverifiedDriversCount > 0 || $kycPendingDriversCount > 0)
                             <span class="menu-badge pill bg--danger ms-auto">
                                 <i class="fa fa-exclamation"></i>
                             </span>
@@ -165,9 +165,9 @@
                             <li class="sidebar-menu-item {{menuActive('admin.drivers.kyc.unverified')}}">
                                 <a href="{{route('admin.drivers.kyc.unverified')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('KYC Unverified')</span>
-                                    @if($kycUnverifiedDriversCount)
-                                        <span class="menu-badge pill bg--danger ms-auto">{{$kycUnverifiedDriversCount}}</span>
+                                    <span class="menu-title">@lang('Vehicle Unverified')</span>
+                                    @if($vehicleUnverifiedDriversCount)
+                                        <span class="menu-badge pill bg--danger ms-auto">{{$vehicleUnverifiedDriversCount}}</span>
                                     @endif
                                 </a>
                             </li>
@@ -175,7 +175,7 @@
                             <li class="sidebar-menu-item {{menuActive('admin.drivers.kyc.pending')}}">
                                 <a href="{{route('admin.drivers.kyc.pending')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('KYC Pending')</span>
+                                    <span class="menu-title">@lang('Verification Pending')</span>
                                     @if($kycPendingDriversCount)
                                         <span class="menu-badge pill bg--danger ms-auto">{{$kycPendingDriversCount}}</span>
                                     @endif

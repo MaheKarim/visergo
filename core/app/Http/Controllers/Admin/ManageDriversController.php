@@ -46,7 +46,7 @@ class ManageDriversController extends Controller
     public function kycUnverifiedDrivers()
     {
         $pageTitle = 'KYC Unverified Drivers';
-        $drivers = $this->driverData('kycUnverified');
+        $drivers = $this->driverData('vehicleUnverified');
         return view('admin.drivers.list', compact('pageTitle', 'drivers'));
     }
 
