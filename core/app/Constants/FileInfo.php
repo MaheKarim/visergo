@@ -58,6 +58,9 @@ class FileInfo
             'path'      =>'assets/admin/images/profile',
             'size'      =>'400x400',
         ];
+        $data['licenseImage'] = [
+            'path'      =>'assets/drivers/images/license',
+        ];
         return $data;
 	}
 

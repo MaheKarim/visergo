@@ -193,7 +193,8 @@ Route::namespace('Api')->name('api.')->group(function () {
                 Route::get('verification-form', 'verificationForm')->name('kyc.form');
                 Route::post('verificationForm-submit', 'verificationFormSubmit')->name('kyc.submit');
                 // Vehicle Verification
-
+                Route::get('vehicle-verification', 'vehicleVerification')->name('vehicle.verification');
+                Route::post('vehicle-verification-submit', 'vehicleVerificationSubmit')->name('vehicle.verification.submit');
             });
 
             // Driver License & Vehicle Registration Verification Middleware

@@ -39,6 +39,11 @@ class Driver extends Authenticatable
         return $this->hasMany(DriverLogin::class);
     }
 
+    public function vehicle()
+    {
+        return $this->hasOne(Vehicle::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {
