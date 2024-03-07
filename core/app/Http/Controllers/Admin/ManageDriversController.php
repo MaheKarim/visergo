@@ -113,7 +113,7 @@ class ManageDriversController extends Controller
 
     public function kycDetails($id)
     {
-        $pageTitle = 'KYC Details';
+        $pageTitle = 'Verification Details';
         $driver = Driver::findOrFail($id);
         return view('admin.drivers.kyc_detail', compact('pageTitle','driver'));
     }
@@ -133,18 +133,21 @@ class ManageDriversController extends Controller
     public function kycReject($id)
     {
         $driver = Driver::findOrFail($id);
-        foreach ($driver->kyc_data as $kycData) {
+        foreach ($driver->driver_verification as $kycData) {
             if ($kycData->type == 'file') {
                 fileManager()->removeFile(getFilePath('verify').'/'.$kycData->value);
             }
         }
         $driver->dv = 0;
         $driver->driver_verification = null;
+        $driver->license_number = null;
+        $driver->license_expire = null;
+        $driver->license_image = null;
         $driver->save();
 
         notify($driver,'KYC_REJECT',[]);
 
-        $notify[] = ['success','KYC rejected successfully'];
+        $notify[] = ['warning','Verification rejected successfully'];
         return to_route('admin.drivers.kyc.pending')->withNotify($notify);
     }
 

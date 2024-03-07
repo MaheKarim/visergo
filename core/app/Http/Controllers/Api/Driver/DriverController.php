@@ -129,7 +129,7 @@ class DriverController extends Controller
         if ($request->hasFile('license_image')) {
             try {
                 $old = $driver->license_image;
-                $driver->license_image = fileUploader($request->license_image, getFilePath('licenseImage'), $old);
+                $driver->license_image = fileUploader($request->license_image, getFilePath('licenseImage'),getFileSize('licenseImage'), $old);
             } catch (\Exception $exp) {
                 $notify[] = ['error', 'Couldn\'t upload your image'];
                 return response()->json([
@@ -145,7 +145,7 @@ class DriverController extends Controller
         $driver->license_expire = $request->license_expire;
         $driver->save();
 
-        $notify[] = 'Driver Verification data submitted successfully';
+        $notify[] = 'Driver verification data submitted successfully';
         return response()->json([
             'remark'=>'kyc_submitted',
             'status'=>'success',

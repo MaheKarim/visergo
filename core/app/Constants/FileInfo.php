@@ -60,6 +60,7 @@ class FileInfo
         ];
         $data['licenseImage'] = [
             'path'      =>'assets/drivers/images/license',
+            'size'      =>'400x400',
         ];
         return $data;
 	}
