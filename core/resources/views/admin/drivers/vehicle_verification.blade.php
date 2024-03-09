@@ -11,7 +11,7 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     {{__($val->name)}}
                                     <span>
-                                @if($val->type == 'checkbox')
+                                        @if($val->type == 'checkbox')
                                             {{ implode(',',$val->value) }}
                                         @elseif($val->type == 'file')
                                             @if($val->value)
@@ -27,31 +27,29 @@
                                 </li>
                             @endforeach
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                @lang('Vehicle Brand')
+                                @lang('Vehicle Type')
+                                <span>{{__($driver->vehicle->vehicleType->name)}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @lang(' Class')
+                                <span>{{__($driver->vehicle->vehicleClass->name)}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @lang(' Brand')
+                                <span>{{__($driver->vehicle->brand->name)}}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @lang('Vehicle Name')
                                 <span>{{__($driver->vehicle->name)}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 @lang('Manufacture Year')
                                 <span>{{__($driver->vehicle->year)}}</span>
                             </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    @lang('Brand')
-                                    <span>{{__($driver->vehicle->brand_id)}}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    @lang('Brand')
-                                    <span>{{__(dd($driver))}}</span>
-                                </li>
-
-{{--                            <li class="list-group-item d-flex justify-content-between align-items-center">--}}
-{{--                                @lang('License Documents')--}}
-{{--                                <span>--}}
-{{--                                   @if($driver->license_image = 'file')--}}
-{{--                                        <a href="{{ route('admin.download.attachment',encrypt(getFilePath('licenseImage').'/'.$driver->license_image)) }}" class="me-3">--}}
-{{--                                            <i class="fa fa-file"></i>  @lang('Attachment') </a>--}}
-{{--                                   @endif--}}
-{{--                                </span>--}}
-{{--                            </li>--}}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @lang('Vehicle Model')
+                                <span>{{__($driver->vehicle->driver->fullName)}}</span>
+                            </li>
                         </ul>
                     @else
                         <h5 class="text-center">@lang('Vehicle verification data not found')</h5>
@@ -61,11 +59,11 @@
                         <div class="d-flex flex-wrap justify-content-end mt-3">
                             <button class="btn btn-outline--danger me-3 confirmationBtn"
                                     data-question="@lang('Are you sure to reject this documents?')"
-                                    data-action="{{ route('admin.drivers.kyc.reject', $driver->id) }}"><i
+                                    data-action="{{ route('admin.drivers.vehicle.reject', $driver->id) }}"><i
                                     class="las la-ban"></i>@lang('Reject')</button>
                             <button class="btn btn-outline--success confirmationBtn"
                                     data-question="@lang('Are you sure to approve this documents?')"
-                                    data-action="{{ route('admin.drivers.kyc.approve', $driver->id) }}"><i
+                                    data-action="{{ route('admin.drivers.vehicle.approve', $driver->id) }}"><i
                                     class="las la-check"></i>@lang('Approve')</button>
                         </div>
                     @endif

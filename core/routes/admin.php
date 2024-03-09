@@ -356,6 +356,8 @@ Route::middleware('admin')->group(function () {
 
         Route::get('vehicle-pending', 'vehiclePendingDrivers')->name('vehicle.pending');
         Route::get('vehicle-data/{id}', 'vehicleDetails')->name('vehicle.details');
+        Route::post('vehicle-approve/{id}', 'vehicleApprove')->name('vehicle.approve');
+        Route::post('vehicle-reject/{id}', 'vehicleReject')->name('vehicle.reject');
 
 
         Route::get('mobile-verified', 'mobileVerifiedDrivers')->name('mobile.verified');

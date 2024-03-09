@@ -132,6 +132,40 @@ class ManageDriversController extends Controller
         return view('admin.drivers.vehicle_verification', compact('pageTitle','driver'));
     }
 
+
+    public function vehicleApprove($id)
+    {
+        $driver = Driver::findOrFail($id);
+        $driver->vv = 1;
+        $driver->save();
+
+        notify($driver,'VEHICLE_APPROVE',[]);
+
+        $notify[] = ['success','Vehicle verified successfully'];
+        return to_route('admin.drivers.verification.pending')->withNotify($notify);
+    }
+
+    public function vehicleReject($id)
+    {
+        $driver = Driver::findOrFail($id);
+        foreach ($driver->vehicle_verification as $kycData) {
+            if ($kycData->type == 'file') {
+                fileManager()->removeFile(getFilePath('verify').'/'.$kycData->value);
+            }
+        }
+        $driver->vv = 0;
+        $driver->vehicle_verification = null;
+        $driver->license_number = null;
+        $driver->license_expire = null;
+        $driver->license_image = null;
+        $driver->save();
+
+        notify($driver,'VEHICLE_REJECT',[]);
+
+        $notify[] = ['warning','Verification rejected successfully'];
+        return to_route('admin.drivers.kyc.pending')->withNotify($notify);
+    }
+
     public function kycApprove($id)
     {
         $driver = Driver::findOrFail($id);

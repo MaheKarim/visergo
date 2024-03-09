@@ -11,4 +11,9 @@ class VehicleType extends Model
 {
     use GlobalStatus, Searchable;
 
+//    public function vehicle()
+//    {
+//        return $this->hasMany(Vehicle::class, 'vehicle_type_id', 'id');
+//    }
+
 }
