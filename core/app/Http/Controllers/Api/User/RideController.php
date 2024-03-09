@@ -22,10 +22,6 @@ class RideController extends Controller
             'destination_long' => 'required',
         ]);
 
-        /**
-         * 2. Check if zone is available
-         */
-
         $user = auth()->user();
 
         $existingRide = Ride::where('user_id', $user->id)
