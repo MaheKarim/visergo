@@ -80,7 +80,8 @@ class Kernel extends HttpKernel
         'driver' => \App\Http\Middleware\RedirectIfNotDriver::class,
         'driver.guest' => \App\Http\Middleware\RedirectIfDriver::class,
         'driver.check.status' => \App\Http\Middleware\DriverCheckStatus::class,
-        'driver.verification' => DriverVerificationStatus::class
+        'driver.verification' => DriverVerificationStatus::class,
+        'isDriverOnline' => \App\Http\Middleware\DriverOnlineStatus::class,
 
     ];
 }

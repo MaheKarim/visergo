@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class RideRequestController extends Controller
 {
-    public function rideRequests(): \Illuminate\Http\JsonResponse
+    public function rideRequests()
     {
         $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->latest()->get();
 

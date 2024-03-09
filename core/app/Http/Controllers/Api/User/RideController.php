@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use App\Models\Ride;
+use App\Models\VehicleType;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +16,7 @@ class RideController extends Controller
 {
     public function rideRequest(Request $request, $id = 0)
     {
-        /**
-         * 1. Can't request within (minute or request die)
-         */
+
         $validator = Validator::make($request->all(), [
             'pickup_lat' => 'required',
             'pickup_long' => 'required',
@@ -64,6 +63,7 @@ class RideController extends Controller
                 'data' => $request->all(),
             ]);
         } else{
+
             $pickup_lat = $request->pickup_lat;
             $pickup_long = $request->pickup_long;
             $destination_lat = $request->destination_lat;
@@ -74,62 +74,76 @@ class RideController extends Controller
             $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
             $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
 
-            if (Status::RIDE &&($pickup_in_zone && $destination_in_zone)) {
-                $distance = number_format($this->distanceCalculate($pickup_lat, $pickup_long, $destination_lat, $destination_long), 2, '.', '');
-                $ride = new Ride();
-                $ride->user_id = $user->id;
-                $ride->zone_id = $zone->id;
-                $ride->ride_for = $request->ride_for;
-                $ride->pillion_name = $request->pillion_name;
-                $ride->pillion_number = $request->pillion_number;
-                $ride->pickup_lat = $pickup_lat;
-                $ride->pickup_long = $pickup_long;
-                $ride->destination_lat = $destination_lat;
-                $ride->destination_long = $destination_long;
-                $ride->distance = $distance;
+            // Introduce Google MAP Api
+            $apiKey = gs()->location_api;
+            $url      = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
+            $response = json_decode(file_get_contents($url), true);
 
-                $ride->total = 100;
+            if ($response['status'] == 'OK') {
+                $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
+                $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
+                if (Status::RIDE && ($pickup_in_zone && $destination_in_zone)) {
 
-                $ride->ride_request_type = Status::RIDE;
-                $ride->status = Status::RIDE_INITIATED;
-                $ride->save();
 
-                // Reward Claim After Ride Completed
-                if ($ride->status == Status::RIDE_COMPLETED) {
-                    $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
-                    $user->reward_point += $ride->point;
-                    $user->save();
+                    // Calculate total fare based on distance and base fare
+                    $base_fare = VehicleType::where('id', Status::RIDE)->value('base_fare');
+                    $perKMCost = VehicleType::where('id', Status::RIDE)->value('ride_fare_per_km');
+//                    $total = $distance * $base_fare;
+                    // TODO:: Need To Update
+
+                    $ride = new Ride();
+                    $ride->user_id = $user->id;
+                    $ride->zone_id = $zone->id;
+                    $ride->ride_for = $request->ride_for;
+                    $ride->pillion_name = $request->pillion_name;
+                    $ride->pillion_number = $request->pillion_number;
+                    $ride->pickup_lat = $pickup_lat;
+                    $ride->pickup_long = $pickup_long;
+                    $ride->destination_lat = $destination_lat;
+                    $ride->destination_long = $destination_long;
+                    $ride->distance = $distance;
+                    $ride->duration = $duration;
+                    $ride->base_fare = $base_fare;
+
+                    $ride->total = $base_fare + ($distance * $perKMCost);
+
+                    $ride->ride_request_type = Status::RIDE;
+                    $ride->status = Status::RIDE_INITIATED;
+                    $ride->save();
+
+                    // Reward Claim After Ride Completed
+                    if ($ride->status == Status::RIDE_COMPLETED) {
+                        $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
+                        $user->reward_point += $ride->point;
+                        $user->save();
+                    }
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Ride Requested Created Successfully',
+                        'distance' => $distance,
+                        'data' => $ride,
+                    ]);
+                } elseif (!$pickup_in_zone) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Pickup location is not within the zone.',
+                        'data' => $request->all(),
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Destination location is not within the zone.',
+                        'data' => $request->all(),
+                    ]);
                 }
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Ride Requested Created Successfully',
-                    'distance' => $distance,
-                    'data' => $ride,
-                ]);
-            } elseif (!$pickup_in_zone) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Pickup location is not within the zone.',
-                    'data' => $request->all(),
-                ]);
             } else {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Destination location is not within the zone.',
+                    'message' => 'Something went wrong in API',
                     'data' => $request->all(),
                 ]);
             }
         }
     }
 
-
-    private function distanceCalculate($lat1, $lon1, $lat2, $lon2)
-    {
-        $deltaLat = deg2rad($lat2 - $lat1);
-        $deltaLon = deg2rad($lon2 - $lon1);
-        $a = sin($deltaLat / 2) * sin($deltaLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($deltaLon / 2) * sin($deltaLon / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        $distance = 6371 * $c; // Earth's radius in km
-        return $distance;
-    }
 }

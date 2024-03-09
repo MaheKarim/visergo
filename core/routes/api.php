@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\Driver\DriverController;
 use App\Models\Driver;
 use App\Models\GeneralSetting;
 use Illuminate\Support\Facades\Route;
@@ -202,16 +201,17 @@ Route::namespace('Api')->name('api.')->group(function () {
                 // Deposit & Transactions
                 Route::controller('DriverController')->prefix('driver')->group(function () {
                     Route::post('current-status', 'currentStatus')->name('current.status');
-                    // Live Requests
-
                     Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                     Route::get('transactions', 'transactions')->name('transactions');
                 });
 
-                Route::controller('RideRequestController')->name('ride.')->prefix('driver')->group(function () {
-                    // Live Requests
-                    Route::get('ride/requests', 'rideRequests')->name('ride.requests');
-                    Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
+                // Driver Online Status Middleware
+                Route::middleware('isDriverOnline')->group(function () {
+                    Route::controller('RideRequestController')->name('ride.')->prefix('driver')->group(function () {
+                        // Live Requests
+                        Route::get('ride/requests', 'rideRequests')->name('ride.requests');
+                        Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
+                    });
                 });
                 Route::get('driver-info', function () {
                     $user = auth()->user();
@@ -233,9 +233,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     }
                 });
             });
-
         });
-
 
         Route::get('driver/logout', 'Auth\DriverLoginController@logout');
     });

@@ -13,16 +13,6 @@
                                     <input class="form-control" name="name" required type="text" value="{{ old('name', @$zone->name) }}">
                                 </div>
                             </div>
-
-{{--                            <div class="col-sm-6">--}}
-{{--                                <div class="form-group">--}}
-{{--                                    <label>@lang('Instructions')</label>--}}
-
-{{--                                    <video autoplay loop muted class="w-100 h-100">--}}
-{{--                                        <source src="{{   getImage('assets/admin/zone.mp4') }}" type="video/mp4">--}}
-{{--                                      </video>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label>@lang('Select Area')</label>
