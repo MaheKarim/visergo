@@ -396,18 +396,4 @@ class DriverController extends Controller
             ]
         ]);
     }
-
-
-    public function rideRequests()
-    {
-        $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->latest()->get();
-        return response()->json([
-            'remark'=>'ride_requests',
-            'status'=>'success',
-            'message'=>[],
-            'data'=>[
-                'live_requests'=>$liveRequests
-            ]
-        ]);
-    }
 }
