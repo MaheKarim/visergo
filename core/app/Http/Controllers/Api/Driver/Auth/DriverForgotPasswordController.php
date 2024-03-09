@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Api\Driver\Auth;
 
-use App\Http\Controllers\Api\Auth\User;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
+use App\Models\DriverPasswordReset;
 use App\Models\GeneralSetting;
-use App\Models\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -28,9 +27,9 @@ class DriverForgotPasswordController extends Controller
         }
 
         $fieldType = $this->findFieldType();
-        $user = Driver::where($fieldType, $request->value)->first();
+        $driver = Driver::where($fieldType, $request->value)->first();
 
-        if (!$user) {
+        if (!$driver) {
             $notify[] = 'Couldn\'t find any account with this information';
             return response()->json([
                 'remark'=>'validation_error',
@@ -39,25 +38,25 @@ class DriverForgotPasswordController extends Controller
             ]);
         }
 
-        PasswordReset::where('email', $user->email)->delete();
+        DriverPasswordReset::where('email', $driver->email)->delete();
         $code = verificationCode(6);
-        $password = new PasswordReset();
-        $password->email = $user->email;
+        $password = new DriverPasswordReset();
+        $password->email = $driver->email;
         $password->token = $code;
         $password->created_at = \Carbon\Carbon::now();
         $password->save();
 
-        $userIpInfo = getIpInfo();
-        $userBrowserInfo = osBrowser();
-        notify($user, 'PASS_RESET_CODE', [
+        $driverIpInfo = getIpInfo();
+        $driverBrowserInfo = osBrowser();
+        notify($driver, 'PASS_RESET_CODE', [
             'code' => $code,
-            'operating_system' => @$userBrowserInfo['os_platform'],
-            'browser' => @$userBrowserInfo['browser'],
-            'ip' => @$userIpInfo['ip'],
-            'time' => @$userIpInfo['time']
+            'operating_system' => @$driverBrowserInfo['os_platform'],
+            'browser' => @$driverBrowserInfo['browser'],
+            'ip' => @$driverIpInfo['ip'],
+            'time' => @$driverIpInfo['time']
         ],['email']);
 
-        $email = $user->email;
+        $email = $driver->email;
         $response[] = 'Verification code sent to mail';
         return response()->json([
             'remark'=>'code_sent',
@@ -85,7 +84,7 @@ class DriverForgotPasswordController extends Controller
         }
         $code =  $request->code;
 
-        if (PasswordReset::where('token', $code)->where('email', $request->email)->count() != 1) {
+        if (DriverPasswordReset::where('token', $code)->where('email', $request->email)->count() != 1) {
             $notify[] = 'Verification code doesn\'t match';
             return response()->json([
                 'remark'=>'validation_error',
@@ -115,7 +114,7 @@ class DriverForgotPasswordController extends Controller
         }
 
 
-        $reset = PasswordReset::where('token', $request->token)->orderBy('created_at', 'desc')->first();
+        $reset = DriverPasswordReset::where('token', $request->token)->orderBy('created_at', 'desc')->first();
         if (!$reset) {
             $response[] = 'Invalid verification code';
             return response()->json([
@@ -125,19 +124,19 @@ class DriverForgotPasswordController extends Controller
             ]);
         }
 
-        $user = User::where('email', $reset->email)->first();
-        $user->password = bcrypt($request->password);
-        $user->save();
+        $driver = Driver::where('email', $reset->email)->first();
+        $driver->password = bcrypt($request->password);
+        $driver->save();
 
 
 
-        $userIpInfo = getIpInfo();
-        $userBrowser = osBrowser();
-        notify($user, 'PASS_RESET_DONE', [
-            'operating_system' => @$userBrowser['os_platform'],
-            'browser' => @$userBrowser['browser'],
-            'ip' => @$userIpInfo['ip'],
-            'time' => @$userIpInfo['time']
+        $driverIpInfo = getIpInfo();
+        $driverBrowser = osBrowser();
+        notify($driver, 'PASS_RESET_DONE', [
+            'operating_system' => @$driverBrowser['os_platform'],
+            'browser' => @$driverBrowser['browser'],
+            'ip' => @$driverIpInfo['ip'],
+            'time' => @$driverIpInfo['time']
         ],['email']);
 
 
