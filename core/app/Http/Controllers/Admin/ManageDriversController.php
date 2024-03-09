@@ -66,7 +66,7 @@ class ManageDriversController extends Controller
 
     public function vehiclePendingDrivers()
     {
-        $pageTitle = 'Vehicle Pending Drivers';
+        $pageTitle = 'Pending Vehicles';
         $drivers = $this->driverData('vehiclePending');
         return view('admin.drivers.list', compact('pageTitle', 'drivers'));
     }
