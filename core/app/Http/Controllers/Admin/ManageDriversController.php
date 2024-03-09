@@ -142,7 +142,7 @@ class ManageDriversController extends Controller
         notify($driver,'VEHICLE_APPROVE',[]);
 
         $notify[] = ['success','Vehicle verified successfully'];
-        return to_route('admin.drivers.verification.pending')->withNotify($notify);
+        return to_route('admin.drivers.vehicle.pending')->withNotify($notify);
     }
 
     public function vehicleReject($id)
@@ -163,7 +163,7 @@ class ManageDriversController extends Controller
         notify($driver,'VEHICLE_REJECT',[]);
 
         $notify[] = ['warning','Verification rejected successfully'];
-        return to_route('admin.drivers.kyc.pending')->withNotify($notify);
+        return to_route('admin.drivers.vehicle.pending')->withNotify($notify);
     }
 
     public function kycApprove($id)
