@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
 use App\Models\Ride;
 use App\Models\Zone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
@@ -39,6 +41,15 @@ class RideController extends Controller
         }
 
         $user = auth()->user();
+
+        if ($user instanceof Driver) {
+            return response()->json([
+                'remark'=>'unauthorized_action',
+                'status' => 'error',
+                'message' => 'Drivers are not allowed to make ride requests.'
+            ], 403);
+        }
+
 
         $existingRide = Ride::where('user_id', $user->id)
             ->where('ride_request_type', Status::RIDE)
