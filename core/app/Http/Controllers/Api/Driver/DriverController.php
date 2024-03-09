@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
 use App\Models\Form;
 use App\Models\GeneralSetting;
+use App\Models\Ride;
 use App\Models\Transaction;
 use App\Models\Vehicle;
 use App\Models\VehicleModel;
@@ -392,6 +393,20 @@ class DriverController extends Controller
             'message'=>['success'=>$notify],
             'data'=>[
                 'current_status'=>auth()->user()->current_status
+            ]
+        ]);
+    }
+
+
+    public function rideRequests()
+    {
+        $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->latest()->get();
+        return response()->json([
+            'remark'=>'ride_requests',
+            'status'=>'success',
+            'message'=>[],
+            'data'=>[
+                'live_requests'=>$liveRequests
             ]
         ]);
     }
