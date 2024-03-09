@@ -22,61 +22,77 @@ class RideController extends Controller
             'destination_long' => 'required',
         ]);
 
+        /**
+         * 2. Check if zone is available
+         */
+
         $user = auth()->user();
-        $pickup_lat = $request->pickup_lat;
-        $pickup_long = $request->pickup_long;
-        $destination_lat = $request->destination_lat;
-        $destination_long = $request->destination_long;
 
-        $zone = Zone::where('status', Status::ENABLE)->first(); // WIP
+        $existingRide = Ride::where('user_id', $user->id)
+            ->where('ride_request_type', Status::RIDE)
+            ->where('status', Status::RIDE_INITIATED)
+            ->first();
 
-        $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
-        $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+        if ($existingRide) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You have already requested a ride.',
+                'data' => $request->all(),
+            ]);
+        } else{
+            $pickup_lat = $request->pickup_lat;
+            $pickup_long = $request->pickup_long;
+            $destination_lat = $request->destination_lat;
+            $destination_long = $request->destination_long;
 
-        if (Status::RIDE &&($pickup_in_zone && $destination_in_zone)) {
+            $zone = Zone::where('status', Status::ENABLE)->first(); // WIP
 
-            $distance = number_format($this->distanceCalculate($pickup_lat, $pickup_long, $destination_lat, $destination_long), 2, '.', '');
+            $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
+            $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
 
-            $ride = new Ride();
-            $ride->user_id = $user->id;
-            $ride->zone_id = $zone->id;
-            $ride->pickup_lat = $pickup_lat;
-            $ride->pickup_long = $pickup_long;
-            $ride->destination_lat = $destination_lat;
-            $ride->destination_long = $destination_long;
-            $ride->distance = $distance;
+            if (Status::RIDE &&($pickup_in_zone && $destination_in_zone)) {
+                $distance = number_format($this->distanceCalculate($pickup_lat, $pickup_long, $destination_lat, $destination_long), 2, '.', '');
+                $ride = new Ride();
+                $ride->user_id = $user->id;
+                $ride->zone_id = $zone->id;
+                $ride->pickup_lat = $pickup_lat;
+                $ride->pickup_long = $pickup_long;
+                $ride->destination_lat = $destination_lat;
+                $ride->destination_long = $destination_long;
+                $ride->distance = $distance;
 
-            $ride->total = 100;
+                $ride->total = 100;
 
-            $ride->ride_request = Status::RIDE;
-            $ride->status = Status::RIDE_INITIATED;
-            $ride->save();
+                $ride->ride_request_type = Status::RIDE;
+                $ride->status = Status::RIDE_INITIATED;
+                $ride->save();
 
-            if ($ride->status == Status::RIDE_COMPLETED) {
-                $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
-                $user->reward_point += $ride->point;
-                $user->save();
+                // Reward Claim After Ride Completed
+                if ($ride->status == Status::RIDE_COMPLETED) {
+                    $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
+                    $user->reward_point += $ride->point;
+                    $user->save();
+                }
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Ride Requested Created Successfully',
+                    'distance' => $distance,
+                    'data' => $ride,
+                ]);
+            } elseif (!$pickup_in_zone) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Pickup location is not within the zone.',
+                    'data' => $request->all(),
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Destination location is not within the zone.',
+                    'data' => $request->all(),
+                ]);
             }
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Ride Requested Created Successfully',
-                'distance' => $distance,
-                'data' => $ride,
-            ]);
-        } elseif (!$pickup_in_zone) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pickup location is not within the zone.',
-                'data' => $request->all(),
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Destination location is not within the zone.',
-                'data' => $request->all(),
-            ]);
         }
-
     }
 
 
