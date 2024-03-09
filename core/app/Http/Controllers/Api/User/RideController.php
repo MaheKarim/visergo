@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ride;
 use App\Models\Zone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
 {
@@ -15,17 +16,33 @@ class RideController extends Controller
         /**
          * 1. Can't request within (minute or request die)
          */
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'pickup_lat' => 'required',
             'pickup_long' => 'required',
             'destination_lat' => 'required',
             'destination_long' => 'required',
+            'ride_for' => 'required',
+            'pillion_name' => [
+                'required_if:ride_for,'. Status::RIDE_FOR_PILLION,
+            ],
+            'pillion_number' => [
+                'required_if:ride_for,'. Status::RIDE_FOR_PILLION,
+            ],
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'remark'=>'validation_error',
+                'status'=>'error',
+                'message'=>['error'=>$validator->errors()->all()],
+            ]);
+        }
 
         $user = auth()->user();
 
         $existingRide = Ride::where('user_id', $user->id)
             ->where('ride_request_type', Status::RIDE)
+            ->where('ride_for', Status::RIDE_FOR_OWN)
             ->where('status', Status::RIDE_INITIATED)
             ->first();
 
@@ -51,6 +68,9 @@ class RideController extends Controller
                 $ride = new Ride();
                 $ride->user_id = $user->id;
                 $ride->zone_id = $zone->id;
+                $ride->ride_for = $request->ride_for;
+                $ride->pillion_name = $request->pillion_name;
+                $ride->pillion_number = $request->pillion_number;
                 $ride->pickup_lat = $pickup_lat;
                 $ride->pickup_long = $pickup_long;
                 $ride->destination_lat = $destination_lat;

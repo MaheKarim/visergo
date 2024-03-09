@@ -57,4 +57,11 @@ class Status{
     const ONLINE = 1;
     const OFFLINE = 0;
 
+    const CANCEL = 1;
+    const CANCELABLE = 0;
+
+    const RIDE_FOR_OWN = 1;
+    const RIDE_FOR_PILLION = 2;
+
+
 }
