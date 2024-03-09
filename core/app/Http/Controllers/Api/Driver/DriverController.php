@@ -379,4 +379,20 @@ class DriverController extends Controller
             ]);
         }
     }
+
+    public function currentStatus(Request $request)
+    {
+        $driver = auth()->user();
+        $driver->current_status = $request->current_status;
+        $driver->save();
+        $notify[] = 'Status updated successfully';
+        return response()->json([
+            'remark'=>'current_status',
+            'status'=>'success',
+            'message'=>['success'=>$notify],
+            'data'=>[
+                'current_status'=>auth()->user()->current_status
+            ]
+        ]);
+    }
 }

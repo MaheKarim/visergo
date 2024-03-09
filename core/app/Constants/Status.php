@@ -54,4 +54,7 @@ class Status{
     const DRIVER_ACTIVE = 1;
     const DRIVER_BAN = 0;
 
+    const ONLINE = 1;
+    const OFFLINE = 0;
+
 }

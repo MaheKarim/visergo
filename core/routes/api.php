@@ -201,6 +201,7 @@ Route::namespace('Api')->name('api.')->group(function () {
             Route::middleware('driver.verification')->group(function () {
                 // Deposit & Transactions
                 Route::controller('DriverController')->prefix('driver')->group(function () {
+                    Route::post('current-status', 'currentStatus')->name('current.status');
                     Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                     Route::get('transactions', 'transactions')->name('transactions');
                 });
