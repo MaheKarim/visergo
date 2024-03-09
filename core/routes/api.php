@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Driver\DriverController;
+use App\Models\Driver;
 use App\Models\GeneralSetting;
 use Illuminate\Support\Facades\Route;
 
@@ -213,15 +214,23 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
                 });
                 Route::get('driver-info', function () {
-                    $notify[] = 'Driver information';
-                    return response()->json([
-                        'remark' => 'user_info',
-                        'status' => 'success',
-                        'message' => ['success' => $notify],
-                        'data' => [
-                            'user' => auth()->user()
-                        ]
-                    ]);
+                    $user = auth()->user();
+                    if ($user instanceof Driver) {
+                        return response()->json([
+                            'remark' => 'user_info',
+                            'status' => 'success',
+                            'message' => ['success' => 'Driver information'],
+                            'data' => [
+                                'user' => $user
+                            ]
+                        ]);
+                    } else {
+                        return response()->json([
+                            'remark' => 'user_info',
+                            'status' => 'success',
+                            'message' => ['success' => 'No driver found'],
+                        ]);
+                    }
                 });
             });
 
