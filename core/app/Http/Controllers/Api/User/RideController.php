@@ -86,6 +86,8 @@ class RideController extends Controller
                     // Calculate total fare based on distance and base fare
                     $base_fare = VehicleType::where('id', Status::RIDE)->value('base_fare');
                     $perKMCost = VehicleType::where('id', Status::RIDE)->value('ride_fare_per_km');
+                    $rideCost = $distance * $perKMCost;
+
                     // TODO:: Need To Update
 
                     $ride = new Ride();
@@ -102,8 +104,11 @@ class RideController extends Controller
                     $ride->distance = $distance;
                     $ride->duration = $duration;
                     $ride->base_fare = $base_fare;
-
-                    $ride->total = $base_fare + ($distance * $perKMCost);
+                    if ($rideCost < $base_fare) {
+                        $ride->total = $base_fare;
+                    } else {
+                        $ride->total = $rideCost;
+                    }
 
                     $ride->ride_request_type = Status::RIDE;
                     $ride->status = Status::RIDE_INITIATED;
