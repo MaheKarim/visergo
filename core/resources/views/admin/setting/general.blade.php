@@ -80,6 +80,26 @@
                         </div>
 
                         <div class="row">
+                            <div class="col-md-6">
+                                <label>@lang('VAT Title')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" name="vat_title" required value="{{ $general->vat_title }}" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>@lang('VAT Value')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="vat_value" required min="0" value="{{ showAmount($general->vat_value) }}">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-12">
                             <label>@lang('Google Location API Key')</label>
                                 <div class="form-group">

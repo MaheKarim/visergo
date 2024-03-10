@@ -32,6 +32,8 @@ class GeneralSettingController extends Controller
             'spend_amount_for_reward' => 'required|numeric|min:0',
             'reward_point' => 'required|numeric|min:0',
             'location_api' => 'nullable|string',
+            'vat_title' => 'required|string',
+            'vat_value' => 'required|numeric|min:0',
         ]);
 
         $timezones = json_decode(file_get_contents(resource_path('views/admin/partials/timezone.json')));
@@ -46,6 +48,8 @@ class GeneralSettingController extends Controller
         $general->spend_amount_for_reward = $request->spend_amount_for_reward;
         $general->reward_point = $request->reward_point;
         $general->location_api = $request->location_api;
+        $general->vat_title = $request->vat_title;
+        $general->vat_value = $request->vat_value;
         $general->save();
 
         $timezoneFile = config_path('timezone.php');
