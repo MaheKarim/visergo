@@ -20,24 +20,26 @@ class DrivingCheck
     {
         if (Auth::check()) {
             $driver = auth()->user();
-            $ride = Ride::where('driver_id', $driver->id)
-                ->where('ride_request_type', Status::RIDE)
-                ->where('status', Status::RIDE_INITIATED)
-                ->first();
+            if ($driver->is_driving == Status::IDLE) {
+                $ride = Ride::where('driver_id', $driver->id)
+                    ->where('ride_request_type', Status::RIDE)
+                    ->whereIn('status', [Status::RIDE_INITIATED, Status::RIDE_ACTIVE, Status::RIDE_ONGOING])
+                    ->first();
 
-            if ($driver->is_driving == Status::IDLE && !$ride) {
-                return $next($request);
-            } else {
-                if ($request->is('api/*')) {
-                    $notify[] = 'You can not accept multiple ride requests at the same time';
-                    return response()->json([
-                        'remark'=>'unverified',
-                        'status'=>'error',
-                        'message'=>['error'=>$notify],
-                        'data'=>[
-                            'is_driving'=>$driver->is_driving,
-                        ],
-                    ]);
+                if (!$ride) {
+                    return $next($request);
+                } else {
+                    if ($request->is('api/*')) {
+                        $notify[] = 'You cannot accept multiple ride requests at the same time';
+                        return response()->json([
+                            'remark' => 'unverified',
+                            'status' => 'error',
+                            'message' => ['error' => $notify],
+                            'data' => [
+                                'is_driving' => $driver->is_driving,
+                            ],
+                        ]);
+                    }
                 }
             }
         }
