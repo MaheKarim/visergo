@@ -81,6 +81,9 @@ class RideController extends Controller
             if ($response['status'] == 'OK') {
                 $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
                 $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
+                $pickupAddress = $response['origin_addresses'][0];
+                $destinationAddress = $response['destination_addresses'][0];
+
                 if (Status::RIDE && ($pickup_in_zone && $destination_in_zone)) {
 
                     // Calculate total fare based on distance and base fare
@@ -106,6 +109,8 @@ class RideController extends Controller
                     $ride->pickup_long = $pickup_long;
                     $ride->destination_lat = $destination_lat;
                     $ride->destination_long = $destination_long;
+                    $ride->pickup_address = $pickupAddress;
+                    $ride->destination_address = $destinationAddress;
                     $ride->otp = getNumber(4);
                     $ride->distance = $distance;
                     $ride->duration = $duration;
