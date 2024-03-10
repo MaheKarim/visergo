@@ -31,7 +31,7 @@ class RideRequestController extends Controller
         ]);
     }
 
-     public function rideRequestAccept(Request $request, $id = 0): \Illuminate\Http\JsonResponse
+     public function rideRequestAccept(Request $request, $id = 0)
     {
         $driver = auth()->user();
         $ride = Ride::where('id',$request->id)->where('status',Status::RIDE_INITIATED)->first();
@@ -56,6 +56,50 @@ class RideRequestController extends Controller
             'message'=>[],
             'data'=>[
                 'ride'=>$ride
+            ]
+        ]);
+    }
+
+    public function rideRequestStart(Request $request, $id = 0)
+    {
+        $driver = auth()->user();
+        $ride = Ride::where('driver_id', $driver->id)
+            ->where('ride_request_type', Status::RIDE)
+            ->where('status', Status::RIDE_ACTIVE)->first();
+        if (!$ride) {
+            return response()->json([
+                'remark' => 'technical_error',
+                'status' => 'error',
+                'message' => [],
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        }
+
+        $otp = $request->otp;
+        if ($ride->otp !== $otp) {
+            return response()->json([
+                'remark' => 'otp_mismatch',
+                'status' => 'error',
+                'message' => 'Invalid OTP',
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        }
+
+        $ride->otp = null;
+        $ride->status = Status::RIDE_ONGOING;
+        $ride->ride_start_at = date('Y-m-d H:i:s');
+        $ride->save();
+
+        return response()->json([
+            'remark' => 'ride_start',
+            'status' => 'success',
+            'message' => [],
+            'data' => [
+                'ride' => $ride
             ]
         ]);
     }

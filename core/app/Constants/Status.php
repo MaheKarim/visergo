@@ -38,7 +38,7 @@ class Status{
     const RIDE_ACTIVE = 2;
     const RIDE_ONGOING = 3;
     const RIDE_COMPLETED = 4;
-    const RIDE_CLOSE = 5;
+    const RIDE_CANCELED = 5;
 
     const RIDE = 1;
     const INTER_CITY = 2;
