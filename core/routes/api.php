@@ -93,7 +93,6 @@ Route::namespace('Api')->name('api.')->group(function () {
                 });
 
                 Route::controller('UserController')->group(function () {
-
                     //KYC
                     Route::get('kyc-form', 'kycForm')->name('kyc.form');
                     Route::post('kyc-submit', 'kycSubmit')->name('kyc.submit');
@@ -101,7 +100,6 @@ Route::namespace('Api')->name('api.')->group(function () {
                     //Report
                     Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                     Route::get('transactions', 'transactions')->name('transactions');
-
                 });
 
                 //Profile setting
@@ -146,6 +144,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('RideController')->name('ride.')->group(function () {
                         Route::get('ride', 'ride')->name('ride');
                         Route::post('ride/create', 'rideRequest')->name('ride.insert');
+                        Route::get('ride/completed', 'rideCompleted')->name('ride.completed');
                     });
                 });
             });

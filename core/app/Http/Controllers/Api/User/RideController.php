@@ -52,7 +52,7 @@ class RideController extends Controller
         $existingRide = Ride::where('user_id', $user->id)
             ->where('ride_request_type', Status::RIDE)
             ->where('ride_for', Status::RIDE_FOR_OWN)
-            ->where('status', Status::RIDE_INITIATED)
+            ->whereNotIn('status', [Status::RIDE_COMPLETED, Status::RIDE_CANCELED])
             ->first();
 
         if ($existingRide) {
@@ -157,6 +157,25 @@ class RideController extends Controller
                 ]);
             }
         }
+    }
+
+
+    public function rideCompleted()
+    {
+        $user = auth()->user();
+        $ride = Ride::where('user_id', $user->id)->where('status', Status::RIDE_COMPLETED)->paginate(10);
+        if ($ride == null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No Completed Ride Found',
+                'data' => $ride,
+            ]);
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Completed Ride',
+            'data' => $ride,
+        ]);
     }
 
 }
