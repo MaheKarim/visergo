@@ -9,6 +9,30 @@ use Illuminate\Http\Request;
 
 class RideRequestController extends Controller
 {
+
+    public function ongoingRequests()
+    {
+        $driver = auth()->user();
+        $ride = Ride::where('driver_id', $driver->id)
+            ->where('status', Status::RIDE_ACTIVE)->first();
+        if ($ride == null) {
+            return response()->json([
+                'remark' => 'no_ride_found',
+                'status' => 'error',
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'remark' => 'ride_found',
+                'status' => 'success',
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        }
+    }
     public function rideRequests()
     {
         $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->latest()->get();
@@ -60,15 +84,16 @@ class RideRequestController extends Controller
         ]);
     }
 
-    public function rideRequestStart(Request $request, $id = 0)
+    public function rideRequestStart(Request $request, $id)
     {
         $driver = auth()->user();
         $ride = Ride::where('driver_id', $driver->id)
             ->where('ride_request_type', Status::RIDE)
             ->where('status', Status::RIDE_ACTIVE)->first();
-        if (!$ride) {
+
+        if ($ride == null) {
             return response()->json([
-                'remark' => 'technical_error',
+                'remark' => 'no_request_found',
                 'status' => 'error',
                 'message' => [],
                 'data' => [
@@ -78,18 +103,19 @@ class RideRequestController extends Controller
         }
 
         $otp = $request->otp;
-        if ($ride->otp !== $otp) {
+        if ($ride->otp != $otp) {
             return response()->json([
                 'remark' => 'otp_mismatch',
                 'status' => 'error',
                 'message' => 'Invalid OTP',
                 'data' => [
-                    'ride' => $ride
+                    'otp' => $otp
                 ]
             ]);
+        } else {
+            $ride->otp = null;
         }
 
-        $ride->otp = null;
         $ride->status = Status::RIDE_ONGOING;
         $ride->ride_start_at = date('Y-m-d H:i:s');
         $ride->save();

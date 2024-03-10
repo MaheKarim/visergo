@@ -20,10 +20,10 @@ class DrivingCheck
     {
         if (Auth::check()) {
             $driver = auth()->user();
-            if ($driver->is_driving == Status::IDLE) {
+            if ($driver->is_driving == Status::DRIVING) {
                 $ride = Ride::where('driver_id', $driver->id)
                     ->where('ride_request_type', Status::RIDE)
-                    ->whereIn('status', [Status::RIDE_INITIATED, Status::RIDE_ACTIVE, Status::RIDE_ONGOING])
+                    ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING])
                     ->first();
 
                 if (!$ride) {
