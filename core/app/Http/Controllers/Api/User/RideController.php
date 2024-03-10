@@ -24,18 +24,18 @@ class RideController extends Controller
             'destination_long' => 'required',
             'ride_for' => 'required',
             'pillion_name' => [
-                'required_if:ride_for,'. Status::RIDE_FOR_PILLION,
+                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
             ],
             'pillion_number' => [
-                'required_if:ride_for,'. Status::RIDE_FOR_PILLION,
+                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
             ],
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $validator->errors()->all()],
             ]);
         }
 
@@ -43,7 +43,7 @@ class RideController extends Controller
 
         if ($user instanceof Driver) {
             return response()->json([
-                'remark'=>'unauthorized_action',
+                'remark' => 'unauthorized_action',
                 'status' => 'error',
                 'message' => 'Drivers are not allowed to make ride requests.'
             ], 403);
@@ -61,7 +61,7 @@ class RideController extends Controller
                 'message' => 'You have already requested a ride.',
                 'data' => $request->all(),
             ]);
-        } else{
+        } else {
 
             $pickup_lat = $request->pickup_lat;
             $pickup_long = $request->pickup_long;
@@ -75,7 +75,7 @@ class RideController extends Controller
 
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
-            $url      = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
+            $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
             $response = json_decode(file_get_contents($url), true);
 
             if ($response['status'] == 'OK') {
@@ -87,6 +87,13 @@ class RideController extends Controller
                     $base_fare = VehicleType::where('id', Status::RIDE)->value('base_fare');
                     $perKMCost = VehicleType::where('id', Status::RIDE)->value('ride_fare_per_km');
                     $rideCost = $distance * $perKMCost;
+
+                    if ($rideCost < $base_fare) {
+                        $rideCost = $base_fare;
+                    }
+
+                    $vatAmount = $rideCost * (gs('vat_value') / 100);
+                    $totalAmount = $rideCost + $vatAmount;
 
                     // TODO:: Need To Update
                     $ride = new Ride();
@@ -103,11 +110,9 @@ class RideController extends Controller
                     $ride->distance = $distance;
                     $ride->duration = $duration;
                     $ride->base_fare = $base_fare;
-                    if ($rideCost < $base_fare) {
-                        $ride->total = $base_fare;
-                    } else {
-                        $ride->total = $rideCost;
-                    }
+
+                    $ride->total = $totalAmount;
+                    $ride->vat_amount = $vatAmount;
 
                     $ride->ride_request_type = Status::RIDE;
                     $ride->status = Status::RIDE_INITIATED;
