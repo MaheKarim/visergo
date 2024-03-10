@@ -68,6 +68,11 @@ class User extends Authenticatable
         return $this->hasMany(SupportTicket::class);
     }
 
+    public function conversation()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
     public function fullname(): Attribute
     {
         return new Attribute(

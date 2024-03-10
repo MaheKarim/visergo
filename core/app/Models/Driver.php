@@ -45,6 +45,11 @@ class Driver extends Authenticatable
         return $this->hasOne(Vehicle::class);
     }
 
+    public function conversation()
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
     public function getFullNameAttribute()
     {
         return ucfirst($this->firstname) . ' ' . ucfirst($this->lastname);
