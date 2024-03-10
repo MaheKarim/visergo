@@ -39,7 +39,7 @@ class Status{
     const RIDE_ONGOING = 3; // When Driver Give OTP
     const RIDE_END = 4; // When Driver End
     const RIDE_COMPLETED = 5; // When Payment Done
-    const RIDE_CANCELED = 5; // When Canceled
+    const RIDE_CANCELED = 6; // When Canceled
 
     const RIDE = 1;
     const INTER_CITY = 2;

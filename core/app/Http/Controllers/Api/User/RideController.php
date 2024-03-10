@@ -111,7 +111,7 @@ class RideController extends Controller
                     $ride->destination_long = $destination_long;
                     $ride->pickup_address = $pickupAddress;
                     $ride->destination_address = $destinationAddress;
-                    $ride->otp = getNumber(4);
+                    $ride->otp = generateOTP();
                     $ride->distance = $distance;
                     $ride->duration = $duration;
                     $ride->base_fare = $base_fare;

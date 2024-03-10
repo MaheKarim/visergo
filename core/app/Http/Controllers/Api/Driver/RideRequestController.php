@@ -60,29 +60,33 @@ class RideRequestController extends Controller
     {
         $driver = auth()->user();
         $ride = Ride::where('id',$request->id)->where('status',Status::RIDE_INITIATED)->first();
-        if (!$ride) {
+        if ($ride == null) {
+            $notify = 'No Ride Found';
+            return response()->json([
+                'remark'=>'no_request_found',
+                'status'=>'error',
+                'message'=>$notify,
+                'data'=>[
+                    'ride'=>$ride, $driver
+                ]
+            ]);
+        } else {
+            $ride->status = Status::RIDE_ACTIVE;
+            $ride->driver_id = auth()->user()->id;
+            $ride->save();
+            $driver->is_driving = Status::DRIVING;
+            $driver->save();
+            $notify = 'Ride Accepted Successfully';
             return response()->json([
                 'remark'=>'ride_request_accept',
-                'status'=>'error',
-                'message'=>[],
+                'status'=>'success',
+                'message'=>$notify,
                 'data'=>[
                     'ride'=>$ride
                 ]
             ]);
         }
-        $ride->status = Status::RIDE_ACTIVE;
-        $ride->driver_id = auth()->user()->id;
-        $ride->save();
-        $driver->is_driving = Status::DRIVING;
-        $driver->save();
-        return response()->json([
-            'remark'=>'ride_request_accept',
-            'status'=>'success',
-            'message'=>[],
-            'data'=>[
-                'ride'=>$ride
-            ]
-        ]);
+
     }
 
     public function rideRequestStart(Request $request, $id)

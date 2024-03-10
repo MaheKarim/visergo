@@ -20,10 +20,10 @@ class DrivingCheck
     {
         if (Auth::check()) {
             $driver = auth()->user();
-            if ($driver->is_driving == Status::DRIVING) {
+            if ($driver->is_driving != Status::DRIVING) {
                 $ride = Ride::where('driver_id', $driver->id)
                     ->where('ride_request_type', Status::RIDE)
-                    ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING])
+                    ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING, Status::RIDE_END])
                     ->first();
 
                 if (!$ride) {
@@ -43,6 +43,14 @@ class DrivingCheck
                 }
             }
         }
-        abort(403);
+        $notify[] = 'You can not accept ride requests at the moment';
+        return response()->json([
+            'remark' => 'unverified',
+            'status' => 'error',
+            'message' => ['error' => $notify],
+            'data' => [
+                'is_driving' => $driver->is_driving,
+            ],
+        ], 403);
     }
 }

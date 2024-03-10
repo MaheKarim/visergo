@@ -5,6 +5,7 @@ use App\Lib\GoogleAuthenticator;
 use App\Models\Extension;
 use App\Models\Frontend;
 use App\Models\GeneralSetting;
+use App\Models\Ride;
 use Carbon\Carbon;
 use App\Lib\Captcha;
 use App\Lib\ClientInfo;
@@ -481,4 +482,22 @@ function underZone($lat, $long, $zone)
         }
     }
     return $inside;
+}
+if (!function_exists('generateOTP')) {
+    function generateOTP($length = 4) {
+        $numbers = '0123456789';
+        $otp = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $otp .= $numbers[rand(0, strlen($numbers) - 1)];
+        }
+
+        return $otp;
+    }
+}
+
+if (!function_exists('isUniqueOTP')) {
+    function isUniqueOTP($otp) {
+        return !Ride::where('otp', $otp)->exists();
+    }
 }
