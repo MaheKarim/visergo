@@ -213,9 +213,10 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('ride/ongoing-requests', 'ongoingRequests')->name('ride.ongoing.requests');
                         // Can  Not Accept Multiple Ride Requests Middleware
                         Route::middleware('drivingCheck')->group(function () {
-                            Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
+                            Route::post('ride/requests/{id}/accept', 'rideRequestAccept')->name('ride.requests.accept');
                         });
                             Route::post('ride/requests/{id}/start', 'rideRequestStart')->name('ride.requests.start');
+                            Route::post('ride/requests/{id}/completed', 'rideRequestCompleted')->name('ride.requests.completed');
                     });
                 });
                 Route::get('driver-info', function () {

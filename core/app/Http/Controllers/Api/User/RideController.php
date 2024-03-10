@@ -89,7 +89,6 @@ class RideController extends Controller
                     $rideCost = $distance * $perKMCost;
 
                     // TODO:: Need To Update
-
                     $ride = new Ride();
                     $ride->user_id = $user->id;
                     $ride->zone_id = $zone->id;

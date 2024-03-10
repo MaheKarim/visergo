@@ -34,11 +34,12 @@ class Status{
     const KYC_PENDING = 2;
     const KYC_VERIFIED = 1;
 
-    const RIDE_INITIATED = 1;
-    const RIDE_ACTIVE = 2;
-    const RIDE_ONGOING = 3;
-    const RIDE_COMPLETED = 4;
-    const RIDE_CANCELED = 5;
+    const RIDE_INITIATED = 1; // When User Ride Request
+    const RIDE_ACTIVE = 2; // When Driver Accept
+    const RIDE_ONGOING = 3; // When Driver Give OTP
+    const RIDE_END = 4; // When Driver End
+    const RIDE_COMPLETED = 5; // When Payment Done
+    const RIDE_CANCELED = 5; // When Canceled
 
     const RIDE = 1;
     const INTER_CITY = 2;

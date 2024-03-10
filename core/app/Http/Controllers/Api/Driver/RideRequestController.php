@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Driver;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Ride;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class RideRequestController extends Controller
@@ -117,7 +118,7 @@ class RideRequestController extends Controller
         }
 
         $ride->status = Status::RIDE_ONGOING;
-        $ride->ride_start_at = date('Y-m-d H:i:s');
+        $ride->ride_start_at = Carbon::now();
         $ride->save();
 
         return response()->json([
@@ -128,5 +129,38 @@ class RideRequestController extends Controller
                 'ride' => $ride
             ]
         ]);
+    }
+
+    public function rideRequestCompleted(Request $request, $id)
+    {
+        $driver = auth()->user();
+        $ride = Ride::where('driver_id', $driver->id)
+            ->where('status', Status::RIDE_ONGOING)->find($id);
+
+        if ($ride == null) {
+            return response()->json([
+                'remark' => 'no_request_found',
+                'status' => 'error',
+                'message' => [],
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        } else {
+            $ride->status = Status::RIDE_END;
+            $ride->ride_completed_at = Carbon::now();
+            $ride->save();
+
+            $driver->is_driving = Status::IDLE;
+            $driver->save();
+            return response()->json([
+                'remark' => 'ride_complete',
+                'status' => 'success',
+                'message' => [],
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        }
     }
 }
