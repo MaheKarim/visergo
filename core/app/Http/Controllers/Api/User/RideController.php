@@ -49,7 +49,6 @@ class RideController extends Controller
             ], 403);
         }
 
-
         $existingRide = Ride::where('user_id', $user->id)
             ->where('ride_request_type', Status::RIDE)
             ->where('ride_for', Status::RIDE_FOR_OWN)
@@ -84,11 +83,9 @@ class RideController extends Controller
                 $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
                 if (Status::RIDE && ($pickup_in_zone && $destination_in_zone)) {
 
-
                     // Calculate total fare based on distance and base fare
                     $base_fare = VehicleType::where('id', Status::RIDE)->value('base_fare');
                     $perKMCost = VehicleType::where('id', Status::RIDE)->value('ride_fare_per_km');
-//                    $total = $distance * $base_fare;
                     // TODO:: Need To Update
 
                     $ride = new Ride();
@@ -101,6 +98,7 @@ class RideController extends Controller
                     $ride->pickup_long = $pickup_long;
                     $ride->destination_lat = $destination_lat;
                     $ride->destination_long = $destination_long;
+                    $ride->otp = getNumber(4);
                     $ride->distance = $distance;
                     $ride->duration = $duration;
                     $ride->base_fare = $base_fare;
@@ -111,6 +109,7 @@ class RideController extends Controller
                     $ride->status = Status::RIDE_INITIATED;
                     $ride->save();
 
+                    // TODO:: Coupon Apply Here
                     // Reward Claim After Ride Completed
                     if ($ride->status == Status::RIDE_COMPLETED) {
                         $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;

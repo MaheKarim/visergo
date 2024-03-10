@@ -33,6 +33,7 @@ class RideRequestController extends Controller
 
      public function rideRequestAccept(Request $request, $id = 0): \Illuminate\Http\JsonResponse
     {
+        $driver = auth()->user();
         $ride = Ride::where('id',$request->id)->where('status',Status::RIDE_INITIATED)->first();
         if (!$ride) {
             return response()->json([
@@ -47,6 +48,8 @@ class RideRequestController extends Controller
         $ride->status = Status::RIDE_ACTIVE;
         $ride->driver_id = auth()->user()->id;
         $ride->save();
+        $driver->is_driving = Status::DRIVING;
+        $driver->save();
         return response()->json([
             'remark'=>'ride_request_accept',
             'status'=>'success',

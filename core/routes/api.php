@@ -210,7 +210,10 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('RideRequestController')->name('ride.')->prefix('driver')->group(function () {
                         // Live Requests
                         Route::get('ride/requests', 'rideRequests')->name('ride.requests');
-                        Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
+                        // Accept Request
+                        Route::middleware('drivingCheck')->group(function () {
+                            Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
+                        });
                     });
                 });
                 Route::get('driver-info', function () {

@@ -82,6 +82,7 @@ class Kernel extends HttpKernel
         'driver.check.status' => \App\Http\Middleware\DriverCheckStatus::class,
         'driver.verification' => DriverVerificationStatus::class,
         'isDriverOnline' => \App\Http\Middleware\DriverOnlineStatus::class,
+        'drivingCheck' => \App\Http\Middleware\DrivingCheck::class,
 
     ];
 }
