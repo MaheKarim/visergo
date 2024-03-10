@@ -131,7 +131,7 @@ class RideRequestController extends Controller
         ]);
     }
 
-    public function rideRequestCompleted(Request $request, $id)
+    public function rideRequestEnd(Request $request, $id)
     {
         $driver = auth()->user();
         $ride = Ride::where('driver_id', $driver->id)
