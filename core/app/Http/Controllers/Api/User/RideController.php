@@ -103,8 +103,10 @@ class RideController extends Controller
                     $ride->user_id = $user->id;
                     $ride->zone_id = $zone->id;
                     $ride->ride_for = $request->ride_for;
-                    $ride->pillion_name = $request->pillion_name;
-                    $ride->pillion_number = $request->pillion_number;
+                    if ($ride->ride_for == Status::RIDE_FOR_PILLION) {
+                        $ride->pillion_name = $request->pillion_name;
+                        $ride->pillion_number = $request->pillion_number;
+                    }
                     $ride->pickup_lat = $pickup_lat;
                     $ride->pickup_long = $pickup_long;
                     $ride->destination_lat = $destination_lat;
