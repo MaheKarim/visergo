@@ -19,6 +19,11 @@ class Ride extends Model
         return $this->belongsTo(Driver::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function conversation()
     {
         return $this->hasOne(Conversation::class);

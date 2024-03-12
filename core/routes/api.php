@@ -214,8 +214,12 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::middleware('drivingCheck')->group(function () {
                             Route::post('ride/requests/{id}/accept', 'rideRequestAccept')->name('ride.requests.accept');
                         });
-                            Route::post('ride/requests/{id}/start', 'rideRequestStart')->name('ride.requests.start');
-                            Route::post('ride/requests/{id}/end', 'rideRequestEnd')->name('ride.requests.end');
+                        Route::post('ride/requests/{id}/start', 'rideRequestStart')->name('ride.requests.start');
+                        Route::post('ride/requests/{id}/end', 'rideRequestEnd')->name('ride.requests.end');
+
+                        // Ride Chat
+                        Route::get('ride/chat/{id}/messages', 'rideChatMessages')->name('ride.chat.messages');
+                        Route::post('ride/chat/{id}', 'rideChat')->name('ride.chat');
                     });
                 });
                 Route::get('driver-info', function () {

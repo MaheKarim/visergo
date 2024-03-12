@@ -16,7 +16,7 @@ class Conversation extends Model
         return $this->belongsTo(Ride::class);
     }
 
-    public function messages()
+    public function conversationMessages()
     {
         return $this->hasMany(ConversationMessage::class);
     }

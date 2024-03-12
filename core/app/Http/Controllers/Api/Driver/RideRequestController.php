@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Conversation;
+use App\Models\ConversationMessage;
 use App\Models\Ride;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -56,37 +58,35 @@ class RideRequestController extends Controller
         ]);
     }
 
-     public function rideRequestAccept(Request $request, $id = 0)
+    public function rideRequestAccept(Request $request, $id)
     {
         $driver = auth()->user();
-        $ride = Ride::where('id',$request->id)->where('status',Status::RIDE_INITIATED)->first();
+        $ride = Ride::where('id', $id)->where('status', Status::RIDE_INITIATED)->first();
         if ($ride == null) {
             $notify = 'No Ride Found';
             return response()->json([
-                'remark'=>'no_request_found',
-                'status'=>'error',
-                'message'=>$notify,
-                'data'=>[
-                    'ride'=>$ride, $driver
-                ]
-            ]);
-        } else {
-            $ride->status = Status::RIDE_ACTIVE;
-            $ride->driver_id = auth()->user()->id;
-            $ride->save();
-            $driver->is_driving = Status::DRIVING;
-            $driver->save();
-            $notify = 'Ride Accepted Successfully';
-            return response()->json([
-                'remark'=>'ride_request_accept',
-                'status'=>'success',
-                'message'=>$notify,
-                'data'=>[
-                    'ride'=>$ride
+                'remark' => 'no_request_found',
+                'status' => 'error',
+                'message' => $notify,
+                'data' => [
+                    'ride' => $ride, $driver
                 ]
             ]);
         }
-
+        $ride->status = Status::RIDE_ACTIVE;
+        $ride->driver_id = auth()->user()->id;
+        $ride->save();
+        $driver->is_driving = Status::DRIVING;
+        $driver->save();
+        $notify = 'Ride Accepted Successfully';
+        return response()->json([
+            'remark' => 'ride_request_accept',
+            'status' => 'success',
+            'message' => $notify,
+            'data' => [
+                'ride' => $ride
+            ]
+        ]);
     }
 
     public function rideRequestStart(Request $request, $id)
@@ -166,5 +166,87 @@ class RideRequestController extends Controller
                 ]
             ]);
         }
+    }
+
+    public function rideChat(Request $request, $id)
+    {
+        $driver = auth()->user();
+
+        $ride = Ride::where('ride_request_type', Status::RIDE)
+            ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING])
+            ->where('driver_id', $driver->id)
+            ->with('conversation')
+            ->find($id);
+
+        if ($ride == null) {
+            return response()->json([
+                'remark' => 'no_request_found',
+                'status' => 'error',
+                'message' => [],
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        } else {
+           $conversation = $ride->conversation;
+           if(!$ride->conversation) {
+                $conversation = new Conversation();
+                $conversation->ride_id= $ride->id;
+                $conversation->user_id = $ride->user_id;
+                $conversation->driver_id = $ride->driver_id;
+                $conversation->save();
+           }
+            // Create a new conversation message
+           $conversationMessage = new ConversationMessage();
+           $conversationMessage->conversation_id = $conversation->id;
+           $conversationMessage->user_id = null;
+           $conversationMessage->driver_id = $ride->driver_id;
+           $conversationMessage->message = $request->input('message');
+           $conversationMessage->save();
+
+           $notify = 'Message Sent Successfully';
+            return response()->json([
+                'remark' => 'ride_chat_sent',
+                'status' => 'success',
+                'message' => $notify,
+                'data' => [
+                    'msg' => $conversationMessage
+                ]
+            ]);
+        }
+    }
+
+    public function rideChatMessages($id)
+    {
+        // Find the ride
+        $ride = Ride::find($id);
+
+        if ($ride === null) {
+            return response()->json([
+                'remark' => 'no_ride_found',
+                'status' => 'error',
+                'message' => 'Ride with the given ID was not found.',
+            ], 404);
+        }
+
+        // Retrieve conversation ID associated with the ride
+        $conversationId = Conversation::where('ride_id', $ride->id)->first();
+
+        if ($conversationId === null) {
+            return response()->json([
+                'remark' => 'no_conversation_found',
+                'status' => 'error',
+                'message' => 'No conversation associated with the ride.',
+            ], 404);
+        }
+
+        // Retrieve all messages associated with the conversation ID
+        $messages = ConversationMessage::where('conversation_id', $conversationId->id)->get();
+
+        return response()->json([
+            'remark' => 'messages_found',
+            'status' => 'success',
+            'messages' => $messages,
+        ]);
     }
 }
