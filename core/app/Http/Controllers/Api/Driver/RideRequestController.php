@@ -11,6 +11,7 @@ use App\Models\Driver;
 use App\Models\Ride;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class RideRequestController extends Controller
 {
@@ -170,5 +171,58 @@ class RideRequestController extends Controller
         }
     }
 
+
+    public function rideRequestCancel(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'cancel_reason' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'remark' => 'ride_cancel_fail',
+                'status' => 'error',
+                'message' => $validator->errors(),
+            ]);
+        }
+
+            $driver = auth()->user();
+            $cancelRide = Ride::where('driver_id', $driver->id)
+            ->where('status',[Status::RIDE_ACTIVE])->find($id);
+
+        if ($cancelRide == null) {
+            return response()->json([
+                'remark' => 'no_request_found',
+                'status' => 'error',
+                'message' => [],
+                'data' => [
+                    'ride' => $cancelRide
+                ]
+            ]);
+        }
+        if ($cancelRide->status == Status::RIDE_ONGOING) {
+            $notify = 'You can not cancel ongoing ride';
+            return response()->json([
+               'remark' => 'ride_cancel_fail',
+               'status' => 'error',
+               'message' => $notify,
+            ]);
+        }
+        $cancelRide->status = Status::RIDE_INITIATED;
+        $cancelRide->ride_cancelled_at = Carbon::now();
+        $cancelRide->cancel_reason = $request->cancel_reason;
+        $cancelRide->cancel_by_driver = $driver->id;
+        $driver->is_driving = Status::IDLE;
+        $driver->save();
+        $cancelRide->save();
+        return response()->json([
+            'remark' => 'ride_cancel',
+            'status' => 'success',
+            'message' => [],
+            'data' => [
+                'ride' => $cancelRide
+            ]
+        ]);
+    }
 
 }
