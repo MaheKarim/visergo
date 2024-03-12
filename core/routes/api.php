@@ -144,7 +144,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('RideController')->name('ride.')->group(function () {
                         Route::get('ride', 'ride')->name('ride');
                         Route::post('ride/create', 'rideRequest')->name('ride.insert');
-                        Route::get('ride/completed', 'rideCompleted')->name('ride.completed');
+                        Route::get('ride/completed/history', 'rideCompleted')->name('ride.completed');
                     });
                 });
             });
@@ -159,6 +159,12 @@ Route::namespace('Api')->name('api.')->group(function () {
     |                           Driver API Routes
     |--------------------------------------------------------------------------
     */
+    Route::middleware('auth:sanctum')->group(function () {
+        // Ride Chat
+        Route::get('ride/chat/{id}/messages', 'ChatController@rideChatMessages')->name('ride.chat.messages');
+        Route::post('ride/chat/{id}', 'ChatController@sendRideChat')->name('ride.chat');
+    });
+
 
     Route::namespace('Driver\Auth')->group(function () {
         Route::post('driver/login', 'DriverLoginController@login')->name('driver.login');
@@ -172,9 +178,6 @@ Route::namespace('Api')->name('api.')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->namespace('Driver')->group(function () {
-        // Ride Chat
-        Route::get('ride/chat/{id}/messages', 'RideRequestController@rideChatMessages')->name('ride.chat.messages');
-        Route::post('ride/chat/{id}', 'RideRequestController@sendRideChat')->name('ride.chat');
         // Authorization
         Route::controller('DriverAuthorizationController')->name('driver.')->prefix('driver')->group(function () {
             Route::get('authorization', 'authorization')->name('authorization');

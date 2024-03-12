@@ -170,22 +170,5 @@ class RideRequestController extends Controller
         }
     }
 
-    public function sendRideChat(Request $request, $id)
-    {
-        $driver = auth()->user();
-        $message = $request->input('message');
 
-        $result = RideChat::sendMessage($id, $driver, $message);
-
-        return response()->json([
-            'remark' => 'remark',
-            'status' => 'success',
-            'message' => $result,
-        ]);
-    }
-
-    public function rideChatMessages($id)
-    {
-        return RideChat::fullChat($id);
-    }
 }
