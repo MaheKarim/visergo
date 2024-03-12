@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
+use App\Models\CancellationReason;
 use App\Models\Form;
 use App\Models\GeneralSetting;
 use App\Models\Transaction;
@@ -247,5 +249,19 @@ class UserController extends Controller
                 'message'=>['error'=>$notify],
             ]);
         }
+    }
+
+    public function userCancelReason()
+    {
+        $reason = CancellationReason::where('for', Status::RIDER)->get();
+        $notify[] = 'Rider Cancellation reason';
+        return response()->json([
+            'remark'=>'cancellation_reason',
+            'status'=>'success',
+            'message'=>['success'=>$notify],
+            'data'=>[
+                'reason'=>$reason
+            ]
+        ]);
     }
 }

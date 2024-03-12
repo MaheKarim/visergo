@@ -106,6 +106,9 @@ Route::namespace('Api')->name('api.')->group(function () {
                 Route::controller('UserController')->group(function () {
                     Route::post('profile-setting', 'submitProfile');
                     Route::post('change-password', 'submitPassword');
+
+                    // Cancellation Reason API
+                    Route::get('/cancellation-reasons', 'userCancelReason')->name('user.cancel.reason');
                 });
 
                 // Withdraw
@@ -207,6 +210,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::post('current-status', 'currentStatus')->name('current.status');
                     Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                     Route::get('transactions', 'transactions')->name('transactions');
+                    Route::get('/cancellation-reasons', 'driverCancelReason')->name('driver.cancel.reason');
                 });
 
                 // Driver Online Status Middleware
@@ -221,6 +225,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                         });
                         Route::post('ride/requests/{id}/start', 'rideRequestStart')->name('ride.requests.start');
                         Route::post('ride/requests/{id}/end', 'rideRequestEnd')->name('ride.requests.end');
+                        Route::post('ride/requests/{id}/cancel', 'rideRequestCancel')->name('ride.requests.cancel');
                     });
                 });
                 Route::get('driver-info', function () {

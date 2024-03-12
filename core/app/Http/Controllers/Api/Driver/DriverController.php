@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Driver;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
+use App\Models\CancellationReason;
 use App\Models\Form;
 use App\Models\GeneralSetting;
 use App\Models\Ride;
@@ -393,6 +394,21 @@ class DriverController extends Controller
             'message'=>['success'=>$notify],
             'data'=>[
                 'current_status'=>auth()->user()->current_status
+            ]
+        ]);
+    }
+
+    public function driverCancelReason()
+    {
+        $reason = CancellationReason::where('for', Status::DRIVER)->get();
+
+        $notify[] = 'Driver Cancellation reason';
+        return response()->json([
+            'remark'=>'cancellation_reason',
+            'status'=>'success',
+            'message'=>['success'=>$notify],
+            'data'=>[
+                'reason'=>$reason
             ]
         ]);
     }
