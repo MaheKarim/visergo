@@ -44,6 +44,8 @@ class VehicleTypeController extends Controller
         $vehicle->is_intercity = $request->is_intercity;
         $vehicle->is_rental = $request->is_rental;
         $vehicle->is_reserve = $request->is_reserve;
+        $vehicle->manage_class = $request->manage_class;
+        $vehicle->manage_brand = $request->manage_brand;
         $vehicle->save();
 
         $notify[] = ['success', $notification];

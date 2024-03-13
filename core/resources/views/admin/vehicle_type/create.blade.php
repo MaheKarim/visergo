@@ -58,14 +58,14 @@
                                 <div class="form-group">
                                     <label>@lang('Is Vehicle Have Class ?')</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="manage_class" id="yes" value="1">
-                                        <label class="form-check-label" for="yes">
+                                        <input class="form-check-input" type="radio" name="manage_class" id="yesRadio" value="1">
+                                        <label class="form-check-label" for="yesRadio">
                                             Yes
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="manage_class" id="no" value="0">
-                                        <label class="form-check-label" for="no">
+                                        <input class="form-check-input" type="radio" name="manage_class" id="noRadio" value="0">
+                                        <label class="form-check-label" for="noRadio">
                                             No
                                         </label>
                                     </div>
