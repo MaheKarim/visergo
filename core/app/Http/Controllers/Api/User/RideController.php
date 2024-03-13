@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
 {
-    public function rideRequest(Request $request, $id = 0)
+    public function rideRequest(Request $request, $id = 0, $type = '')
     {
 
         $validator = Validator::make($request->all(), [
@@ -72,6 +72,7 @@ class RideController extends Controller
 
             $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
             $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+//            dd($destination_in_zone, $pickup_in_zone);
 
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
@@ -84,11 +85,13 @@ class RideController extends Controller
                 $pickupAddress = $response['origin_addresses'][0];
                 $destinationAddress = $response['destination_addresses'][0];
 
-                if (Status::RIDE && ($pickup_in_zone && $destination_in_zone)) {
+                // TODO:: Need To Update // ride_service_type
+                $type = VehicleType::where('id', $request->ride_request_type)->first();
+                $base_fare = $type->value('base_fare');
 
-                    // Calculate total fare based on distance and base fare
-                    $base_fare = VehicleType::where('id', Status::RIDE)->value('base_fare');
-                    $perKMCost = VehicleType::where('id', Status::RIDE)->value('ride_fare_per_km');
+                if (($request->ride_request_type = $type) && ($pickup_in_zone && $destination_in_zone)) {
+
+                    $perKMCost = $type->value('ride_fare_per_km');
                     $rideCost = $distance * $perKMCost;
 
                     if ($rideCost < $base_fare) {
@@ -121,7 +124,7 @@ class RideController extends Controller
                     $ride->total = $totalAmount;
                     $ride->vat_amount = $vatAmount;
 
-                    $ride->ride_request_type = Status::RIDE;
+                    $ride->ride_request_type = $request->ride_request_type;
                     $ride->status = Status::RIDE_INITIATED;
                     $ride->save();
 

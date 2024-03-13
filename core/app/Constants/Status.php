@@ -41,10 +41,10 @@ class Status{
     const RIDE_COMPLETED = 5; // When Payment Done
     const RIDE_CANCELED = 6; // When Canceled
 
-    const RIDE = 1;
-    const INTER_CITY = 2;
-    const RENTAL = 3;
-    const RESERVE = 4;
+    const RIDE_SERVICE = 1;
+    const INTER_CITY_SERVICE = 2;
+    const RENTAL_SERVICE = 3;
+    const RESERVE_SERVICE = 4;
 
     const FIXED = 1;
     const PERCENTAGE = 2;
