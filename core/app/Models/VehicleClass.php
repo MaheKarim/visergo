@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class VehicleClass extends Model
 {
-    use HasFactory, GlobalStatus, Searchable;
+    use GlobalStatus, Searchable;
 
     protected $guarded = ['id'];
 

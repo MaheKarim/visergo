@@ -153,5 +153,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Type Name"/>
-    <a class="btn btn-outline--primary" href="{{ route('admin.vehicle.type.create') }}"><i class="las la-plus"></i>@lang('Add New')</a>
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"
+            data-modal_title="@lang('Add New Vehicle Type')"><i class="las la-plus"></i>@lang('Add New')</button>
 @endpush

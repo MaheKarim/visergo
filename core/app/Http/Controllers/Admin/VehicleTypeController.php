@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Service;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
 
@@ -20,11 +21,13 @@ class VehicleTypeController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'base_fare' => 'required|numeric|min:0',
-            'ride_fare_per_km' => 'required|numeric|min:0',
-            'intercity_fare_per_km' => 'required|numeric|min:0',
-            'rental_fare_per_km' => 'required|numeric|min:0',
-            'reserve_fare_per_km' => 'required|numeric|min:0',
+            'base_fare' => 'nullable|numeric|min:0',
+            'is_ride' => 'nullable|boolean',
+            'is_intercity' => 'nullable|boolean',
+            'is_rental' => 'nullable|boolean',
+            'is_reserve' => 'nullable|boolean',
+            'manage_class' => 'nullable|boolean',
+            'manage_brand' => 'nullable|boolean',
         ]);
 
         if (!$id) {
@@ -37,10 +40,10 @@ class VehicleTypeController extends Controller
 
         $vehicle->name = $request->name;
         $vehicle->base_fare = $request->base_fare;
-        $vehicle->ride_fare_per_km = $request->ride_fare_per_km;
-        $vehicle->intercity_fare_per_km = $request->intercity_fare_per_km;
-        $vehicle->rental_fare_per_km = $request->rental_fare_per_km;
-        $vehicle->reserve_fare_per_km = $request->reserve_fare_per_km;
+        $vehicle->is_ride = $request->is_ride;
+        $vehicle->is_intercity = $request->is_intercity;
+        $vehicle->is_rental = $request->is_rental;
+        $vehicle->is_reserve = $request->is_reserve;
         $vehicle->save();
 
         $notify[] = ['success', $notification];
@@ -50,5 +53,13 @@ class VehicleTypeController extends Controller
     public function status($id)
     {
         return VehicleType::changeStatus($id);
+    }
+
+    public function create()
+    {
+        $pageTitle = 'Create Vehicle Type';
+        $services = Service::all();
+
+        return view('admin.vehicle_type.create', compact('pageTitle', 'services'));
     }
 }
