@@ -30,6 +30,19 @@ Route::namespace('Api')->name('api.')->group(function () {
         ]);
     });
 
+    Route::get('tips', function () {
+        $general = GeneralSetting::first('tips');
+        $notify[] = 'Tips';
+        return response()->json([
+            'remark' => 'tips_data',
+            'status' => 'success',
+            'message' => ['success' => $notify],
+            'data' => [
+                'general_setting' => $general,
+            ],
+        ]);
+    });
+
     Route::get('get-countries', function () {
         $c = json_decode(file_get_contents(resource_path('views/partials/country.json')));
         $notify[] = 'General setting data';
