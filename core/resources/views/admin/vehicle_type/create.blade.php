@@ -4,14 +4,15 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card mb-4">
-                <form action="{{ route('admin.vehicle.type.store') }}" method="POST">
+                <form action="{{ route('admin.vehicle.type.store', @$vehicleType->id) }}" method="POST">
                     @csrf
-                <div class="card-body">
+                    <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>@lang('Type Name')</label>
-                                    <input class="form-control" name="name" type="text" required>
+                                    <input class="form-control" name="name" type="text"
+                                           value="{{ old('name', @$vehicleType->name)  }}" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -22,15 +23,15 @@
                                         @foreach ($services as $service)
                                             <div class="col-md-6">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="service"
-                                                        value="{{ $service->id }}" id="service-{{ $service->id }}">
+                                                    <input class="form-check-input" type="checkbox" name="service[]"
+                                                           value="{{ $service->id }}"
+                                                           id="service-{{ $service->id }}" @checked(@$vehicleType && in_array($service->id, @$vehicleType->vehicleServices->pluck('id')->toArray()))>
                                                     <label class="form-check-label" for="service-{{ $service->id }}">
                                                         {{ __($service->name) }}
                                                     </label>
                                                 </div>
                                             </div>
                                         @endforeach
-
                                     </div>
                                 </div>
                             </div>
@@ -41,14 +42,14 @@
                                     <label>@lang('Is Vehicle Have Class ?')</label>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="manage_class" id="yesRadio"
-                                            value="1">
+                                               value="1" @checked(@$vehicleType->manage_class == 1)>
                                         <label class="form-check-label" for="yesRadio">
                                             Yes
                                         </label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="manage_class" id="noRadio"
-                                            value="0">
+                                               value="0" @checked(@$vehicleType->manage_class === 0)>
                                         <label class="form-check-label" for="noRadio">
                                             No
                                         </label>
@@ -59,7 +60,7 @@
                                 <div class="form-group">
                                     <label>@lang('Base Fare')</label>
                                     <div class="input-group">
-                                        <input class="form-control" name="base_fare" type="number">
+                                        <input class="form-control" name="base_fare" type="number" value="{{ old()['base_fare'] ?? showAmount(@$vehicleType->base_fare) }}">
                                         <span class="input-group-text">{{ $general->cur_text }}</span>
                                     </div>
                                 </div>
@@ -69,7 +70,8 @@
                                     <label>@lang('Select Class')</label>
                                     <select class="form-control" name="classes[]" multiple>
                                         @foreach ($classes as $class)
-                                            <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                            <option
+                                                value="{{ $class->id }}" @selected(@$vehicleType && in_array($class->id,@$vehicleType->rideFares->pluck('vehicle_class_id')->toArray()))>{{ $class->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -77,10 +79,25 @@
                         </div>
 
                         <div class="row fareList">
-
+                            @foreach(@$vehicleType->rideFares ?? [] as $rideFare)
+                                <div class="col-md-4">
+                                    <input type="text"
+                                           name="old_value[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id}}]"
+                                           value="{{ $rideFare->id }}">
+                                    <div class="form-group">
+                                        <label>{{ __($rideFare->service->name)  }}
+                                            - {{ __($rideFare->vehicleClass->name)  }}</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0"
+                                                   value="{{getAmount($rideFare->fare)}}"
+                                                   name="fare[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id}}]"
+                                                   class="form-control">
+                                            <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-
-
 
                         <div class="card-footer">
                             <div class="form-group">
@@ -96,46 +113,54 @@
 
 @push('script')
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
-            $('[name=manage_class]').on('change', function() {
-                let manageClass = $(this).val();
-                if (manageClass == 1) {
-                    $('.classArea').removeClass('d-none');
-                    $('.fareArea').addClass('d-none');
-                } else {
-                    $('.classArea').addClass('d-none');
-                    $('.fareArea').removeClass('d-none');
+            $('select[multiple]').select2();
+
+            @if(@$vehicleType)
+                let selectedService = @json(array_values(array_unique(@$vehicleType->vehicleServices->pluck('id')->toArray())));
+                let selectedClasses = @json(array_values(array_unique(@$vehicleType->rideFares->pluck('vehicle_class_id')->toArray())));
+            @else
+                let selectedService = [];
+                let selectedClasses = [];
+            @endif
+
+            let classes = @json($classes);
+            let services = @json($services);
+
+            $('[name=manage_class]').on('change', function () {
+                if ($(this).is(':checked')) {
+                    let manageClass = $(this).val();
+                    if (manageClass == 1) {
+                        $('.classArea').removeClass('d-none');
+                        $('.fareArea').addClass('d-none');
+                        generateFareHtml();
+                    } else {
+                        $('.classArea').addClass('d-none');
+                        $('.fareArea').removeClass('d-none');
+                        $('.fareList').html('');
+                    }
                 }
             });
 
-            let selectedService = [];
-
-            $('[name=service]').on('change', function() {
+            $('[name="service[]"]').on('change', function () {
                 selectedService = [];
 
-                $('[name=service]:checked').each(function() {
+                $('[name="service[]"]:checked').each(function () {
                     selectedService.push($(this).val());
                 });
-
-                console.log(selectedService);
-
                 generateFareHtml();
-
             });
 
-            let selectedClasses = [];
-
-            $('[name="classes[]"]').on('change', function() {
-                selectedClasses = $(this).find(':selected').map(function() {
+            $('[name="classes[]"]').on('change', function () {
+                selectedClasses = [];
+                selectedClasses = $(this).find(':selected').map(function () {
                     return $(this).val();
                 }).get();
                 generateFareHtml();
             });
 
 
-            let classes = @json($classes);
-            let services = @json($services);
 
             function getNameUsingId(id, type = 'service') {
                 if (type === 'service') {
@@ -158,70 +183,23 @@
                 return null;
             }
 
-            function generateFareHtml()
-            {
+            function generateFareHtml() {
                 let html = '';
                 selectedService.forEach(service => {
-                    console.log(service, getNameUsingId(service));
                     selectedClasses.forEach(classElement => {
                         html += `<div class="col-md-4">
-                                <div class="form-group">
-                                    <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')}</label>
-                                    <div class="input-group">
-                                        <input type="number" step="any" min="0" name="fare[${service}][${classElement}]" class="form-control">
-                                        <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                    <div class="form-group">
+                                        <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')}</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0" name="fare[${service}][${classElement}]" class="form-control">
+                                            <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>`;
+                                </div>`;
                     });
                 });
                 $('.fareList').html(html);
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            $('select[multiple]').select2();
-
-            // Hide the Base Fare and classInput inputs initially
-            // $('input[name="base_fare"]').closest('.col-md-6').hide();
-            // $('select[name="classes[]"]').closest('.col-md-6').hide();
-
-            // // Event listener for radio buttons
-            // $('input[name="manage_class"]').on('change', function() {
-            //     // Check if 'Yes' radio is selected
-            //     if ($(this).val() === '1') {
-            //         // Show the classInput input
-            //         $('select[name="classes[]"]').closest('.col-md-6').show();
-            //         // Hide the Base Fare input
-            //         $('input[name="base_fare"]').closest('.col-md-6').hide();
-            //     } else {
-            //         // Hide the classInput input if 'No' radio is selected
-            //         $('select[name="classes[]"]').closest('.col-md-6').hide();
-            //         // Show the Base Fare input
-            //         $('input[name="base_fare"]').closest('.col-md-6').show();
-            //     }
-            // });
-
 
         });
     </script>

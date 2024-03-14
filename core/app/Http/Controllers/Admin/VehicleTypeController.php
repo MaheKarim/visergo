@@ -48,66 +48,45 @@ class VehicleTypeController extends Controller
             $notification = 'Vehicle type added successfully';
         }
 
-        $vehicleType->name = $request->name;
-        $vehicleType->base_fare = $request->base_fare ?? 0;
-        $vehicleType->save();
-
-        $serviceIds = array_keys($request->fare);
-        $classIds = array_keys($request->fare[$serviceIds[0]]);
-
-        $vehicleType->vehicleServices()->sync($serviceIds);
-        $vehicleType->classes()->sync($classIds);
-
-//        foreach ($serviceIds as $serviceId) {
-//            $vehicleService = new VehicleService();
-//            $vehicleService->vehicle_type_id = $vehicleType->id;
-//            $vehicleService->service_id = $serviceId;
-//            $vehicleService->save();
-//        }
-//
-//        foreach ($classIds as $classId) {
-//            $typeClass = new TypeClass();
-//            $typeClass->vehicle_type_id = $vehicleType->id;
-//            $typeClass->vehicle_class_id = $classId;
-//            $typeClass->save();
-//        }
-
-
-        foreach ($request->fare as $service => $classes) {
-            foreach ($classes as $class => $fare) {
-                $rideFare = new RideFare();
-                $rideFare->vehicle_type_id = $vehicleType->id;
-                $rideFare->service_id = $service;
-                $rideFare->vehicle_class_id = $class;
-                // $rideFare->fare = $request->fare[$service][$class];
-                $rideFare->fare = $fare;
-                $rideFare->save();
-            }
+        if($id && !$request->old_value && $vehicleType->manage_class == 1)
+        {
+            RideFare::where('vehicle_type_id', $vehicleType->id)->delete();
         }
 
+        $vehicleType->name = $request->name;
+        $vehicleType->base_fare = $request->base_fare ?? 0;
+        $vehicleType->manage_class = $request->manage_class;
+        $vehicleType->save();
 
-//        if (!$id) {
-//            $vehicle = new VehicleType();
-//            $notification = 'Vehicle type added successfully';
-//        } else {
-//            $vehicle = VehicleType::findOrFail($id);
-//            $notification = 'Vehicle type updated successfully';
-//        }
-//
-//        $vehicle->name = $request->name;
-//        $vehicle->base_fare = $request->base_fare;
-//        $vehicle->is_ride = $request->is_ride;
-//        $vehicle->is_intercity = $request->is_intercity;
-//        $vehicle->is_rental = $request->is_rental;
-//        $vehicle->is_reserve = $request->is_reserve;
-//        $vehicle->manage_class = $request->manage_class;
-//        $vehicle->manage_brand = $request->manage_brand;
-//        $vehicle->save();
-//
-//        if ($request->manage_class && is_array($request->classes)) {
-//            $vehicle->classes()->sync($request->classes);
-//        }
+        if($vehicleType->manage_class == 1)
+        {
+            $serviceIds = array_keys($request->fare);
+            $classIds = array_keys($request->fare[$serviceIds[0]]);
 
+            $vehicleType->vehicleServices()->sync($serviceIds);
+            $vehicleType->classes()->sync($classIds);
+
+            foreach ($request->fare as $service => $classes) {
+                foreach ($classes as $class => $fare) {
+                    if($request->old_value){
+//                    dd($service, $class, $request->old_value[$service][$class]);
+                        $rideFare = RideFare::find($request->old_value[$service][$class]);
+                    }else{
+                        $rideFare = new RideFare();
+                    }
+
+                    $rideFare->vehicle_type_id = $vehicleType->id;
+                    $rideFare->service_id = $service;
+                    $rideFare->vehicle_class_id = $class;
+                    // $rideFare->fare = $request->fare[$service][$class];
+                    $rideFare->fare = $fare;
+                    $rideFare->save();
+                }
+            }
+
+        }else{
+            $vehicleType->vehicleServices()->sync($request->service);
+        }
 
         $notify[] = ['success', 'Vehicle type added successfully'];
         return back()->withNotify($notify);
@@ -118,6 +97,7 @@ class VehicleTypeController extends Controller
         return VehicleType::changeStatus($id);
     }
 
+
     public function create()
     {
         $pageTitle = 'Create Vehicle Type';
@@ -126,4 +106,16 @@ class VehicleTypeController extends Controller
 
         return view('admin.vehicle_type.create', compact('pageTitle', 'services', 'classes'));
     }
+
+    public function edit($id)
+    {
+        $pageTitle = 'Update Vehicle Type';
+        $vehicleType = VehicleType::with('vehicleServices', 'classes',  'rideFares.service',  'rideFares.vehicleClass')->findOrFail($id);
+        $services = Service::all();
+        $classes = VehicleClass::all();
+
+        return view('admin.vehicle_type.create', compact('pageTitle', 'services', 'classes', 'vehicleType'));
+    }
+
+
 }

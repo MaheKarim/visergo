@@ -48,11 +48,11 @@
 
                                     <td>
                                         <div class="button--group">
-                                            <button class="btn btn-outline--primary cuModalBtn btn-sm"
+                                            <a href="{{route('admin.vehicle.type.edit', $vehicle->id)}}" class="btn btn-outline--primary btn-sm"
                                                     data-modal_title="@lang('Update Vehicle Type')"
                                                     data-resource="{{ $vehicle }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
-                                            </button>
+                                            </a>
 
                                             @if($vehicle->status == Status::DISABLE)
                                                 <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"

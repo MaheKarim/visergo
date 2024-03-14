@@ -297,7 +297,8 @@ Route::middleware('admin')->group(function () {
     Route::controller('VehicleTypeController')->name('vehicle.type.')->prefix('vehicle-type')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
-        Route::post('edit/{id?}', 'store')->name('store');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('store/{id?}', 'store')->name('store');
         Route::post('status/{id}', 'status')->name('status');
     });
     // Vehicle Class

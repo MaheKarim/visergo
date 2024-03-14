@@ -11,14 +11,36 @@ class VehicleType extends Model
 {
     use GlobalStatus, Searchable;
 
-    public function classes()
-    {
-        return $this->belongsToMany(TypeClass::class, 'type_classes', 'vehicle_type_id', 'vehicle_class_id');
-    }
-
     public function vehicleServices()
     {
-        return $this->belongsToMany(VehicleService::class, 'vehicle_services', 'vehicle_type_id', 'service_id');
+        return $this->belongsToMany(Service::class, 'vehicle_services', 'vehicle_type_id', 'service_id');
     }
+
+//    public function vehicleServices()
+//    {
+//        return $this->belongsToMany(VehicleService::class, 'vehicle_services', 'vehicle_type_id', 'service_id');
+//    }
+
+    public function classes()
+    {
+        return $this->belongsToMany(VehicleClass::class, 'type_classes', 'vehicle_type_id', 'vehicle_class_id');
+    }
+
+//    public function vehicleServices()
+//    {
+//        return $this->hasMany(VehicleService::class);
+//    }
+//
+
+//    public function classes()
+//    {
+//        return $this->hasMany(TypeClass::class);
+//    }
+
+    public  function  rideFares()
+    {
+        return $this->hasMany(RideFare::class);
+    }
+
 
 }
