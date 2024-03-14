@@ -128,20 +128,25 @@
             let classes = @json($classes);
             let services = @json($services);
 
+            let firstChange = true;
+
             $('[name=manage_class]').on('change', function () {
                 if ($(this).is(':checked')) {
                     let manageClass = $(this).val();
                     if (manageClass == 1) {
                         $('.classArea').removeClass('d-none');
                         $('.fareArea').addClass('d-none');
-                        generateFareHtml();
+                        if (!firstChange) {
+                            generateFareHtml();
+                        }
                     } else {
                         $('.classArea').addClass('d-none');
                         $('.fareArea').removeClass('d-none');
                         $('.fareList').html('');
                     }
                 }
-            });
+                firstChange = false;
+            }).change();
 
             $('[name="service[]"]').on('change', function () {
                 selectedService = [];
