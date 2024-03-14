@@ -50,7 +50,7 @@ class RideController extends Controller
         }
 
         $existingRide = Ride::where('user_id', $user->id)
-            ->where('ride_request_type', Status::RIDE)
+            ->where('ride_request_type', Status::RIDE_SERVICE)
             ->where('ride_for', Status::RIDE_FOR_OWN)
             ->whereNotIn('status', [Status::RIDE_COMPLETED, Status::RIDE_CANCELED])
             ->first();
@@ -72,7 +72,6 @@ class RideController extends Controller
 
             $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
             $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
-//            dd($destination_in_zone, $pickup_in_zone);
 
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
@@ -87,11 +86,15 @@ class RideController extends Controller
 
                 // TODO:: Need To Update // ride_service_type
                 $type = VehicleType::where('id', $request->ride_request_type)->first();
-                $base_fare = $type->value('base_fare');
-
+//                dd($type->base_fare);
+//                $base_fare = $type->value('base_fare');
+                if ($type->manage_class == 0) {
+                    $base_fare = $type->value('base_fare');
+//                    dd($base_fare);
+                }
                 if (($request->ride_request_type = $type) && ($pickup_in_zone && $destination_in_zone)) {
+                    $perKMCost = $type->value('base_fare');
 
-                    $perKMCost = $type->value('ride_fare_per_km');
                     $rideCost = $distance * $perKMCost;
 
                     if ($rideCost < $base_fare) {

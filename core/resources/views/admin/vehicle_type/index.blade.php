@@ -11,10 +11,7 @@
                             <tr>
                                 <th>@lang('Type Name')</th>
                                 <th>@lang('Base Fare')</th>
-                                <th>@lang('Ride Cost / km')</th>
-                                <th>@lang('Intercity / km')</th>
-                                <th>@lang('Rental / km')</th>
-                                <th>@lang('Reserve / km')</th>
+                                <th>@lang('Have Class ?')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
@@ -29,17 +26,9 @@
                                         {{ __(showAmount($vehicle->base_fare)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
-                                        {{ __(showAmount($vehicle->ride_fare_per_km)) }} {{ $general->cur_text }}
+                                        {{ $vehicle->manage_class == 1 ? __('Yes') : __('No') }}
                                     </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->intercity_fare_per_km)) }} {{ $general->cur_text }}
-                                    </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->rental_fare_per_km)) }} {{ $general->cur_text }}
-                                    </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->reserve_fare_per_km)) }} {{ $general->cur_text }}
-                                    </td>
+
                                     <td>
                                         @php
                                             echo $vehicle->statusBadge

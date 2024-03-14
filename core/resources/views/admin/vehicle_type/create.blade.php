@@ -136,9 +136,9 @@
                     if (manageClass == 1) {
                         $('.classArea').removeClass('d-none');
                         $('.fareArea').addClass('d-none');
-                        if (!firstChange) {
-                            generateFareHtml();
-                        }
+                            if (!firstChange) {
+                                generateFareHtml();
+                            }
                     } else {
                         $('.classArea').addClass('d-none');
                         $('.fareArea').removeClass('d-none');
@@ -192,7 +192,7 @@
                 let html = '';
                 selectedService.forEach(service => {
                     selectedClasses.forEach(classElement => {
-                        html += `<div class="col-md-4">
+                        html += `<div class="col-md-4 ">
                                     <div class="form-group">
                                         <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')}</label>
                                         <div class="input-group">
