@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('conversation_messages', function (Blueprint $table) {
+        Schema::create('vehicle_services', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('vehicle_type_id')->default(0);
+            $table->unsignedBigInteger('service_id')->default(0);
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('conversation_messages');
+        Schema::dropIfExists('vehicle_services');
     }
 };
