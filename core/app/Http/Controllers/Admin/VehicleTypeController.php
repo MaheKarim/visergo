@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Models\VehicleClass;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
 
@@ -61,7 +62,8 @@ class VehicleTypeController extends Controller
     {
         $pageTitle = 'Create Vehicle Type';
         $services = Service::all();
+        $classes = VehicleClass::all();
 
-        return view('admin.vehicle_type.create', compact('pageTitle', 'services'));
+        return view('admin.vehicle_type.create', compact('pageTitle', 'services', 'classes'));
     }
 }
