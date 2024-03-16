@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
-
+    public function rideFareId()
+    {
+        return $this->belongsTo(RideFare::class);
+    }
 }

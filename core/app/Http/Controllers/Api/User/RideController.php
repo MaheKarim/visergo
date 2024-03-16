@@ -85,47 +85,40 @@ class RideController extends Controller
         }
 
         $vehicleTypes = VehicleType::all();
-        $responses = [];
-
+        $responses = [
+            'remark' => 'fare_calculated',
+            'status' => 'success',
+            'messages' => []
+        ];
         foreach ($vehicleTypes as $vehicleType) {
             if ($vehicleType->manage_class == Status::YES) {
                 $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
                     ->where('service_id', $request->service_id)
                     ->with(['vehicleClass'])->get();
+
                 foreach ($multipleClass as $class) {
                     $baseFare = $class->fare;
                     $fare = $baseFare * $distance;
                     $typeClass = $class->vehicleClass->name;
-                    $response = [
-                        'remark' => 'fare_calculated',
-                        'status' => 'success',
-                        'message' => [
-                            'fare' => $fare,
-                            'class' => $typeClass,
-                            'vehicle_type' => $vehicleType->name,
-                            'pickup_address' => $pickupAddress,
-                            'destination_address' => $destinationAddress,
-                        ],
+                    $responses['messages'][] = [
+                        'fare' => $fare,
+                        'class' => $typeClass,
+                        'vehicle_type' => $vehicleType->name,
+                        'pickup_address' => $pickupAddress,
+                        'destination_address' => $destinationAddress,
                     ];
-                    $responses[] = $response;
                 }
             } elseif ($vehicleType->manage_class == Status::NO) {
                 $baseFare = $vehicleType->base_fare;
                 $fare = $baseFare * $distance;
-                $response = [
-                    'remark' => 'fare_calculated',
-                    'status' => 'success',
-                    'message' => [
-                        'fare' => $fare,
-                        'vehicle_type' => $vehicleType->name,
-                        'pickup_address' => $pickupAddress,
-                        'destination_address' => $destinationAddress,
-                    ],
+                $responses['messages'][] = [
+                    'fare' => $fare,
+                    'vehicle_type' => $vehicleType->name,
+                    'pickup_address' => $pickupAddress,
+                    'destination_address' => $destinationAddress,
                 ];
-                $responses[] = $response;
             }
         }
-
         if (empty($responses)) {
             return response()->json([
                 'remark' => 'validation_error',
