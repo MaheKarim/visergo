@@ -81,7 +81,7 @@
                         <div class="row fareList">
                             @foreach(@$vehicleType->rideFares ?? [] as $rideFare)
                                 <div class="col-md-4">
-                                    <input type="text"
+                                    <input type="hidden"
                                            name="old_value[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id}}]"
                                            value="{{ $rideFare->id }}">
                                     <div class="form-group">

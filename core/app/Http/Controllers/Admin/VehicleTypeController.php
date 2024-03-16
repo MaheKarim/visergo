@@ -32,13 +32,10 @@ class VehicleTypeController extends Controller
             'is_reserve' => 'nullable|boolean',
             'manage_class' => 'nullable|boolean',
             'manage_brand' => 'nullable|boolean',
-            'classes' => 'nullable|array', // Ensure classes is an array
+            'classes' => 'nullable|array',
 //            'fare' => 'required_if:manage_class,1|array',
 //            'fare.*' => 'required|numeric|min:0'
         ]);
-
-
-//        return $request;
 
         if($id){
             $vehicleType = VehicleType::findOrFail($id);
@@ -69,7 +66,6 @@ class VehicleTypeController extends Controller
             foreach ($request->fare as $service => $classes) {
                 foreach ($classes as $class => $fare) {
                     if($request->old_value){
-//                    dd($service, $class, $request->old_value[$service][$class]);
                         $rideFare = RideFare::find($request->old_value[$service][$class]);
                     }else{
                         $rideFare = new RideFare();
@@ -78,7 +74,6 @@ class VehicleTypeController extends Controller
                     $rideFare->vehicle_type_id = $vehicleType->id;
                     $rideFare->service_id = $service;
                     $rideFare->vehicle_class_id = $class;
-                    // $rideFare->fare = $request->fare[$service][$class];
                     $rideFare->fare = $fare;
                     $rideFare->save();
                 }
