@@ -158,7 +158,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     });
                     // Ride Request Controller
                     Route::controller('RideController')->name('ride.')->group(function () {
-                        Route::get('ride', 'ride')->name('ride');
+                        Route::post('ride', 'ride')->name('ride');
                         Route::post('ride/create/', 'rideRequest')->name('ride.insert');
                         Route::get('ride/completed/history', 'rideCompleted')->name('ride.completed');
                     });

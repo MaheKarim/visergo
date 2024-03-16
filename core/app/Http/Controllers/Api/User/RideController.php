@@ -6,14 +6,143 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use App\Models\Ride;
+use App\Models\RideFare;
 use App\Models\VehicleType;
 use App\Models\Zone;
+use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
 {
+
+    public function ride(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'pickup_lat' => 'required',
+            'pickup_long' => 'required',
+            'destination_lat' => 'required',
+            'destination_long' => 'required',
+            'ride_for' => 'required',
+            'pillion_name' => [
+                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
+            ],
+            'pillion_number' => [
+                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
+            ],
+        ]);
+
+        if ($request->has('vehicle_type')) {
+            $validator->after(function ($validator) use ($request) {
+                if (!VehicleType::where('id', $request->vehicle_type)->exists()) {
+                    $validator->errors()->add('vehicle_type', 'Vehicle type not found');
+                }
+            });
+        }
+
+        if ($validator->fails()) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => ['error' => $validator->errors()->all()],
+            ]);
+        }
+
+        $user = auth()->user();
+
+        if ($user instanceof Driver) {
+            return response()->json([
+                'remark' => 'unauthorized_action',
+                'status' => 'error',
+                'message' => 'Drivers are not allowed to make ride requests.'
+            ], 403);
+        }
+
+        // Ride Request
+
+        $pickup_lat = $request->pickup_lat;
+        $pickup_long = $request->pickup_long;
+        $destination_lat = $request->destination_lat;
+        $destination_long = $request->destination_long;
+
+        $zone = Zone::where('status', Status::ENABLE)->first(); // WIP
+
+        $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
+        $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+
+        // Introduce Google MAP Api
+        $apiKey = gs()->location_api;
+        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
+        $response = json_decode(file_get_contents($url), true);
+
+        if ($response['status'] == 'OK') {
+            $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
+//            $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
+            $pickupAddress = $response['origin_addresses'][0];
+            $destinationAddress = $response['destination_addresses'][0];
+        }
+
+        $vehicleTypes = VehicleType::all();
+        $responses = [];
+
+        foreach ($vehicleTypes as $vehicleType) {
+            if ($vehicleType->manage_class == Status::YES) {
+                $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
+                    ->where('service_id', $request->service_id)
+                    ->with(['vehicleClass'])->get();
+                foreach ($multipleClass as $class) {
+                    $baseFare = $class->fare;
+                    $fare = $baseFare * $distance;
+                    $typeClass = $class->vehicleClass->name;
+                    $response = [
+                        'remark' => 'fare_calculated',
+                        'status' => 'success',
+                        'message' => [
+                            'fare' => $fare,
+                            'class' => $typeClass,
+                            'vehicle_type' => $vehicleType->name,
+                            'pickup_address' => $pickupAddress,
+                            'destination_address' => $destinationAddress,
+                        ],
+                    ];
+                    $responses[] = $response;
+                }
+            } elseif ($vehicleType->manage_class == Status::NO) {
+                $baseFare = $vehicleType->base_fare;
+                $fare = $baseFare * $distance;
+                $response = [
+                    'remark' => 'fare_calculated',
+                    'status' => 'success',
+                    'message' => [
+                        'fare' => $fare,
+                        'vehicle_type' => $vehicleType->name,
+                        'pickup_address' => $pickupAddress,
+                        'destination_address' => $destinationAddress,
+                    ],
+                ];
+                $responses[] = $response;
+            }
+        }
+
+        if (empty($responses)) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => 'Vehicle types not found',
+            ]);
+        }
+
+
+        if ($request->has('ride_for') && $request->ride_for == Status::RIDE_FOR_PILLION) {
+            $response['message']['pillion_name'] = $request->pillion_name;
+            $response['message']['pillion_number'] = $request->pillion_number;
+        }
+
+        return response()->json($responses);
+
+    }
     public function rideRequest(Request $request, $id = 0, $type = '')
     {
 
@@ -88,7 +217,7 @@ class RideController extends Controller
                 $type = VehicleType::where('id', $request->ride_request_type)->first();
 //                dd($type->base_fare);
 //                $base_fare = $type->value('base_fare');
-                if ($type->manage_class == 0) {
+                if ($type->manage_class == null && $type->manage_class == 0) {
                     $base_fare = $type->value('base_fare');
 //                    dd($base_fare);
                 }
@@ -166,7 +295,6 @@ class RideController extends Controller
             }
         }
     }
-
 
     public function rideCompleted()
     {
