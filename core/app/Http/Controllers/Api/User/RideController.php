@@ -53,10 +53,11 @@ class RideController extends Controller
         $user = auth()->user();
 
         if ($user instanceof Driver) {
+            $notify[] = 'Drivers are not allowed to make ride requests';
             return response()->json([
                 'remark' => 'unauthorized_action',
                 'status' => 'error',
-                'message' => 'Drivers are not allowed to make ride requests.'
+                'message' => $notify
             ], 403);
         }
 
@@ -88,7 +89,7 @@ class RideController extends Controller
         $responses = [
             'remark' => 'fare_calculated',
             'status' => 'success',
-            'messages' => []
+            'data' => []
         ];
         foreach ($vehicleTypes as $vehicleType) {
             if ($vehicleType->manage_class == Status::YES) {
@@ -100,10 +101,12 @@ class RideController extends Controller
                     $baseFare = $class->fare;
                     $fare = $baseFare * $distance;
                     $typeClass = $class->vehicleClass->name;
-                    $responses['messages'][] = [
+                    $responses['data'][] = [
                         'fare' => $fare,
                         'class' => $typeClass,
+                        'class_id' => $class->vehicleClass->id,
                         'vehicle_type' => $vehicleType->name,
+                        'vehicle_type_id' => $vehicleType->id,
                         'pickup_address' => $pickupAddress,
                         'destination_address' => $destinationAddress,
                     ];
@@ -111,9 +114,12 @@ class RideController extends Controller
             } elseif ($vehicleType->manage_class == Status::NO) {
                 $baseFare = $vehicleType->base_fare;
                 $fare = $baseFare * $distance;
-                $responses['messages'][] = [
+
+                $responses['data'][] = [
                     'fare' => $fare,
+//                    'class_id' => $class->vehicleClass->id,
                     'vehicle_type' => $vehicleType->name,
+                    'vehicle_type_id' => $vehicleType->id,
                     'pickup_address' => $pickupAddress,
                     'destination_address' => $destinationAddress,
                 ];

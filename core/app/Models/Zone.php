@@ -3,14 +3,13 @@ namespace App\Models;
 use App\Constants\Status;
 use App\Traits\GlobalStatus;
 use App\Traits\Searchable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use MatanYadaev\EloquentSpatial\Objects\Polygon;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 class Zone extends Model
 {
-    use HasFactory, Searchable, GlobalStatus, HasSpatial;
+    use Searchable, GlobalStatus, HasSpatial;
 
     protected $fillable = [
         'coordinates',
