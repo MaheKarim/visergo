@@ -18,7 +18,6 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="row">
-
                                         <label> @lang('Select Services') </label>
                                         @foreach ($services as $service)
                                             <div class="col-md-6">
@@ -56,15 +55,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 d-none fareArea">
-                                <div class="form-group">
-                                    <label>@lang('Base Fare')</label>
-                                    <div class="input-group">
-                                        <input class="form-control" name="base_fare" type="number" value="{{ old()['base_fare'] ?? showAmount(@$vehicleType->base_fare) }}">
-                                        <span class="input-group-text">{{ $general->cur_text }}</span>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="col-md-6 d-none classArea">
                                 <div class="form-group">
                                     <label>@lang('Select Class')</label>
@@ -78,24 +68,54 @@
                             </div>
                         </div>
 
-                        <div class="row fareList">
-                            @foreach(@$vehicleType->rideFares ?? [] as $rideFare)
-                                <div class="col-md-4">
-                                    <input type="hidden"
-                                           name="old_value[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id}}]"
-                                           value="{{ $rideFare->id }}">
-                                    <div class="form-group">
-                                        <label>{{ __($rideFare->service->name)  }}
-                                            - {{ __($rideFare->vehicleClass->name)  }}</label>
-                                        <div class="input-group">
-                                            <input type="number" step="any" min="0"
-                                                   value="{{getAmount($rideFare->fare)}}"
-                                                   name="fare[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id}}]"
-                                                   class="form-control">
-                                            <span class="input-group-text">{{ __($general->cur_text) }}</span>
-                                        </div>
+                        <div class="row fareArea">
+                            <div class="col-md-4 d-none ">
+                                <div class="form-group">
+                                    <label>@lang('Base Fare')</label>
+                                    <div class="input-group">
+                                        <input class="form-control" name="fare" type="number"
+                                               value="{{ old()['base_fare'] ?? showAmount(@$vehicleType->base_fare) }}">
+                                        <span class="input-group-text">{{ $general->cur_text }}</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="row fareList">
+                            @foreach(@$vehicleType->rideFares ?? [] as $rideFare)
+                                @if($rideFare->vehicle_class_id == null)
+                                    <div class="col-md-4 ">
+                                        <input type="hidden"
+                                               name="old_value[{{$rideFare->service_id}}]"
+                                               value="{{ $rideFare->id }}">
+                                        <div class="form-group">
+                                            <label>{{ __($rideFare->service->name)  }} Base Fare</label>
+                                            <div class="input-group">
+                                                <input class="form-control" name="fare[{{$rideFare->service_id}}]"
+                                                       type="number" step="any" min="0"
+                                                       value="{{getAmount($rideFare->fare)}}">
+                                                <span class="input-group-text">{{ $general->cur_text }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @elseif($rideFare->vehicle_class_id != null)
+                                    <div class="col-md-4">
+                                        <input type="hidden"
+                                               name="old_value[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id }}]"
+                                               value="{{ $rideFare->id }}">
+                                        <div class="form-group">
+                                            <label>{{ __($rideFare->service->name)  }}
+                                                - {{ __($rideFare->vehicleClass->name )  }}</label>
+                                            <div class="input-group">
+                                                <input type="number" step="any" min="0"
+                                                       value="{{getAmount($rideFare->fare)}}"
+                                                       name="fare[{{$rideFare->service_id}}][{{$rideFare->vehicle_class_id }}]"
+                                                       class="form-control">
+                                                <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
 
@@ -118,11 +138,11 @@
             $('select[multiple]').select2();
 
             @if(@$vehicleType)
-                let selectedService = @json(array_values(array_unique(@$vehicleType->vehicleServices->pluck('id')->toArray())));
-                let selectedClasses = @json(array_values(array_unique(@$vehicleType->rideFares->pluck('vehicle_class_id')->toArray())));
+            let selectedService = @json(array_values(array_unique(@$vehicleType->vehicleServices->pluck('id')->toArray())));
+            let selectedClasses = @json(array_values(array_unique(@$vehicleType->rideFares->pluck('vehicle_class_id')->toArray())));
             @else
-                let selectedService = [];
-                let selectedClasses = [];
+            let selectedService = [];
+            let selectedClasses = [];
             @endif
 
             let classes = @json($classes);
@@ -136,13 +156,17 @@
                     if (manageClass == 1) {
                         $('.classArea').removeClass('d-none');
                         $('.fareArea').addClass('d-none');
-                            if (!firstChange) {
-                                generateFareHtml();
-                            }
+                        if (!firstChange) {
+                            generateFareHtml();
+                        }
                     } else {
                         $('.classArea').addClass('d-none');
                         $('.fareArea').removeClass('d-none');
-                        $('.fareList').html('');
+                        if (!firstChange) {
+                            generateNonClassFareHtml();
+                        }
+                        $('.fareArea').html('');
+                        // $('.fareList').html('');
                     }
                 }
                 firstChange = false;
@@ -154,7 +178,12 @@
                 $('[name="service[]"]:checked').each(function () {
                     selectedService.push($(this).val());
                 });
-                generateFareHtml();
+
+                if ($('[name="manage_class"]:checked').val() == '1') {
+                    generateFareHtml();
+                } else {
+                    generateNonClassFareHtml();
+                }
             });
 
             $('[name="classes[]"]').on('change', function () {
@@ -164,7 +193,6 @@
                 }).get();
                 generateFareHtml();
             });
-
 
 
             function getNameUsingId(id, type = 'service') {
@@ -194,7 +222,7 @@
                     selectedClasses.forEach(classElement => {
                         html += `<div class="col-md-4 ">
                                     <div class="form-group">
-                                        <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')}</label>
+                                        <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')} Base Fare</label>
                                         <div class="input-group">
                                             <input type="number" step="any" min="0" name="fare[${service}][${classElement}]" class="form-control">
                                             <span class="input-group-text">{{ __($general->cur_text) }}</span>
@@ -204,6 +232,40 @@
                     });
                 });
                 $('.fareList').html(html);
+            }
+
+            function generatePerKmFareCostHtml() {
+                let html = '';
+                selectedService.forEach(service => {
+                    selectedClasses.forEach(classElement => {
+                        html += `<div class="col-md-4 ">
+                                    <div class="form-group">
+                                        <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')} Fare per/km</label>
+                                        <div class="input-group">
+                                            <input type="number" step="any" min="0" name="per_km_cost[${service}][${classElement}]" class="form-control">
+                                            <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                        </div>
+                                    </div>
+                                </div>`;
+                    });
+                });
+                $('.fareListCopy').html(html);
+            }
+
+            function generateNonClassFareHtml() {
+                let html = '';
+                selectedService.forEach(service => {
+                    html += `<div class="col-md-4 ">
+                                <div class="form-group">
+                                    <label>${getNameUsingId(service)} - Base Fare</label>
+                                    <div class="input-group">
+                                        <input type="number" step="any" min="0" name="fare[${service}]" class="form-control">
+                                        <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                });
+                $('.fareArea').html(html);
             }
 
         });

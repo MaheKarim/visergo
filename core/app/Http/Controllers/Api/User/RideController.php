@@ -178,7 +178,7 @@ class RideController extends Controller
         }
 
         $existingRide = Ride::where('user_id', $user->id)
-            ->where('ride_request_type', Status::RIDE_SERVICE)
+            ->where('service_id', Status::RIDE_SERVICE)
             ->where('ride_for', Status::RIDE_FOR_OWN)
             ->whereNotIn('status', [Status::RIDE_COMPLETED, Status::RIDE_CANCELED])
             ->first();
@@ -213,12 +213,20 @@ class RideController extends Controller
                 $destinationAddress = $response['destination_addresses'][0];
 
                 // TODO:: Need To Update // ride_service_type
-                $type = VehicleType::where('id', $request->ride_request_type)->first();
-//                dd($type->base_fare);
-//                $base_fare = $type->value('base_fare');
+                $type = VehicleType::where('id', $request->type_id)->first();
+                if ($type == null) {
+                    $notify[] = ['error', 'Vehicle type not found'];
+                    return response()->json([
+                        'remark' => 'validation_error',
+                        'status' => 'error',
+                        'message' => $notify,
+                    ]);
+                }
+
                 if ($type->manage_class == null && $type->manage_class == 0) {
                     $base_fare = $type->value('base_fare');
-//                    dd($base_fare);
+                }   else {
+//                    $base_fare = $type->base_fare;
                 }
                 if (($request->ride_request_type = $type) && ($pickup_in_zone && $destination_in_zone)) {
                     $perKMCost = $type->value('base_fare');

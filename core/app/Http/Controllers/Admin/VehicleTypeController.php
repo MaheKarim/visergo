@@ -10,6 +10,7 @@ use App\Models\VehicleClass;
 use App\Models\VehicleService;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Validator;
 
 class VehicleTypeController extends Controller
 {
@@ -25,24 +26,19 @@ class VehicleTypeController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'base_fare' => 'nullable|numeric|min:0',
-            'is_ride' => 'nullable|boolean',
-            'is_intercity' => 'nullable|boolean',
-            'is_rental' => 'nullable|boolean',
-            'is_reserve' => 'nullable|boolean',
-            'manage_class' => 'nullable|boolean',
+            'manage_class' => 'required|boolean',
             'manage_brand' => 'nullable|boolean',
             'classes' => 'nullable|array',
-//            'fare' => 'required_if:manage_class,1|array',
-//            'fare.*' => 'required|numeric|min:0'
+            'fare' => 'required|array',
+            'fare.*' => 'required|numeric|min:0'
         ]);
 
         if($id){
             $vehicleType = VehicleType::findOrFail($id);
-            $notification = 'Vehicle type updated successfully';
+            $notification = ['success', 'Vehicle type updated successfully'];
         }else{
             $vehicleType = new VehicleType();
-            $notification = 'Vehicle type added successfully';
+            $notification = ['success', 'Vehicle type added successfully'];
         }
 
         if($id && !$request->old_value && $vehicleType->manage_class == 1)
@@ -80,11 +76,22 @@ class VehicleTypeController extends Controller
             }
 
         }else{
-            $vehicleType->vehicleServices()->sync($request->service);
+            $serviceIds = array_keys($request->fare);
+            $vehicleType->vehicleServices()->sync($serviceIds);
+            foreach ($request->fare as $service => $fare) {
+                if($request->old_value){
+                    $rideFare = RideFare::find($request->old_value[$service]);
+                }else{
+                    $rideFare = new RideFare();
+                }
+                $rideFare->vehicle_type_id = $vehicleType->id;
+                $rideFare->service_id = $service;
+                $rideFare->fare = $fare;
+                $rideFare->save();
+            }
         }
 
-        $notify[] = ['success', 'Vehicle type added successfully'];
-        return back()->withNotify($notify);
+        return to_route('admin.vehicle.type.index')->withNotify($notification);
     }
 
     public function status($id)

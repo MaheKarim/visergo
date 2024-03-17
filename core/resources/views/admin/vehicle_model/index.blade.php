@@ -27,13 +27,13 @@
                                     </td>
 
                                     <td>
-                                         {{ __($model->vehicleType->name) }}
+                                         {{ __($model->vehicleType->name ?? null) }}
                                     </td>
                                     <td>
-                                         {{ __($model->vehicleClass->name) }}
+                                         {{ __($model->vehicleClass->name ?? null ) }}
                                     </td>
                                     <td>
-                                        {{ __($model->brand->name) }}
+                                        {{ __($model->brand->name ?? null ) }}
                                     </td>
 
                                     <td>
