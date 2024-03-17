@@ -40,8 +40,8 @@
                                 <div class="form-group ">
                                     <label>@lang('Is Vehicle Have Class ?')</label>
                                     <div class="form-check">
-                                        <input class="form-check-input manage_class" type="radio" name="manage_class"
-                                            id="yesRadio" value="1" @checked(@$vehicleType->manage_class == 1)>
+                                        <input class="form-check-input" type="radio" name="manage_class" id="yesRadio"
+                                            value="1" @checked(@$vehicleType->manage_class == 1)>
                                         <label class="form-check-label" for="yesRadio">
                                             Yes
                                         </label>
@@ -72,7 +72,7 @@
                             @foreach (@$vehicleType->rideFares ?? [] as $rideFare)
                                 {{--                                @dd($rideFare) --}}
                                 <div class="col-md-4 ">
-                                    <input type="hidden" name="old_value[{{ $rideFare->service_id }}]"
+                                    <input type="text" name="old_value[{{ $rideFare->service_id }}]"
                                         value="{{ $rideFare->id }}">
                                     <div class="form-group">
                                         <label>{{ __($rideFare->service->name) }} Base Fare </label>
@@ -93,7 +93,7 @@
                             @foreach (@$vehicleType->rideFares ?? [] as $rideFare)
                                 @if ($rideFare->vehicle_class_id == null)
                                     <div class="col-md-4 ">
-                                        <input type="hidden" name="old_value[{{ $rideFare->service_id }}]"
+                                        <input type="text" name="old_value[{{ $rideFare->service_id }}]"
                                             value="{{ $rideFare->id }}">
                                         <div class="form-group">
                                             <label>{{ __($rideFare->service->name) }} Base Fare</label>
@@ -168,20 +168,96 @@
 
             $('select[multiple]').select2();
 
+            @if (@$vehicleType)
+                let selectedService = @json(array_values(array_unique(@$vehicleType->vehicleServices->pluck('id')->toArray())));
+                let selectedClasses = @json(array_values(array_unique(@$vehicleType->rideFares->pluck('vehicle_class_id')->toArray())));
+            @else
+                let selectedService = [];
+                let selectedClasses = [];
+            @endif
+
+            let classes = @json($classes);
+            let services = @json($services);
+
+            // let firstChange = true;
+
+            // $('[name=manage_class]').on('change', function() {
+            //     if ($(this).is(':checked')) {
+            //         let manageClass = $(this).val();
+            //         if (manageClass == 1) {
+            //             $('.classArea').removeClass('d-none');
+            //             $('.fareArea').addClass('d-none');
+            //             if (!firstChange) {
+            //                 generateFareHtml();
+            //             }
+            //         } else {
+            //             $('.classArea').addClass('d-none');
+            //             $('.fareArea').removeClass('d-none');
+            //             if (!firstChange) {
+            //                 generateNonClassFareHtml();
+            //             }
+            //             // $('.fareArea').html('');
+            //             $('.fareList').html('');
+            //         }
+            //     }
+            //     firstChange = false;
+            // }).change();
+
+            // $('[name="service[]"]').on('change', function () {
+            //     selectedService = [];
+
+            //     $('[name="service[]"]:checked').each(function () {
+            //         selectedService.push($(this).val());
+            //     });
+
+            //     if ($('[name="manage_class"]:checked').val() == '1') {
+            //         generateFareHtml();
+
+            //     } else {
+            //         generateNonClassFareHtml();
+            //     }
+            // });
+
+            // $('[name="classes[]"]').on('change', function () {
+            //     selectedClasses = [];
+            //     selectedClasses = $(this).find(':selected').map(function () {
+            //         return $(this).val();
+            //     }).get();
+            //     generateFareHtml();
+            // });
+
+
+            // function getNameUsingId(id, type = 'service') {
+            //     if (type === 'service') {
+            //         const service = services.find(function(service) {
+            //             return service.id == id;
+            //         });
+
+            //         if (service) {
+            //             return service.name;
+            //         }
+            //     } else if (type === 'class') {
+            //         const classObj = classes.find(function(classObj) {
+            //             return classObj.id == id;
+            //         });
+
+            //         if (classObj) {
+            //             return classObj.name;
+            //         }
+            //     }
+            //     return null;
+            // }
+
+            // ashik
             $('[name=manage_class]').on('change', function() {
                 if ($(this).val() == 1) {
                     $('.classArea').removeClass('d-none');
                     $('.fareArea').addClass('d-none');
                 } else {
-                    $('.classes').val('').trigger('change');
                     $('.classArea').addClass('d-none');
                     $('.fareArea').removeClass('d-none');
                 }
             });
-
-            @if (old() != null)
-                generateFareElements();
-            @endif
 
             $(document).on('change', '.services, .classes', function() {
                 generateFareElements();
@@ -239,7 +315,6 @@
 
             function makeBaseFareElements(services) {
                 var baseFareElements = '';
-                var kmFareElements = '';
                 $.each(services, function(index, service) {
                     var serviceId = $(service).val();
                     var serviceName = $(service).siblings('label').text();
@@ -253,21 +328,70 @@
                                 </div>
                             </div>
                         </div>`;
-
-                    kmFareElements += `<div class="col-md-4 ">
-                                <div class="form-group">
-                                    <label>${serviceName} Fare per/km</label>
-                                    <div class="input-group">
-                                        <input type="number" step="any" min="0" name="per_km_cost[${serviceId}]" class="form-control">
-                                        <span class="input-group-text">{{ __($general->cur_text) }}</span>
-                                    </div>
-                                </div>
-                            </div>`;
                 });
 
                 $('.fareList').html(baseFareElements);
-                $('.perKmFare').html(kmFareElements);
             }
+            // ashik
+
+            // function generateFareHtml() {
+            //     let html = '';
+            //     let perKmFareHtml = '';
+            //     selectedService.forEach(service => {
+            //         selectedClasses.forEach(classElement => {
+            //             html += `<div class="col-md-4 ">
+        //                         <div class="form-group">
+        //                             <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')} Base Fare</label>
+        //                             <div class="input-group">
+        //                                 <input type="number" step="any" min="0" name="fare[${service}][${classElement}]" class="form-control">
+        //                                 <span class="input-group-text">{{ __($general->cur_text) }}</span>
+        //                             </div>
+        //                         </div>
+        //                     </div>`;
+
+            //             perKmFareHtml += `<div class="col-md-4 ">
+        //                         <div class="form-group">
+        //                             <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')} Fare per/km</label>
+        //                             <div class="input-group">
+        //                                 <input type="number" step="any" min="0" name="per_km_cost[${service}][${classElement}]" class="form-control">
+        //                                 <span class="input-group-text">{{ __($general->cur_text) }}</span>
+        //                             </div>
+        //                         </div>
+        //                     </div>`;
+
+            //         });
+            //     });
+            //     $('.fareList').html(html);
+            //     $('.perKmFare').html(perKmFareHtml);
+            // }
+
+            // function generateNonClassFareHtml() {
+            //     let html = '';
+            //     let nonClassFarePerKm = '';
+            //     selectedService.forEach(service => {
+            //         html += `<div class="col-md-4 ">
+        //                     <div class="form-group">
+        //                         <label>${getNameUsingId(service)} - Base Fare</label>
+        //                         <div class="input-group">
+        //                             <input type="number" step="any" min="0" name="fare[${service}]" class="form-control">
+        //                             <span class="input-group-text">{{ __($general->cur_text) }}</span>
+        //                         </div>
+        //                     </div>
+        //                 </div>`;
+            //         nonClassFarePerKm += `<div class="col-md-4 ">
+        //                     <div class="form-group">
+        //                         <label>${getNameUsingId(service)} - Fare per/km</label>
+        //                         <div class="input-group">
+        //                             <input type="number" step="any" min="0" name="per_km_cost[${service}]" class="form-control">
+        //                             <span class="input-group-text">{{ __($general->cur_text) }}</span>
+        //                         </div>
+        //                     </div>
+        //                 </div>`;
+            //     });
+            //     $('.fareArea').html(html);
+            //     $('.nonClassFarePerKm').html(nonClassFarePerKm);
+            // }
+
         });
     </script>
 @endpush
