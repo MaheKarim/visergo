@@ -69,23 +69,32 @@
                         </div>
 
                         <div class="row fareArea">
-                            <div class="col-md-4 d-none ">
-                                <div class="form-group">
-                                    <label>@lang('Base Fare')</label>
-                                    <div class="input-group">
-                                        <input class="form-control" name="fare" type="number"
-                                               value="{{ old()['base_fare'] ?? showAmount(@$vehicleType->base_fare) }}">
-                                        <span class="input-group-text">{{ $general->cur_text }}</span>
+                            @foreach(@$vehicleType->rideFares ?? [] as $rideFare)
+{{--                                @dd($rideFare)--}}
+                                <div class="col-md-4 ">
+                                    <input type="text"
+                                           name="old_value[{{$rideFare->service_id}}]"
+                                           value="{{ $rideFare->id }}">
+                                    <div class="form-group">
+                                        <label>{{ __($rideFare->service->name)  }} Base Fare </label>
+                                        <div class="input-group">
+                                            <input class="form-control" name="fare[{{$rideFare->service_id}}]"
+                                                   type="number" step="any" min="0"
+                                                   value="{{getAmount($rideFare->fare)}}">
+                                            <span class="input-group-text">{{ $general->cur_text }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                        @endforeach
                         </div>
+                            <div class="row nonClassFarePerKm">
+                            </div>
 
                         <div class="row fareList">
                             @foreach(@$vehicleType->rideFares ?? [] as $rideFare)
                                 @if($rideFare->vehicle_class_id == null)
                                     <div class="col-md-4 ">
-                                        <input type="hidden"
+                                        <input type="text"
                                                name="old_value[{{$rideFare->service_id}}]"
                                                value="{{ $rideFare->id }}">
                                         <div class="form-group">
@@ -119,6 +128,30 @@
                             @endforeach
                         </div>
 
+                        <div class="row perKmFare">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-">
+                                    <label>@lang('Have Brand ?')</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="manage_brand" id="brandYesRadio"
+                                               value="1" @checked(@$vehicleType->manage_brand == 1)>
+                                        <label class="form-check-label" for="brandYesRadio">
+                                            Yes
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="manage_brand" id="brandNoRadio"
+                                               value="0" @checked(@$vehicleType->manage_brand === 0)>
+                                        <label class="form-check-label" for="brandNoRadio">
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-footer">
                             <div class="form-group">
                                 <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
@@ -165,8 +198,8 @@
                         if (!firstChange) {
                             generateNonClassFareHtml();
                         }
-                        $('.fareArea').html('');
-                        // $('.fareList').html('');
+                        // $('.fareArea').html('');
+                        $('.fareList').html('');
                     }
                 }
                 firstChange = false;
@@ -181,6 +214,7 @@
 
                 if ($('[name="manage_class"]:checked').val() == '1') {
                     generateFareHtml();
+
                 } else {
                     generateNonClassFareHtml();
                 }
@@ -218,6 +252,7 @@
 
             function generateFareHtml() {
                 let html = '';
+                let perKmFareHtml = '';
                 selectedService.forEach(service => {
                     selectedClasses.forEach(classElement => {
                         html += `<div class="col-md-4 ">
@@ -229,16 +264,8 @@
                                         </div>
                                     </div>
                                 </div>`;
-                    });
-                });
-                $('.fareList').html(html);
-            }
 
-            function generatePerKmFareCostHtml() {
-                let html = '';
-                selectedService.forEach(service => {
-                    selectedClasses.forEach(classElement => {
-                        html += `<div class="col-md-4 ">
+                        perKmFareHtml += `<div class="col-md-4 ">
                                     <div class="form-group">
                                         <label>${getNameUsingId(service)} - ${getNameUsingId(classElement, 'class')} Fare per/km</label>
                                         <div class="input-group">
@@ -247,13 +274,16 @@
                                         </div>
                                     </div>
                                 </div>`;
+
                     });
                 });
-                $('.fareListCopy').html(html);
+                $('.fareList').html(html);
+                $('.perKmFare').html(perKmFareHtml);
             }
 
             function generateNonClassFareHtml() {
                 let html = '';
+                let nonClassFarePerKm = '';
                 selectedService.forEach(service => {
                     html += `<div class="col-md-4 ">
                                 <div class="form-group">
@@ -264,8 +294,18 @@
                                     </div>
                                 </div>
                             </div>`;
+                    nonClassFarePerKm += `<div class="col-md-4 ">
+                                <div class="form-group">
+                                    <label>${getNameUsingId(service)} - Fare per/km</label>
+                                    <div class="input-group">
+                                        <input type="number" step="any" min="0" name="per_km_cost[${service}]" class="form-control">
+                                        <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                    </div>
+                                </div>
+                            </div>`;
                 });
                 $('.fareArea').html(html);
+                $('.nonClassFarePerKm').html(nonClassFarePerKm);
             }
 
         });

@@ -25,34 +25,36 @@ class VehicleTypeController extends Controller
     public function store(Request $request, $id = 0)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string',
             'manage_class' => 'required|boolean',
-            'manage_brand' => 'nullable|boolean',
-            'classes' => 'nullable|array',
+            'manage_brand' => 'required|boolean',
+            'service' => 'required|array',
+            'service.*' => 'required|numeric|min:1',
             'fare' => 'required|array',
-            'fare.*' => 'required|numeric|min:0'
+            'fare.*' => 'nullable|numeric|min:0',
+            'per_km_cost' => 'required|array',
+            'per_km_cost.*' => 'nullable|numeric|min:0',
         ]);
 
-        if($id){
+
+        if ($id) {
             $vehicleType = VehicleType::findOrFail($id);
             $notification = ['success', 'Vehicle type updated successfully'];
-        }else{
+        } else {
             $vehicleType = new VehicleType();
             $notification = ['success', 'Vehicle type added successfully'];
         }
 
-        if($id && !$request->old_value && $vehicleType->manage_class == 1)
-        {
+        if ($id && !$request->old_value && $vehicleType->manage_class == 1) {
             RideFare::where('vehicle_type_id', $vehicleType->id)->delete();
         }
 
         $vehicleType->name = $request->name;
-        $vehicleType->base_fare = $request->base_fare ?? 0;
         $vehicleType->manage_class = $request->manage_class;
+        $vehicleType->manage_brand = $request->manage_brand;
         $vehicleType->save();
 
-        if($vehicleType->manage_class == 1)
-        {
+        if ($vehicleType->manage_class == 1) {
             $serviceIds = array_keys($request->fare);
             $classIds = array_keys($request->fare[$serviceIds[0]]);
 
@@ -61,9 +63,9 @@ class VehicleTypeController extends Controller
 
             foreach ($request->fare as $service => $classes) {
                 foreach ($classes as $class => $fare) {
-                    if($request->old_value){
+                    if ($request->old_value) {
                         $rideFare = RideFare::find($request->old_value[$service][$class]);
-                    }else{
+                    } else {
                         $rideFare = new RideFare();
                     }
 
@@ -71,22 +73,23 @@ class VehicleTypeController extends Controller
                     $rideFare->service_id = $service;
                     $rideFare->vehicle_class_id = $class;
                     $rideFare->fare = $fare;
+                    $rideFare->per_km_cost = $request->per_km_cost[$service][$class];
                     $rideFare->save();
                 }
             }
-
-        }else{
+        } else {
             $serviceIds = array_keys($request->fare);
             $vehicleType->vehicleServices()->sync($serviceIds);
             foreach ($request->fare as $service => $fare) {
-                if($request->old_value){
+                if ($request->old_value) {
                     $rideFare = RideFare::find($request->old_value[$service]);
-                }else{
+                } else {
                     $rideFare = new RideFare();
                 }
                 $rideFare->vehicle_type_id = $vehicleType->id;
                 $rideFare->service_id = $service;
                 $rideFare->fare = $fare;
+                $rideFare->per_km_cost = $request->per_km_cost[$service];
                 $rideFare->save();
             }
         }
