@@ -158,6 +158,7 @@ class RideController extends Controller
             'pillion_number' => [
                 'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
             ],
+            'service_id' => 'required',
         ]);
 
         if ($validator->fails()) {
