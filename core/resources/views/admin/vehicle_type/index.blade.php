@@ -10,7 +10,6 @@
                             <thead>
                             <tr>
                                 <th>@lang('Type Name')</th>
-                                <th>@lang('Base Fare')</th>
                                 <th>@lang('Have Class ?')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
@@ -21,9 +20,6 @@
                                 <tr>
                                     <td>
                                         <span class="fw-bold">{{ __($vehicle->name) }}</span>
-                                    </td>
-                                    <td>
-                                        {{ __(showAmount($vehicle->base_fare)) }} {{ $general->cur_text }}
                                     </td>
                                     <td>
                                         {{ $vehicle->manage_class == 1 ? __('Yes') : __('No') }}

@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 d-none classArea">
+                            <div class="col-md-6 @if(!@$vehicleType->manage_class) d-none @endif classArea">
                                 <div class="form-group">
                                     <label>@lang('Select Class')</label>
                                     <select class="form-control classes" name="classes[]" multiple>
@@ -68,65 +68,70 @@
                             </div>
                         </div>
 
-                        <div class="row fareArea">
-                            @foreach (@$vehicleType->rideFares ?? [] as $rideFare)
-                                {{--                                @dd($rideFare) --}}
-                                <div class="col-md-4 ">
-                                    <input type="hidden" name="old_value[{{ $rideFare->service_id }}]"
-                                        value="{{ $rideFare->id }}">
-                                    <div class="form-group">
-                                        <label>{{ __($rideFare->service->name) }} Base Fare </label>
-                                        <div class="input-group">
-                                            <input class="form-control" name="fare[{{ $rideFare->service_id }}]"
-                                                type="number" step="any" min="0"
-                                                value="{{ getAmount($rideFare->fare) }}">
-                                            <span class="input-group-text">{{ $general->cur_text }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div class="row nonClassFarePerKm">
-                        </div>
-
                         <div class="row fareList">
-                            @foreach (@$vehicleType->rideFares ?? [] as $rideFare)
-                                @if ($rideFare->vehicle_class_id == null)
-                                    <div class="col-md-4 ">
-                                        <input type="hidden" name="old_value[{{ $rideFare->service_id }}]"
-                                            value="{{ $rideFare->id }}">
-                                        <div class="form-group">
-                                            <label>{{ __($rideFare->service->name) }} Base Fare</label>
-                                            <div class="input-group">
-                                                <input class="form-control" name="fare[{{ $rideFare->service_id }}]"
-                                                    type="number" step="any" min="0"
-                                                    value="{{ getAmount($rideFare->fare) }}">
-                                                <span class="input-group-text">{{ $general->cur_text }}</span>
+                            @if(@$vehicleType)
+                                @if(@$vehicleType->manage_class == Status::YES)
+                                    @foreach($vehicleType->rideFares as $rideFare)
+                                        <div class="col-md-4 ">
+                                            <div class="form-group">
+                                                <label>{{ $rideFare->service->name  }} - {{ $rideFare->vehicleClass->name  }} @lang('Base Fare')</label>
+                                                <div class="input-group">
+                                                    <input type="number" step="any" min="0"
+                                                           value="{{ getAmount($rideFare->fare)  }}"
+                                                           name="fare[{{ $rideFare->service_id  }}][{{ $rideFare->vehicle_class_id  }}]"
+                                                           class="form-control">
+                                                    <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @elseif($rideFare->vehicle_class_id != null)
-                                    <div class="col-md-4">
-                                        <input type="hidden"
-                                            name="old_value[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
-                                            value="{{ $rideFare->id }}">
-                                        <div class="form-group">
-                                            <label>{{ __($rideFare->service->name) }}
-                                                - {{ __($rideFare->vehicleClass->name) }}</label>
-                                            <div class="input-group">
-                                                <input type="number" step="any" min="0"
-                                                    value="{{ getAmount($rideFare->fare) }}"
-                                                    name="fare[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
-                                                    class="form-control">
-                                                <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                    @endforeach
+                                @else
+                                    @foreach($vehicleType->rideFares as $rideFare)
+                                        <div class="col-md-4 ">
+                                            <div class="form-group">
+                                                <label>{{ $rideFare->service->name  }} @lang('Base Fare')</label>
+                                                <div class="input-group">
+                                                    <input type="number" step="any"
+                                                           value="{{ getAmount($rideFare->fare)  }}" min="0"
+                                                           name="fare[{{ $rideFare->service_id  }}]"
+                                                           class="form-control">
+                                                    <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    @endforeach
                                 @endif
-                            @endforeach
+                            @endif
                         </div>
 
                         <div class="row perKmFare">
+                            @if(@$vehicleType)
+                                @if(@$vehicleType->manage_class == Status::YES)
+                                    @foreach($vehicleType->rideFares as $rideFare)
+                                        <div class="col-md-4 ">
+                                            <div class="form-group">
+                                                <label>{{ $rideFare->service->name  }} - {{ $rideFare->vehicleClass->name  }} @lang('Fare per/km')</label>
+                                                <div class="input-group">
+                                                    <input type="number" step="any" min="0" value="{{ getAmount($rideFare->per_km_cost)  }}" name="per_km_cost[{{ $rideFare->service_id  }}][{{ $rideFare->vehicle_class_id  }}]" class="form-control">
+                                                    <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    @foreach($vehicleType->rideFares as $rideFare)
+                                        <div class="col-md-4 ">
+                                            <div class="form-group">
+                                                <label>{{ $rideFare->service->name  }} @lang('Fare per/km')</label>
+                                                <div class="input-group">
+                                                    <input type="number" step="any" min="0" value="{{ getAmount($rideFare->per_km_cost)  }}" name="per_km_cost[{{ $rideFare->service_id  }}]" class="form-control">
+                                                    <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            @endif
                         </div>
 
                         <div class="row">
@@ -171,17 +176,11 @@
             $('[name=manage_class]').on('change', function() {
                 if ($(this).val() == 1) {
                     $('.classArea').removeClass('d-none');
-                    $('.fareArea').addClass('d-none');
                 } else {
                     $('.classes').val('').trigger('change');
                     $('.classArea').addClass('d-none');
-                    $('.fareArea').removeClass('d-none');
                 }
             });
-
-            @if (old() != null)
-                generateFareElements();
-            @endif
 
             $(document).on('change', '.services, .classes', function() {
                 generateFareElements();

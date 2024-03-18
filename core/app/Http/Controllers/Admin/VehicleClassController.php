@@ -20,7 +20,6 @@ class VehicleClassController extends Controller
     {
         $request->validate([
             'name' => 'required|max:40',
-            'base_fare' => 'required|numeric|gte:0',
         ]);
 
         if (!$id) {
@@ -32,7 +31,6 @@ class VehicleClassController extends Controller
         }
 
         $class->name = $request->name;
-        $class->base_fare = $request->base_fare;
         $class->save();
 
         $notify[] = ['success', $notification];

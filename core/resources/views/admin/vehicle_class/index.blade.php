@@ -10,7 +10,6 @@
                             <thead>
                             <tr>
                                 <th>@lang('Class Name')</th>
-                                <th>@lang('Base Fare')</th>
                                 <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
@@ -21,10 +20,6 @@
                                     <td>
                                         <span class="fw-bold">{{ __($class->name) }}</span>
                                     </td>
-                                    <td>
-                                        {{ __(showAmount($class->base_fare)) }} {{ $general->cur_text }}
-                                    </td>
-
                                     <td>
                                         @php
                                             echo $class->statusBadge
@@ -88,13 +83,6 @@
                                 <input class="form-control" name="name" type="text" required>
                             </div>
 
-                            <div class="form-group">
-                                <label>@lang('Base Fare')</label>
-                                <div class="input-group">
-                                    <input class="form-control" name="base_fare" type="number" required>
-                                    <span class="input-group-text">{{__($general->cur_text)}}</span>
-                                </div>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn--primary w-100 h-45" type="submit">@lang('Submit')</button>
