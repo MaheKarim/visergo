@@ -30,6 +30,7 @@ class RideController extends Controller
             'pillion_number' => [
                 'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
             ],
+            'service_id' => 'required',
         ]);
 
         if ($request->has('vehicle_type')) {
@@ -58,8 +59,6 @@ class RideController extends Controller
                 'message' => $notify
             ], 403);
         }
-
-        // Ride Request
 
         $pickup_lat = $request->pickup_lat;
         $pickup_long = $request->pickup_long;
@@ -139,12 +138,6 @@ class RideController extends Controller
                 'status' => 'error',
                 'message' => 'Vehicle types not found',
             ]);
-        }
-
-
-        if ($request->has('ride_for') && $request->ride_for == Status::RIDE_FOR_PILLION) {
-            $response['message']['pillion_name'] = $request->pillion_name;
-            $response['message']['pillion_number'] = $request->pillion_number;
         }
 
         return response()->json($responses);
