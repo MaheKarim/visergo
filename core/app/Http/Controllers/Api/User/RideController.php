@@ -9,9 +9,7 @@ use App\Models\Ride;
 use App\Models\RideFare;
 use App\Models\VehicleType;
 use App\Models\Zone;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
@@ -68,11 +66,30 @@ class RideController extends Controller
         $destination_lat = $request->destination_lat;
         $destination_long = $request->destination_long;
 
-        $zone = Zone::where('status', Status::ENABLE)->first(); // WIP
+        $zones = Zone::active()->first();
 
-        $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
-        $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+        foreach ($zones as $zone) {
+            $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
+            $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+            if ($pickup_in_zone && $destination_in_zone) {
+                break;
+            }
+        }
 
+        if (!$pickup_in_zone) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => 'Pickup point not in zone',
+            ]);
+        }
+        if (!$destination_in_zone) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => 'Destination point not in zone',
+            ]);
+        }
         // Introduce Google MAP Api
         $apiKey = gs()->location_api;
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
@@ -80,7 +97,6 @@ class RideController extends Controller
 
         if ($response['status'] == 'OK') {
             $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
-//            $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
             $pickupAddress = $response['origin_addresses'][0];
             $destinationAddress = $response['destination_addresses'][0];
         }
@@ -92,39 +108,31 @@ class RideController extends Controller
             'data' => []
         ];
         foreach ($vehicleTypes as $vehicleType) {
-            if ($vehicleType->manage_class == Status::YES) {
-                $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
-                    ->where('service_id', $request->service_id)
-                    ->with(['vehicleClass'])->get();
+            $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
+                ->where('service_id', $request->service_id)
+                ->with(['vehicleClass'])->get();
 
-                foreach ($multipleClass as $class) {
-                    $baseFare = $class->fare;
-                    $fare = $baseFare * $distance;
-                    $typeClass = $class->vehicleClass->name;
-                    $responses['data'][] = [
-                        'fare' => $fare,
-                        'class' => $typeClass,
-                        'class_id' => $class->vehicleClass->id,
-                        'vehicle_type' => $vehicleType->name,
-                        'vehicle_type_id' => $vehicleType->id,
-                        'pickup_address' => $pickupAddress,
-                        'destination_address' => $destinationAddress,
-                    ];
-                }
-            } elseif ($vehicleType->manage_class == Status::NO) {
-                $baseFare = $vehicleType->base_fare;
+            foreach ($multipleClass as $class) {
+
+                $baseFare = $class->fare;
                 $fare = $baseFare * $distance;
+                $getVehicleClass = data_get($class, 'vehicleClass.name');
+                $getVehicleClassId = data_get($class, 'vehicleClass.id');
 
                 $responses['data'][] = [
-                    'fare' => $fare,
-//                    'class_id' => $class->vehicleClass->id,
-                    'vehicle_type' => $vehicleType->name,
+                    'id' => $class->id,
                     'vehicle_type_id' => $vehicleType->id,
+                    'service_id' => $request->service_id,
+                    'class_id' => $getVehicleClassId,
+                    'fare' => getAmount($fare),
+                    'class' => $getVehicleClass,
+                    'vehicle_type' => $vehicleType->name,
                     'pickup_address' => $pickupAddress,
                     'destination_address' => $destinationAddress,
                 ];
             }
         }
+
         if (empty($responses)) {
             return response()->json([
                 'remark' => 'validation_error',
@@ -142,7 +150,7 @@ class RideController extends Controller
         return response()->json($responses);
 
     }
-    public function rideRequest(Request $request, $id = 0, $type = '')
+    public function rideRequest(Request $request, $id = 0)
     {
 
         $validator = Validator::make($request->all(), [
@@ -213,8 +221,8 @@ class RideController extends Controller
                 $destinationAddress = $response['destination_addresses'][0];
 
                 // TODO:: Need To Update // ride_service_type
-                $type = VehicleType::where('id', $request->type_id)->first();
-                if ($type == null) {
+                $vehicle = VehicleType::where('id', $request->type_id)->first();
+                if ($vehicle == null) {
                     $notify[] = ['error', 'Vehicle type not found'];
                     return response()->json([
                         'remark' => 'validation_error',
@@ -223,13 +231,13 @@ class RideController extends Controller
                     ]);
                 }
 
-                if ($type->manage_class == null && $type->manage_class == 0) {
-                    $base_fare = $type->value('base_fare');
-                }   else {
-//                    $base_fare = $type->base_fare;
+                if ($vehicle->manage_class == null && $vehicle->manage_class == 0) {
+                    $base_fare = $vehicle->value('base_fare');
+                } else {
+//                    $base_fare = $vehicle->base_fare;
                 }
-                if (($request->ride_request_type = $type) && ($pickup_in_zone && $destination_in_zone)) {
-                    $perKMCost = $type->value('base_fare');
+                if (($request->ride_request_type = $vehicle) && ($pickup_in_zone && $destination_in_zone)) {
+                    $perKMCost = $vehicle->value('base_fare');
 
                     $rideCost = $distance * $perKMCost;
 

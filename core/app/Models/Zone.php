@@ -24,4 +24,9 @@ class Zone extends Model
             return json_decode($this->coordinates->toJson())->coordinates[0];
         });
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', Status::ENABLE);
+    }
 }
