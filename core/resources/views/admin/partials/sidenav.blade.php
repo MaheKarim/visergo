@@ -226,16 +226,16 @@
                     <div class="sidebar-submenu {{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],2)}} ">
                         <ul>
 
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.type.*')}} ">
-                                <a href="{{route('admin.vehicle.type.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Type')</span>
-                                </a>
-                            </li>
                             <li class="sidebar-menu-item {{menuActive('admin.vehicle.class.*')}} ">
                                 <a href="{{route('admin.vehicle.class.index')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">@lang('Vehicle Class')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.type.*')}} ">
+                                <a href="{{route('admin.vehicle.type.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Type')</span>
                                 </a>
                             </li>
 
