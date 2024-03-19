@@ -65,10 +65,21 @@ class RideController extends Controller
         $destination_lat = $request->destination_lat;
         $destination_long = $request->destination_long;
 
-        $zone = Zone::active()->first();
+        $zones = Zone::active()->get();
 
-        $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
-        $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+        foreach ($zones as $zone) {
+            $pickup_in_zone = underZone($pickup_lat, $pickup_long, $zone);
+        }
+
+        foreach ($zones as $zone) {
+            $destination_in_zone = underZone($destination_lat, $destination_long, $zone);
+
+            if ($destination_in_zone) {
+                $zoneId = $zone->id;
+                break;
+            }
+        }
+
 
         if (!underZone($pickup_lat, $pickup_long, $zone) || !underZone($destination_lat, $destination_long, $zone)) {
             return response()->json([
@@ -131,6 +142,7 @@ class RideController extends Controller
         return response()->json($responses);
 
     }
+
     public function rideRequest(Request $request, $id = 0)
     {
 
@@ -186,25 +198,16 @@ class RideController extends Controller
             $destination_lat = $request->destination_lat;
             $destination_long = $request->destination_long;
 
-            $zone = Zone::active()->first();
-            $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
-            $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+            $zones = Zone::active()->get();
 
-            if (!$pickup_in_zone) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Pickup point not in zone',
-                ]);
+            foreach ($zones as $zone) {
+                $pickup_in_zone = underZone($pickup_lat, $pickup_long, $zone);
+                $destination_in_zone = underZone($destination_lat, $destination_long, $zone);
+                if ($destination_in_zone) {
+                    $zoneId = $zone->id;
+                    break;
+                }
             }
-            if (!$destination_in_zone) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Destination point not in zone',
-                ]);
-            }
-
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
             $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
@@ -216,86 +219,86 @@ class RideController extends Controller
                 $pickupAddress = $response['origin_addresses'][0];
                 $destinationAddress = $response['destination_addresses'][0];
             }
-                $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
-                if ($vehicle == null) {
-                    $notify[] = ['error', 'Vehicle type not found'];
-                    return response()->json([
-                        'remark' => 'validation_error',
-                        'status' => 'error',
-                        'message' => $notify,
-                    ]);
-                }
+            $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
+            if ($vehicle == null) {
+                $notify[] = ['error', 'Vehicle type not found'];
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => $notify,
+                ]);
+            }
 
-                // Search Ride Fare based on vehicle type
-                $rideFare = RideFare::where('vehicle_type_id', $vehicle->id)
-                    ->where('service_id', $request->service_id)
-                    ->where('vehicle_class_id', $request->class_id)
-                    ->first();
+            // Search Ride Fare based on vehicle type
+            $rideFare = RideFare::where('vehicle_type_id', $vehicle->id)
+                ->where('service_id', $request->service_id)
+                ->where('vehicle_class_id', $request->class_id)
+                ->first();
 
-                if ($rideFare == null) {
-                    $notify[] = ['error', 'Ride data not found'];
-                    return response()->json([
-                        'remark' => 'validation_error',
-                        'status' => 'error',
-                        'message' => $notify,
-                    ]);
-                }
+            if ($rideFare == null) {
+                $notify[] = ['error', 'Ride data not found'];
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => $notify,
+                ]);
+            }
 
-                $base_fare = $rideFare->fare;
-                $fare = $distance * $rideFare->per_km_cost;
+            $base_fare = $rideFare->fare;
+            $fare = $distance * $rideFare->per_km_cost;
 
-                if ($fare < $base_fare) {
-                    $fare = $base_fare;
-                }
-                if ($request->tips !=0 ){
-                    $fare = $fare + $request->tips;
-                }
-                $amount = $fare;
-                $vatAmount = gs()->vat_amount * $amount / 100;
-                $totalAmount = $amount + $vatAmount;
+            if ($fare < $base_fare) {
+                $fare = $base_fare;
+            }
+            if ($request->tips != 0) {
+                $fare = $fare + $request->tips;
+            }
+            $amount = $fare;
+            $vatAmount = gs()->vat_amount * $amount / 100;
+            $totalAmount = $amount + $vatAmount;
 
 
-                    // TODO:: Need To Update
-                    $ride = new Ride();
-                    $ride->user_id = $user->id;
-                    $ride->zone_id = $zone->id;
-                    $ride->ride_for = $request->ride_for;
-                    if ($ride->ride_for == Status::RIDE_FOR_PILLION) {
-                        $ride->pillion_name = $request->pillion_name;
-                        $ride->pillion_number = $request->pillion_number;
-                    }
-                    $ride->pickup_lat = $pickup_lat;
-                    $ride->pickup_long = $pickup_long;
-                    $ride->destination_lat = $destination_lat;
-                    $ride->destination_long = $destination_long;
-                    $ride->pickup_address = $pickupAddress;
-                    $ride->destination_address = $destinationAddress;
-                    $ride->otp = generateOTP();
-                    $ride->distance = $distance;
-                    $ride->duration = $duration;
-                    $ride->base_fare = $base_fare;
+            // TODO:: Need To Update
+            $ride = new Ride();
+            $ride->user_id = $user->id;
+            $ride->zone_id = $zoneId;
+            $ride->ride_for = $request->ride_for;
+            if ($ride->ride_for == Status::RIDE_FOR_PILLION) {
+                $ride->pillion_name = $request->pillion_name;
+                $ride->pillion_number = $request->pillion_number;
+            }
+            $ride->pickup_lat = $pickup_lat;
+            $ride->pickup_long = $pickup_long;
+            $ride->destination_lat = $destination_lat;
+            $ride->destination_long = $destination_long;
+            $ride->pickup_address = $pickupAddress;
+            $ride->destination_address = $destinationAddress;
+            $ride->otp = generateOTP();
+            $ride->distance = $distance;
+            $ride->duration = $duration;
+            $ride->base_fare = $base_fare;
 
-                    $ride->total = $totalAmount;
-                    $ride->vat_amount = $vatAmount;
+            $ride->total = $totalAmount;
+            $ride->vat_amount = $vatAmount;
 
-                    $ride->status = Status::RIDE_INITIATED;
-                    $ride->save();
-                    // Admin Portion
-                    // Driver Notification Sent
+            $ride->status = Status::RIDE_INITIATED;
+            $ride->save();
+            // Admin Portion
+            // Driver Notification Sent
 
-                    // TODO:: Coupon Apply Here
-                    // Reward Claim After Ride Completed
-                    if ($ride->status == Status::RIDE_COMPLETED) {
-                        $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
-                        $user->reward_point += $ride->point;
-                        $user->save();
-                    }
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'Ride Requested Created Successfully',
-                        'distance' => $distance,
-                        'data' => $ride,
-                    ]);
+            // TODO:: Coupon Apply Here
+            // Reward Claim After Ride Completed
+            if ($ride->status == Status::RIDE_COMPLETED) {
+                $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
+                $user->reward_point += $ride->point;
+                $user->save();
+            }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ride Requested Created Successfully',
+                'distance' => $distance,
+                'data' => $ride,
+            ]);
         }
     }
 

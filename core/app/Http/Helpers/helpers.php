@@ -479,6 +479,9 @@ function underZone($lat, $long, $zone)
             ($x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi);
         if ($intersect) {
             $inside = !$inside; // Toggle the inside status
+
+
+
         }
     }
     // return $inside;

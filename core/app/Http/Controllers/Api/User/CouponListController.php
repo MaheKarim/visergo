@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class CouponListController extends Controller
