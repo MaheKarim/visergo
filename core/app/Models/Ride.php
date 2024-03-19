@@ -9,6 +9,11 @@ class Ride extends Model
 {
     protected $guarded = [];
 
+    public function destinations()
+    {
+        return $this->hasMany(RideDestination::class, 'ride_id', 'id');
+    }
+
     public function zone()
     {
         return $this->belongsTo(Zone::class);

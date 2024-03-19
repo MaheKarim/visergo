@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Models\Ride;
+use App\Models\RideDestination;
 use App\Models\Zone;
 use App\Models\Driver;
 use App\Models\RideFare;
@@ -58,7 +59,6 @@ class RideController extends Controller
                 break;
             }
         }
-
 
         if (!underZone($pickup_lat, $pickup_long, $zone) || !underZone($destination_lat, $destination_long, $zone)) {
             return response()->json([
@@ -137,7 +137,6 @@ class RideController extends Controller
             return $this->driverErrorResponse();
         }
 
-
         $existingRide = Ride::where('user_id', $user->id)
             ->where('service_id', Status::RIDE_SERVICE)
             ->where('ride_for', Status::RIDE_FOR_OWN)
@@ -151,33 +150,60 @@ class RideController extends Controller
                 'data' => $request->all(),
             ]);
         } else {
-
             $pickup_lat = $request->pickup_lat;
             $pickup_long = $request->pickup_long;
-            $destination_lat = $request->destination_lat;
-            $destination_long = $request->destination_long;
+            $destination_lat = $request->input('destination_lat');
+            $destination_long = $request->input('destination_long');
 
             $zones = Zone::active()->get();
 
             foreach ($zones as $zone) {
                 $pickup_in_zone = underZone($pickup_lat, $pickup_long, $zone);
-                $destination_in_zone = underZone($destination_lat, $destination_long, $zone);
-                if ($destination_in_zone) {
+
+                // Check if any destination is under the zone
+                $destination_in_zone = false;
+                foreach ($destination_lat as $index => $dest_lat) {
+                    $dest_long = $destination_long[$index];
+                    if (underZone($dest_lat, $dest_long, $zone)) {
+                        $destination_in_zone = true;
+                        break;
+                    }
+                }
+
+                if ($destination_in_zone && $pickup_in_zone) {
                     $zoneId = $zone->id;
                     break;
                 }
             }
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
-            $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
+
+            $destinations = [];
+            foreach ($destination_lat as $index => $lat) {
+                $destinations[] = "$lat,$destination_long[$index]";
+            }
+
+            $destinations = implode('|', $destinations);
+
+            $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destinations}&key={$apiKey}";
             $response = json_decode(file_get_contents($url), true);
 
             if ($response['status'] == 'OK') {
-                $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
-                $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
+                // Handle multiple destination distances and durations
+                foreach ($response['rows'][0]['elements'] as $index => $element) {
+                    $distance = $element['distance']['value'] / 1000;
+                    $duration = $element['duration']['value'] / 60;
+                    $pickupAddress = $response['origin_addresses'][0];
+                    $destinationAddress = $response['destination_addresses'][$index];
+                    // Process distance and duration for each destination
+                }
+            } else {
+                $distance = 0;
+                $duration = 0;
                 $pickupAddress = $response['origin_addresses'][0];
                 $destinationAddress = $response['destination_addresses'][0];
             }
+
             $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
             if ($vehicle == null) {
                 $notify[] = ['error', 'Vehicle type not found'];
@@ -222,14 +248,17 @@ class RideController extends Controller
             $ride->user_id = $user->id;
             $ride->zone_id = $zoneId;
             $ride->ride_for = $request->ride_for;
+            $ride->service_id = $request->service_id;
+
+
             if ($ride->ride_for == Status::RIDE_FOR_PILLION) {
                 $ride->pillion_name = $request->pillion_name;
                 $ride->pillion_number = $request->pillion_number;
             }
             $ride->pickup_lat = $pickup_lat;
             $ride->pickup_long = $pickup_long;
-            $ride->destination_lat = $destination_lat;
-            $ride->destination_long = $destination_long;
+
+
             $ride->pickup_address = $pickupAddress;
             $ride->destination_address = $destinationAddress;
             $ride->otp = generateOTP();
@@ -242,6 +271,16 @@ class RideController extends Controller
 
             $ride->status = Status::RIDE_INITIATED;
             $ride->save();
+
+            foreach ($destination_lat as $index => $lat) {
+                $destination = new RideDestination();
+                $destination->ride_id = $ride->id;
+                $destination->destination_lat = $lat;
+                $destination->destination_long = $destination_long[$index];
+                $destination->destination_address = $destinationAddress[$index];
+                $destination->save();
+            }
+
             // Admin Portion
             // Driver Notification Sent
 
@@ -310,6 +349,15 @@ class RideController extends Controller
             'status' => 'error',
             'message' => 'Drivers are not allowed to make ride requests.'
         ], 403);
+    }
+
+    private function validationErrorResponse(\Illuminate\Validation\Validator $validator)
+    {
+        return response()->json([
+            'remark' => 'validation_error',
+            'status' => 'error',
+            'message' => $validator->errors()->first(),
+        ], 422);
     }
 
 
