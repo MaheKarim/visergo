@@ -18,20 +18,11 @@ class RideController extends Controller
     public function ride(Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
-            'pickup_lat' => 'required',
-            'pickup_long' => 'required',
-            'destination_lat' => 'required',
-            'destination_long' => 'required',
-            'ride_for' => 'required',
-            'pillion_name' => [
-                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
-            ],
-            'pillion_number' => [
-                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
-            ],
-            'service_id' => 'required',
-        ]);
+        $validator = $this->validateRequest($request);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
 
         if ($request->has('vehicle_type')) {
             $validator->after(function ($validator) use ($request) {
@@ -41,23 +32,11 @@ class RideController extends Controller
             });
         }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
-        }
 
         $user = auth()->user();
 
-        if ($user instanceof Driver) {
-            $notify[] = 'Drivers are not allowed to make ride requests';
-            return response()->json([
-                'remark' => 'unauthorized_action',
-                'status' => 'error',
-                'message' => $notify
-            ], 403);
+        if ($this->isDriver($user)) {
+            return $this->driverErrorResponse();
         }
 
         $pickup_lat = $request->pickup_lat;
@@ -146,38 +125,18 @@ class RideController extends Controller
     public function rideRequest(Request $request, $id = 0)
     {
 
-        $validator = Validator::make($request->all(), [
-            'pickup_lat' => 'required',
-            'pickup_long' => 'required',
-            'destination_lat' => 'required',
-            'destination_long' => 'required',
-            'ride_for' => 'required',
-            'pillion_name' => [
-                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
-            ],
-            'pillion_number' => [
-                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
-            ],
-            'service_id' => 'required',
-        ]);
+        $validator = $this->validateRequest($request);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return $this->validationErrorResponse($validator);
         }
 
         $user = auth()->user();
 
-        if ($user instanceof Driver) {
-            return response()->json([
-                'remark' => 'unauthorized_action',
-                'status' => 'error',
-                'message' => 'Drivers are not allowed to make ride requests.'
-            ], 403);
+        if ($this->isDriver($user)) {
+            return $this->driverErrorResponse();
         }
+
 
         $existingRide = Ride::where('user_id', $user->id)
             ->where('service_id', Status::RIDE_SERVICE)
@@ -319,5 +278,39 @@ class RideController extends Controller
             'data' => $ride,
         ]);
     }
+
+
+    private function validateRequest($request)
+    {
+        return Validator::make($request->all(), [
+            'pickup_lat' => 'required',
+            'pickup_long' => 'required',
+            'destination_lat' => 'required',
+            'destination_long' => 'required',
+            'ride_for' => 'required',
+            'pillion_name' => [
+                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
+            ],
+            'pillion_number' => [
+                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
+            ],
+            'service_id' => 'required',
+        ]);
+    }
+
+    private function isDriver($user)
+    {
+        return $user instanceof Driver;
+    }
+
+    private function driverErrorResponse()
+    {
+        return response()->json([
+            'remark' => 'unauthorized_action',
+            'status' => 'error',
+            'message' => 'Drivers are not allowed to make ride requests.'
+        ], 403);
+    }
+
 
 }
