@@ -329,6 +329,7 @@ Route::middleware('admin')->group(function () {
     Route::controller('CouponController')->name('coupon.')->prefix('coupon')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('edit/{id?}', 'store')->name('store');
+        Route::post('status/{id?}', 'status')->name('status');
     });
     // Cancellation Reason
     Route::controller('CancellationReasonController')->name('cancellation.')->prefix('cancellation')->group(function () {

@@ -162,6 +162,10 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::post('ride/create/', 'rideRequest')->name('ride.insert');
                         Route::get('ride/completed/history', 'rideCompleted')->name('ride.completed');
                     });
+                    // Coupon List For User
+                    Route::controller('CouponListController')->name('coupon.')->group(function () {
+                        Route::get('coupons', 'index')->name('coupon');
+                    });
                 });
             });
         });

@@ -12,9 +12,11 @@
                                 <th>@lang('Coupon')</th>
                                 <th>@lang('Discount Value')</th>
                                 <th>@lang('Discount Type')</th>
+                                <th>@lang('Points Deduct')</th>
                                 <th>@lang('Start Date')</th>
                                 <th>@lang('Expire Date')</th>
                                 <th>@lang('Description')</th>
+                                <th>@lang('Status')</th>
                                 <th>@lang('Action')</th>
                             </tr>
                             </thead>
@@ -31,11 +33,30 @@
                                     <td>
                                         {{ $coupon->discount_type == Status::PERCENTAGE ? __('Percent (%)') : __('Fixed') }}
                                     </td>
+                                    <td>{{ __(getAmount($coupon->points_deduct)) }}</td>
                                     <td>{{ __(date($coupon->start_at)) }}</td>
                                     <td>{{ __(date($coupon->expired_at)) }}</td>
                                     <td>{{ __(strLimit($coupon->description)) }} </td>
                                     <td>
+                                        @php
+                                            echo $coupon->statusBadge
+                                        @endphp
+                                    </td>
+                                    <td>
                                         <div class="button--group">
+                                            @if($coupon->status == Status::DISABLE)
+                                                <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
+                                                        data-question="@lang('Are you sure to enable this coupon?')"
+                                                        data-action="{{ route('admin.coupon.status',$coupon->id) }}">
+                                                    <i class="la la-eye"></i> @lang('Enable')
+                                                </button>
+                                            @else
+                                                <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn"
+                                                        data-question="@lang('Are you sure to disable this coupon?')"
+                                                        data-action="{{ route('admin.coupon.status',$coupon->id) }}">
+                                                    <i class="la la-eye-slash"></i> @lang('Disable')
+                                                </button>
+                                            @endif
                                             <button class="btn btn-outline--primary cuModalBtn btn-sm"
                                                     data-modal_title="@lang('Update')" data-resource="{{ $coupon }}">
                                                 <i class="las la-pen"></i>@lang('Edit')
@@ -115,6 +136,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Coupon"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Coupon')"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

@@ -36,13 +36,13 @@
                                             </button>
                                             @if($brand->status == Status::DISABLE)
                                                 <button class="btn btn-sm btn-outline--success ms-1 confirmationBtn"
-                                                        data-question="@lang('Are you sure to enable this vehicle type?')"
+                                                        data-question="@lang('Are you sure to enable this brand?')"
                                                         data-action="{{ route('admin.brands.status',$brand->id) }}">
                                                     <i class="la la-eye"></i> @lang('Enable')
                                                 </button>
                                             @else
                                                 <button class="btn btn-sm btn-outline--danger ms-1 confirmationBtn"
-                                                        data-question="@lang('Are you sure to disable this vehicle type?')"
+                                                        data-question="@lang('Are you sure to disable this brand?')"
                                                         data-action="{{ route('admin.brands.status',$brand->id) }}">
                                                     <i class="la la-eye-slash"></i> @lang('Disable')
                                                 </button>
@@ -98,6 +98,6 @@
 
 @push('breadcrumb-plugins')
     <x-search-form placeholder="Brand"/>
-    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn"><i class="las la-plus"></i>@lang('Add New')
+    <button type="button" class="btn btn-sm btn-outline--primary cuModalBtn" data-modal_title="@lang('Add New Brand')"><i class="las la-plus"></i>@lang('Add New')
     </button>
 @endpush

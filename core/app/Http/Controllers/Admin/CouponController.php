@@ -35,6 +35,7 @@ class CouponController extends Controller
             'discount_type' => 'required',
             'start_at' => 'required|date|after_or_equal:'.Carbon::now()->format('Y-m-d'),
             'expired_at' => 'required|date|after:start_at|after_or_equal:'.Carbon::now()->format('Y-m-d'),
+            'points_deduct' => 'required|numeric|min:0',
         ]);
 
         if(!$id) {
@@ -50,11 +51,17 @@ class CouponController extends Controller
         $coupon->start_at = $request->start_at;
         $coupon->expired_at = $request->expired_at;
         $coupon->description = $request->description;
+        $coupon->points_deduct = $request->points_deduct;
         $coupon->save();
 
         $notify[] = ['success', $notification];
 
         return back()->withNotify($notify);
+    }
+
+    public function status($id)
+    {
+        return Coupon::changeStatus($id);
     }
 
 }
