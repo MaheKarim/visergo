@@ -481,8 +481,15 @@ function underZone($lat, $long, $zone)
             $inside = !$inside; // Toggle the inside status
         }
     }
-    return $inside;
+    // return $inside;
+    return [
+        'inside' => $inside,
+        'coordinates' => $coordinates,
+        'zone' => $zone,
+    ];
 }
+
+
 if (!function_exists('generateOTP')) {
     function generateOTP($length = 4) {
         $numbers = '0123456789';

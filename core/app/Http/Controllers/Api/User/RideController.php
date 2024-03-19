@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Constants\Status;
-use App\Http\Controllers\Controller;
-use App\Models\Driver;
 use App\Models\Ride;
-use App\Models\RideFare;
-use App\Models\VehicleType;
 use App\Models\Zone;
+use App\Models\Driver;
+use App\Models\RideFare;
+use App\Constants\Status;
+use App\Models\VehicleType;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
@@ -65,28 +65,16 @@ class RideController extends Controller
         $destination_lat = $request->destination_lat;
         $destination_long = $request->destination_long;
 
-        $zones = Zone::active()->first();
+        $zone = Zone::active()->first();
 
-        foreach ($zones as $zone) {
-            $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
-            $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
-            if ($pickup_in_zone && $destination_in_zone) {
-                break;
-            }
-        }
+        $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
+        $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
 
-        if (!$pickup_in_zone) {
+        if (!underZone($pickup_lat, $pickup_long, $zone) || !underZone($destination_lat, $destination_long, $zone)) {
             return response()->json([
                 'remark' => 'validation_error',
                 'status' => 'error',
-                'message' => 'Pickup point not in zone',
-            ]);
-        }
-        if (!$destination_in_zone) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => 'Destination point not in zone',
+                'message' => 'Pickup or Destination point not in zone',
             ]);
         }
         // Introduce Google MAP Api
@@ -198,10 +186,24 @@ class RideController extends Controller
             $destination_lat = $request->destination_lat;
             $destination_long = $request->destination_long;
 
-            $zone = Zone::where('status', Status::ENABLE)->first(); // WIP
-
+            $zone = Zone::active()->first();
             $pickup_in_zone = $zone && underZone($pickup_lat, $pickup_long, $zone);
             $destination_in_zone = $zone && underZone($destination_lat, $destination_long, $zone);
+
+            if (!$pickup_in_zone) {
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => 'Pickup point not in zone',
+                ]);
+            }
+            if (!$destination_in_zone) {
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => 'Destination point not in zone',
+                ]);
+            }
 
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
@@ -213,9 +215,8 @@ class RideController extends Controller
                 $duration = $response['rows'][0]['elements'][0]['duration']['value'] / 60;
                 $pickupAddress = $response['origin_addresses'][0];
                 $destinationAddress = $response['destination_addresses'][0];
-
-                // TODO:: Need To Update // ride_service_type
-                $vehicle = VehicleType::where('id', $request->type_id)->first();
+            }
+                $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
                 if ($vehicle == null) {
                     $notify[] = ['error', 'Vehicle type not found'];
                     return response()->json([
@@ -225,22 +226,34 @@ class RideController extends Controller
                     ]);
                 }
 
-                if ($vehicle->manage_class == null && $vehicle->manage_class == 0) {
-                    $base_fare = $vehicle->value('base_fare');
-                } else {
-//                    $base_fare = $vehicle->base_fare;
+                // Search Ride Fare based on vehicle type
+                $rideFare = RideFare::where('vehicle_type_id', $vehicle->id)
+                    ->where('service_id', $request->service_id)
+                    ->where('vehicle_class_id', $request->class_id)
+                    ->first();
+
+                if ($rideFare == null) {
+                    $notify[] = ['error', 'Ride data not found'];
+                    return response()->json([
+                        'remark' => 'validation_error',
+                        'status' => 'error',
+                        'message' => $notify,
+                    ]);
                 }
-                if (($request->ride_request_type = $vehicle) && ($pickup_in_zone && $destination_in_zone)) {
-                    $perKMCost = $vehicle->value('base_fare');
 
-                    $rideCost = $distance * $perKMCost;
+                $base_fare = $rideFare->fare;
+                $fare = $distance * $rideFare->per_km_cost;
 
-                    if ($rideCost < $base_fare) {
-                        $rideCost = $base_fare;
-                    }
+                if ($fare < $base_fare) {
+                    $fare = $base_fare;
+                }
+                if ($request->tips !=0 ){
+                    $fare = $fare + $request->tips;
+                }
+                $amount = $fare;
+                $vatAmount = gs()->vat_amount * $amount / 100;
+                $totalAmount = $amount + $vatAmount;
 
-                    $vatAmount = $rideCost * (gs('vat_value') / 100);
-                    $totalAmount = $rideCost + $vatAmount;
 
                     // TODO:: Need To Update
                     $ride = new Ride();
@@ -265,9 +278,10 @@ class RideController extends Controller
                     $ride->total = $totalAmount;
                     $ride->vat_amount = $vatAmount;
 
-                    $ride->ride_request_type = $request->ride_request_type;
                     $ride->status = Status::RIDE_INITIATED;
                     $ride->save();
+                    // Admin Portion
+                    // Driver Notification Sent
 
                     // TODO:: Coupon Apply Here
                     // Reward Claim After Ride Completed
@@ -282,26 +296,6 @@ class RideController extends Controller
                         'distance' => $distance,
                         'data' => $ride,
                     ]);
-                } elseif (!$pickup_in_zone) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Pickup location is not within the zone.',
-                        'data' => $request->all(),
-                    ]);
-                } else {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Destination location is not within the zone.',
-                        'data' => $request->all(),
-                    ]);
-                }
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Something went wrong in API',
-                    'data' => $request->all(),
-                ]);
-            }
         }
     }
 
