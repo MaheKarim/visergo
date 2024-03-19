@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 17, 2024 at 01:34 PM
+-- Generation Time: Mar 19, 2024 at 03:15 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -199,7 +199,7 @@ INSERT INTO `brands` (`id`, `name`, `status`, `created_at`, `updated_at`) VALUES
                                                                               (1, 'Mazda - Y', 0, '2024-02-29 04:06:15', '2024-03-02 07:04:41'),
                                                                               (2, 'Honda', 1, '2024-03-02 03:58:39', '2024-03-02 03:58:39'),
                                                                               (3, 'BMW', 1, '2024-03-02 03:58:46', '2024-03-02 03:58:46'),
-                                                                              (4, 'Yamaha', 1, '2024-03-02 03:58:52', '2024-03-02 03:58:52');
+                                                                              (4, 'Yamaha', 0, '2024-03-02 03:58:52', '2024-03-19 11:06:21');
 
 -- --------------------------------------------------------
 
@@ -320,9 +320,11 @@ CREATE TABLE `coupons` (
                            `name` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
                            `discount_value` decimal(28,8) NOT NULL DEFAULT '0.00000000',
                            `discount_type` tinyint(1) NOT NULL DEFAULT '1',
+                           `points_deduct` decimal(28,8) DEFAULT '0.00000000',
                            `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
                            `start_at` date DEFAULT NULL,
                            `expired_at` date DEFAULT NULL,
+                           `status` tinyint(1) DEFAULT '0',
                            `created_at` timestamp NULL DEFAULT NULL,
                            `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -331,9 +333,8 @@ CREATE TABLE `coupons` (
 -- Dumping data for table `coupons`
 --
 
-INSERT INTO `coupons` (`id`, `name`, `discount_value`, `discount_type`, `description`, `start_at`, `expired_at`, `created_at`, `updated_at`) VALUES
-                                                                                                                                                 (6, 'TSK40', 12.00000000, 1, 'vcxvcv', '2024-03-03', '2024-03-12', '2024-03-02 05:52:02', '2024-03-03 02:29:06'),
-                                                                                                                                                 (7, 'MAHE', 50.00000000, 2, NULL, '2024-03-07', '2024-03-14', '2024-03-02 05:52:53', '2024-03-02 05:52:53');
+INSERT INTO `coupons` (`id`, `name`, `discount_value`, `discount_type`, `points_deduct`, `description`, `start_at`, `expired_at`, `status`, `created_at`, `updated_at`) VALUES
+    (8, 'MAHE', 5.00000000, 1, 20.00000000, 'Fixed Discount Value', '2024-03-21', '2024-03-27', 1, '2024-03-19 10:25:19', '2024-03-19 11:28:12');
 
 -- --------------------------------------------------------
 
@@ -959,7 +960,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (43, '2024_03_13_151641_create_services_table', 31),
 (44, '2024_03_14_105631_create_ride_fares_table', 32),
 (45, '2024_03_14_111056_create_type_classes_table', 33),
-(46, '2024_03_14_130425_create_vehicle_services_table', 34);
+(46, '2024_03_14_130425_create_vehicle_services_table', 34),
+(47, '2024_03_19_195421_create_ride_destinations_table', 35);
 
 -- --------------------------------------------------------
 
@@ -1219,12 +1221,12 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (96, 'App\\Models\\Driver', 0, 'auth_token', '306cf6f2ce45f3cad1be21d7280946d1202fcd3d62d0d7ff2e86a5945f5e5ed8', '[\"*\"]', '2024-03-05 04:54:49', '2024-03-05 04:37:57', '2024-03-05 04:54:49'),
 (97, 'App\\Models\\Driver', 0, 'auth_token', 'db2095eda601581b9979a26f512b5cb23eceb58a4c21f3d89819516d7aae703b', '[\"*\"]', NULL, '2024-03-05 04:58:10', '2024-03-05 04:58:10'),
 (112, 'App\\Models\\Driver', 3, 'auth_token', '4a888cf689b27da2926637728fe8c5f921b06de9fee761e7934f1a329be5153e', '[\"*\"]', '2024-03-05 08:17:42', '2024-03-05 08:01:14', '2024-03-05 08:17:42'),
-(136, 'App\\Models\\Driver', 4, 'auth_token', '19e08d8559d5dbdaa520e0dc305e33419db36ddb4baf99d620664641cb6c9f43', '[\"*\"]', '2024-03-16 09:35:04', '2024-03-10 12:49:55', '2024-03-16 09:35:04'),
+(136, 'App\\Models\\Driver', 4, 'auth_token', '19e08d8559d5dbdaa520e0dc305e33419db36ddb4baf99d620664641cb6c9f43', '[\"*\"]', '2024-03-19 13:40:44', '2024-03-10 12:49:55', '2024-03-19 13:40:44'),
 (139, 'App\\Models\\User', 8, 'auth_token', 'bdf6dee6a9b017aa53d771129b7e061caedb60d370e5f6a4b723c97d4e09ca7d', '[\"*\"]', '2024-03-12 08:44:12', '2024-03-12 08:43:01', '2024-03-12 08:44:12'),
 (140, 'App\\Models\\User', 8, 'auth_token', 'b5e7a15d46d38a1453d9b55dc845aea21ee7bdd7f8ff6890d8d3319abadd0a04', '[\"*\"]', NULL, '2024-03-12 09:38:04', '2024-03-12 09:38:04'),
 (141, 'App\\Models\\User', 8, 'auth_token', '584e5fd380c23328881913655f55945afda638c5a79976edb543d5a492ac8584', '[\"*\"]', '2024-03-16 10:01:48', '2024-03-12 09:38:18', '2024-03-16 10:01:48'),
 (142, 'App\\Models\\User', 8, 'auth_token', '189a07b76599eb6130a16e68ea0aa54ae235d38245a20b1ca8932bfa83baf36a', '[\"*\"]', '2024-03-16 10:59:44', '2024-03-16 10:02:38', '2024-03-16 10:59:44'),
-(143, 'App\\Models\\User', 8, 'auth_token', 'fcf64c4ebfa435dca2d77d4c39d31ffeccf021ae2436e558e3f6dcda2fe027ca', '[\"*\"]', '2024-03-17 08:48:03', '2024-03-16 10:59:57', '2024-03-17 08:48:03');
+(143, 'App\\Models\\User', 8, 'auth_token', 'fcf64c4ebfa435dca2d77d4c39d31ffeccf021ae2436e558e3f6dcda2fe027ca', '[\"*\"]', '2024-03-19 15:12:53', '2024-03-16 10:59:57', '2024-03-19 15:12:53');
 
 -- --------------------------------------------------------
 
@@ -1245,8 +1247,6 @@ CREATE TABLE `rides` (
   `driver_id` int UNSIGNED DEFAULT NULL,
   `pickup_lat` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `pickup_long` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `destination_lat` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `destination_long` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `pickup_address` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `destination_address` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `otp` int DEFAULT NULL,
@@ -1272,19 +1272,8 @@ CREATE TABLE `rides` (
 -- Dumping data for table `rides`
 --
 
-INSERT INTO `rides` (`id`, `service_id`, `type_id`, `class_id`, `user_id`, `zone_id`, `ride_for`, `pillion_name`, `pillion_number`, `driver_id`, `pickup_lat`, `pickup_long`, `destination_lat`, `destination_long`, `pickup_address`, `destination_address`, `otp`, `distance`, `duration`, `base_fare`, `vat_amount`, `tips`, `total`, `point`, `cancel_reason`, `cancel_by_driver`, `cancel_by_user`, `status`, `ride_start_at`, `ride_completed_at`, `ride_cancelled_at`, `created_at`, `updated_at`) VALUES
-(22, NULL, 1, 0, 8, 1, 1, NULL, NULL, NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 9429, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 5, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-10 10:44:31', '2024-03-10 10:44:31'),
-(23, NULL, 1, 0, 8, 1, 1, NULL, NULL, NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 3196, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 5, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-10 12:00:07', '2024-03-10 12:07:14'),
-(24, NULL, 1, 0, 8, 1, 1, NULL, NULL, 4, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', NULL, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 5, '2024-03-10 12:52:09', '2024-03-10 13:37:37', NULL, '2024-03-10 12:12:59', '2024-03-10 13:37:37'),
-(30, NULL, 1, 0, 8, 1, 2, 'Jenifer Lopez', '7896582354', NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 2107, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 6, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-12 04:15:09', '2024-03-12 04:15:09'),
-(31, NULL, 1, 0, 8, 1, 2, 'Jenifer Lopez', '7896582354', NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 6226, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 5, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-12 04:18:14', '2024-03-12 04:18:14'),
-(32, NULL, 1, 0, 8, 1, 2, 'Jenifer Lopez', '7896582354', NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 9289, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 5, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-12 04:18:21', '2024-03-12 04:18:21'),
-(33, NULL, 1, 0, 8, 1, 2, 'Jenifer Lopez', '7896582354', NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 3865, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 5, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-12 04:18:26', '2024-03-12 04:18:26'),
-(34, NULL, 1, 0, 8, 1, 1, NULL, NULL, 4, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', NULL, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, NULL, NULL, 6, '2024-03-12 04:30:11', '2024-03-12 10:35:49', NULL, '2024-03-12 04:18:38', '2024-03-12 10:35:49'),
-(35, NULL, 1, 0, 8, 1, 1, NULL, NULL, 4, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 9228, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', NULL, 4, NULL, 6, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '2024-03-12 10:38:18', '2024-03-12 10:37:43', '2024-03-12 10:38:18'),
-(36, NULL, 1, 0, 8, 1, 1, NULL, NULL, 4, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 8326, 19.75600000, 31.60000000, 20.00000000, 2.96340000, NULL, '101.7434', '0', 'Sec Check', 4, NULL, 6, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '2024-03-12 10:43:12', '2024-03-12 10:40:59', '2024-03-12 10:43:12'),
-(39, NULL, 0, 0, 8, 1, 1, NULL, NULL, NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 2848, 19.75600000, 31.93333333, 0.00000000, 0.00000000, 0.00000000, '0', '0', NULL, NULL, NULL, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-14 13:13:11', '2024-03-14 13:13:11'),
-(40, NULL, 0, 0, 8, 1, 1, NULL, NULL, NULL, '23.874317', '90.397006', '23.7827231', '90.3776357', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Q9MG+5W8, Taltala New Bazar Rd, Dhaka, B', 5928, 19.75600000, 31.93333333, 0.00000000, 0.00000000, 0.00000000, '0', '0', NULL, NULL, NULL, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-16 10:06:48', '2024-03-16 10:06:48');
+INSERT INTO `rides` (`id`, `service_id`, `type_id`, `class_id`, `user_id`, `zone_id`, `ride_for`, `pillion_name`, `pillion_number`, `driver_id`, `pickup_lat`, `pickup_long`, `pickup_address`, `destination_address`, `otp`, `distance`, `duration`, `base_fare`, `vat_amount`, `tips`, `total`, `point`, `cancel_reason`, `cancel_by_driver`, `cancel_by_user`, `status`, `ride_start_at`, `ride_completed_at`, `ride_cancelled_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 0, 8, 1, 1, NULL, NULL, NULL, '23.874317', '90.397006', 'House-29 Sonargaon Janapath, Dhaka 1230,', 'Flat B/5, House 2 Road-24, Dhaka 1230, B', 4883, 0.12500000, 0.68333333, 25.00000000, 0.00000000, 0.00000000, '45', '0', NULL, NULL, NULL, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', NULL, '2024-03-19 15:12:53', '2024-03-19 15:12:53');
 
 -- --------------------------------------------------------
 
@@ -1301,14 +1290,38 @@ CREATE TABLE `ride_cancels` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `ride_destinations`
+--
+
+CREATE TABLE `ride_destinations` (
+  `id` bigint UNSIGNED NOT NULL,
+  `ride_id` bigint UNSIGNED NOT NULL,
+  `destination_address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `destination_lat` decimal(28,8) NOT NULL,
+  `destination_long` decimal(28,8) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ride_destinations`
+--
+
+INSERT INTO `ride_destinations` (`id`, `ride_id`, `destination_address`, `destination_lat`, `destination_long`, `created_at`, `updated_at`) VALUES
+(1, 1, 'F', 23.78272310, 90.37763570, '2024-03-19 15:12:53', '2024-03-19 15:12:53'),
+(2, 1, 'l', 23.87375100, 90.39645400, '2024-03-19 15:12:53', '2024-03-19 15:12:53');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ride_fares`
 --
 
 CREATE TABLE `ride_fares` (
   `id` bigint UNSIGNED NOT NULL,
-  `vehicle_type_id` int UNSIGNED DEFAULT NULL,
-  `service_id` int UNSIGNED DEFAULT NULL,
-  `vehicle_class_id` int UNSIGNED DEFAULT NULL,
+  `vehicle_type_id` int UNSIGNED DEFAULT '0',
+  `service_id` int UNSIGNED DEFAULT '0',
+  `vehicle_class_id` int UNSIGNED DEFAULT '0',
   `fare` decimal(28,8) NOT NULL DEFAULT '0.00000000',
   `per_km_cost` decimal(28,8) NOT NULL DEFAULT '0.00000000',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1320,13 +1333,13 @@ CREATE TABLE `ride_fares` (
 --
 
 INSERT INTO `ride_fares` (`id`, `vehicle_type_id`, `service_id`, `vehicle_class_id`, `fare`, `per_km_cost`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, NULL, 25.00000000, 5.00000000, '2024-03-17 10:38:02', '2024-03-17 10:38:02'),
-(2, 1, 3, NULL, 15.00000000, 2.50000000, '2024-03-17 10:38:02', '2024-03-17 10:38:02'),
-(3, 2, 1, 2, 15.00000000, 15.00000000, '2024-03-17 10:46:50', '2024-03-17 10:46:50'),
-(4, 2, 3, 2, 15.00000000, 15.00000000, '2024-03-17 10:46:50', '2024-03-17 10:46:50'),
-(5, 3, 1, NULL, 55.00000000, 520.00000000, '2024-03-17 11:44:26', '2024-03-17 11:44:26'),
-(6, 3, 4, NULL, 53.00000000, 50.00000000, '2024-03-17 11:44:26', '2024-03-17 11:44:26'),
-(7, 4, 1, NULL, 55.00000000, 558.00000000, '2024-03-17 13:09:25', '2024-03-17 13:09:25');
+(20, 2, 1, 1, 200.00000000, 40.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),
+(21, 2, 1, 2, 100.00000000, 30.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),
+(22, 2, 4, 1, 120.00000000, 30.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),
+(23, 2, 4, 2, 90.00000000, 20.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),
+(24, 1, 1, 0, 25.00000000, 10.00000000, '2024-03-19 09:28:44', '2024-03-19 09:28:44'),
+(25, 1, 2, 0, 100.00000000, 5.00000000, '2024-03-19 09:28:44', '2024-03-19 09:28:44'),
+(26, 1, 4, 0, 50.00000000, 5.00000000, '2024-03-19 09:28:44', '2024-03-19 09:28:44');
 
 -- --------------------------------------------------------
 
@@ -1462,9 +1475,10 @@ CREATE TABLE `type_classes` (
 --
 
 INSERT INTO `type_classes` (`id`, `vehicle_type_id`, `vehicle_class_id`, `created_at`, `updated_at`) VALUES
-(1, 2, 2, NULL, NULL),
-(7, 3, 0, NULL, NULL),
-(8, 5, 1, NULL, NULL);
+(1, 1, 1, NULL, NULL),
+(4, 1, 2, NULL, NULL),
+(5, 2, 1, NULL, NULL),
+(6, 2, 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1912,8 +1926,8 @@ CREATE TABLE `vehicle_classes` (
 --
 
 INSERT INTO `vehicle_classes` (`id`, `name`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Economy', 1, '2024-02-29 03:08:48', '2024-03-02 23:49:05'),
-(2, 'Premium', 1, '2024-02-29 03:10:20', '2024-03-02 23:49:08');
+(1, 'Premium', 1, '2024-03-18 07:32:52', '2024-03-18 07:32:52'),
+(2, 'Economy', 1, '2024-03-18 07:32:59', '2024-03-18 07:32:59');
 
 -- --------------------------------------------------------
 
@@ -1993,14 +2007,10 @@ CREATE TABLE `vehicle_services` (
 
 INSERT INTO `vehicle_services` (`id`, `vehicle_type_id`, `service_id`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NULL, NULL),
-(2, 1, 3, NULL, NULL),
-(3, 2, 1, NULL, NULL),
-(4, 2, 3, NULL, NULL),
-(5, 3, 1, NULL, NULL),
-(6, 3, 4, NULL, NULL),
-(7, 4, 1, NULL, NULL),
-(8, 5, 1, NULL, NULL),
-(9, 5, 3, NULL, NULL);
+(2, 1, 2, NULL, NULL),
+(3, 1, 4, NULL, NULL),
+(4, 2, 1, NULL, NULL),
+(5, 2, 4, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2023,11 +2033,8 @@ CREATE TABLE `vehicle_types` (
 --
 
 INSERT INTO `vehicle_types` (`id`, `name`, `manage_class`, `manage_brand`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Bike', 0, 0, 1, '2024-03-17 10:38:02', '2024-03-17 10:38:14'),
-(2, 'Car', 1, 1, 1, '2024-03-17 10:46:50', '2024-03-17 10:46:55'),
-(3, 'CNG', 1, 1, 0, '2024-03-17 11:44:26', '2024-03-17 13:13:01'),
-(4, 'Car - Mazda', 0, 0, 1, '2024-03-17 13:09:25', '2024-03-17 13:09:30'),
-(5, 'Car', 1, 1, 0, '2024-03-17 13:23:15', '2024-03-17 13:23:15');
+(1, 'Bike', 0, 1, 1, '2024-03-18 07:40:50', '2024-03-18 08:55:01'),
+(2, 'Car XL', 1, 1, 1, '2024-03-18 09:20:27', '2024-03-18 09:20:34');
 
 -- --------------------------------------------------------
 
@@ -2303,6 +2310,12 @@ ALTER TABLE `ride_cancels`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `ride_destinations`
+--
+ALTER TABLE `ride_destinations`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `ride_fares`
 --
 ALTER TABLE `ride_fares`
@@ -2485,7 +2498,7 @@ ALTER TABLE `conversation_messages`
 -- AUTO_INCREMENT for table `coupons`
 --
 ALTER TABLE `coupons`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `cron_jobs`
@@ -2569,7 +2582,7 @@ ALTER TABLE `languages`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `model_color`
@@ -2605,7 +2618,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `rides`
 --
 ALTER TABLE `rides`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `ride_cancels`
@@ -2614,10 +2627,16 @@ ALTER TABLE `ride_cancels`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `ride_destinations`
+--
+ALTER TABLE `ride_destinations`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `ride_fares`
 --
 ALTER TABLE `ride_fares`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -2659,7 +2678,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `type_classes`
 --
 ALTER TABLE `type_classes`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `update_logs`
@@ -2713,13 +2732,13 @@ ALTER TABLE `vehicle_models`
 -- AUTO_INCREMENT for table `vehicle_services`
 --
 ALTER TABLE `vehicle_services`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `vehicle_types`
 --
 ALTER TABLE `vehicle_types`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `withdrawals`
