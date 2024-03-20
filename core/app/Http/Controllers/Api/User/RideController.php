@@ -181,31 +181,45 @@ class RideController extends Controller
             $distances_durations = [];
             $totalDistance = 0;
             $totalDuration = 0;
-            $previousDestination = '';
+            $previousDestination = "$pickup_lat,$pickup_long";
+
+            $destinationAddress = array();
 
             foreach ($destination_lat as $index => $lat) {
-                $destinations[] = "$lat,{$destination_long[$index]}";
-            }
+                $destination = "$lat,{$destination_long[$index]}";
 
-            $destinationsStr = implode('|', $destinations);
+                $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$previousDestination}&destinations={$destination}&key={$apiKey}";
+                $response = json_decode(file_get_contents($url), true);
 
-            $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destinationsStr}&key={$apiKey}";
-            $response = json_decode(file_get_contents($url), true);
-
-            if ($response['status'] == 'OK') {
-                foreach ($response['rows'][0]['elements'] as $index => $element) {
+                if ($response['status'] == 'OK') {
+                    $element = $response['rows'][0]['elements'][0];
                     $distance = $element['distance']['value'] / 1000;
                     $duration = $element['duration']['value'] / 60;
+
+                    $result = [
+                        'element' => $element,
+                        'distance' => $distance,
+                        'duration' => $duration
+                    ];
+
+                    $totalDistance += $distance;
+                    $totalDuration += $duration;
+
                     $pickupAddress = $response['origin_addresses'][0];
-                    $destinationAddress = $response['destination_addresses'][$index];
+                    $destinationAddress[$index] = $response['destination_addresses'][0];
+
                     $distances_durations[$index]['destination_addresses'] = $destinationAddress;
+                    $distances_durations[$index]['distance'] = $distance;
+                    $distances_durations[$index]['duration'] = $duration;
+                } else {
+                    return response()->json([
+                        'remark' => 'api_error',
+                        'status' => 'error',
+                        'message' => $response['error_message'],
+                    ]);
                 }
-            } else {
-               return response()->json([
-                   'remark' => 'api_error',
-                   'status' => 'error',
-                   'message' => $response['error_message'],
-               ]);
+
+                $previousDestination = "$lat,{$destination_long[$index]}";
             }
 
             $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
@@ -263,11 +277,11 @@ class RideController extends Controller
             $ride->pickup_long = $pickup_long;
 
 
-            $ride->pickup_address = $pickupAddress;
-            $ride->destination_address = $destinationAddress;
+            $ride->pickup_address = $previousDestination;
+//                    $ride->destination_address = $destinationAddress;
             $ride->otp = generateOTP();
-            $ride->distance = $distance;
-            $ride->duration = $duration;
+            $ride->distance = $totalDistance;
+            $ride->duration = $totalDuration;
             $ride->base_fare = $base_fare;
 
             $ride->total = $totalAmount;
@@ -281,7 +295,7 @@ class RideController extends Controller
                 $destination->ride_id = $ride->id;
                 $destination->destination_lat = $lat;
                 $destination->destination_long = $destination_long[$index];
-                $destination->destination_address = $response['destination_addresses'][$index];
+                $destination->destination_address = $destinationAddress[$index];
                 $destination->save();
             }
 
@@ -291,7 +305,7 @@ class RideController extends Controller
             // TODO:: Coupon Apply Here
             // Reward Claim After Ride Completed
             if ($ride->status == Status::RIDE_COMPLETED) {
-                $ride->point = ($ride->total / gs()->spend_amount_for_reward) * gs()->reward_point;
+                $ride->point = ($ride->total / gs('spend_amount_for_reward')) * gs('reward_point');
                 $user->reward_point += $ride->point;
                 $user->save();
             }
