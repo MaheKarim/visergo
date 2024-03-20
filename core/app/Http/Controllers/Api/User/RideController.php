@@ -71,6 +71,7 @@ class RideController extends Controller
         $apiKey = gs()->location_api;
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
         $response = json_decode(file_get_contents($url), true);
+//        dd($response);
 
         if ($response['status'] == 'OK') {
             $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
@@ -178,24 +179,24 @@ class RideController extends Controller
             // Introduce Google MAP Api
             $apiKey = gs()->location_api;
 
-            $destinations = [];
+            $distances_durations = [];
             foreach ($destination_lat as $index => $lat) {
-                $destinations[] = "$lat,$destination_long[$index]";
+                $destinations[] = "$lat,{$destination_long[$index]}";
             }
 
-            $destinations = implode('|', $destinations);
+            $destinationsStr = implode('|', $destinations);
 
-            $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destinations}&key={$apiKey}";
+            $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destinationsStr}&key={$apiKey}";
             $response = json_decode(file_get_contents($url), true);
 
             if ($response['status'] == 'OK') {
-                // Handle multiple destination distances and durations
                 foreach ($response['rows'][0]['elements'] as $index => $element) {
                     $distance = $element['distance']['value'] / 1000;
                     $duration = $element['duration']['value'] / 60;
                     $pickupAddress = $response['origin_addresses'][0];
                     $destinationAddress = $response['destination_addresses'][$index];
-                    // Process distance and duration for each destination
+                    $distances_durations[$index]['destination_addresses'] = $destinationAddress;
+
                 }
             } else {
                 $distance = 0;
@@ -277,7 +278,7 @@ class RideController extends Controller
                 $destination->ride_id = $ride->id;
                 $destination->destination_lat = $lat;
                 $destination->destination_long = $destination_long[$index];
-                $destination->destination_address = $destinationAddress[$index];
+                $destination->destination_address = $response['destination_addresses'][$index];
                 $destination->save();
             }
 
