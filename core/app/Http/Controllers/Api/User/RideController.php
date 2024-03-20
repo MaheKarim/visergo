@@ -71,7 +71,6 @@ class RideController extends Controller
         $apiKey = gs()->location_api;
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
         $response = json_decode(file_get_contents($url), true);
-//        dd($response);
 
         if ($response['status'] == 'OK') {
             $distance = $response['rows'][0]['elements'][0]['distance']['value'] / 1000;
@@ -180,6 +179,10 @@ class RideController extends Controller
             $apiKey = gs()->location_api;
 
             $distances_durations = [];
+            $totalDistance = 0;
+            $totalDuration = 0;
+            $previousDestination = '';
+
             foreach ($destination_lat as $index => $lat) {
                 $destinations[] = "$lat,{$destination_long[$index]}";
             }
@@ -196,13 +199,13 @@ class RideController extends Controller
                     $pickupAddress = $response['origin_addresses'][0];
                     $destinationAddress = $response['destination_addresses'][$index];
                     $distances_durations[$index]['destination_addresses'] = $destinationAddress;
-
                 }
             } else {
-                $distance = 0;
-                $duration = 0;
-                $pickupAddress = $response['origin_addresses'][0];
-                $destinationAddress = $response['destination_addresses'][0];
+               return response()->json([
+                   'remark' => 'api_error',
+                   'status' => 'error',
+                   'message' => $response['error_message'],
+               ]);
             }
 
             $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
@@ -296,6 +299,7 @@ class RideController extends Controller
                 'status' => 'success',
                 'message' => 'Ride Requested Created Successfully',
                 'distance' => $distance,
+                'destination_address' => $destinationAddress,
                 'data' => $ride,
             ]);
         }
