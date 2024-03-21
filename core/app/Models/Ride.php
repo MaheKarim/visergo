@@ -50,7 +50,11 @@ class Ride extends Model
     public function scopeRideEnd($query)
     {
         return $query->where('status', Status::RIDE_END);
+    }
 
+    public function scopeOngoingRide($query)
+    {
+        return $query->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_END]);
     }
 
 

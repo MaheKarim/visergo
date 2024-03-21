@@ -349,15 +349,40 @@ class RideController extends Controller
         }
 
         $ride = Ride::where('user_id', auth()->user()->id)->rideEnd()->find($id);
-        $ride->tips = $request->tips;
-        $ride->total = $ride->total + $request->tips;
-        $ride->save();
+        if ($request->tips != 0) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ride Tips Added Already',
+                'data' => $ride,
+            ]);
+        } else {
+            $ride->tips = $request->tips;
+            $ride->total = $ride->total + $request->tips;
+            $ride->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ride Tips Added Successfully',
+                'data' => $ride,
+            ]);
+        }
+    }
+
+    public function rideOngoing()
+    {
+        $ride = Ride::where('user_id', auth()->user()->id)->ongoingRide()->first();
+        if ($ride == null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No Ongoing Ride Found',
+                'data' => $ride,
+            ]);
+        }
         return response()->json([
             'status' => 'success',
-            'message' => 'Ride Tips Added Successfully',
+            'message' => 'Ongoing Ride',
             'data' => $ride,
         ]);
     }
-
 
 }
