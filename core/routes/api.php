@@ -172,6 +172,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('PaymentController')->name('payment.')->group(function () {
                         Route::get('methods', 'methods')->name('methods');
                         Route::get('method/{id}', 'method')->name('method');
+                        Route::post('payment/{id}/insert', 'depositInsert')->name('insert');
                     });
                 });
             });

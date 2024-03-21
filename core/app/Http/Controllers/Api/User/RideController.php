@@ -247,6 +247,8 @@ class RideController extends Controller
 
             $ride->total = $totalAmount;
             $ride->status = Status::RIDE_INITIATED;
+            $ride->payment_status = Status::PAYMENT_INITIATE;
+            $ride->payment_type = Status::NO;
             $ride->save();
 
             foreach ($destination_lat as $index => $lat) {

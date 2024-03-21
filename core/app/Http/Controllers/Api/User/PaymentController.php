@@ -6,6 +6,7 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Deposit;
 use App\Models\GatewayCurrency;
+use App\Models\Ride;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,12 +27,13 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function depositInsert(Request $request)
+    public function depositInsert(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|gt:0',
             'method_code' => 'required',
             'currency' => 'required',
+            'ride_id' => 'required|exists:rides,id',
         ]);
 
         if ($validator->fails()) {
@@ -42,8 +44,18 @@ class PaymentController extends Controller
             ]);
         }
 
-
         $user = auth()->user();
+        $ride = Ride::where('user_id', $user->id)->ongoingRide()->paymentPending()->find($id);
+
+        if ($ride == null) {
+            $notify[] = 'Invalid ride request';
+            return response()->json([
+                'remark'=>'validation_error',
+                'status'=>'error',
+                'message'=>['error'=>$notify],
+            ]);
+        }
+
         $gate = GatewayCurrency::whereHas('method', function ($gate) {
             $gate->where('status', Status::ENABLE);
         })->where('method_code', $request->method_code)->where('currency', $request->currency)->first();
@@ -55,8 +67,8 @@ class PaymentController extends Controller
                 'message'=>['error'=>$notify],
             ]);
         }
-
-        if ($gate->min_amount > $request->amount || $gate->max_amount < $request->amount) {
+        $amount = $ride->total;
+        if ($gate->min_amount > $amount || $gate->max_amount < $amount) {
             $notify[] =  'Please follow deposit limit';
             return response()->json([
                 'remark'=>'validation_error',
@@ -65,15 +77,16 @@ class PaymentController extends Controller
             ]);
         }
 
-        $charge = $gate->fixed_charge + ($request->amount * $gate->percent_charge / 100);
-        $payable = $request->amount + $charge;
+        $charge = $gate->fixed_charge + ($amount * $gate->percent_charge / 100);
+        $payable = $amount + $charge;
         $finalAmount = $payable * $gate->rate;
 
         $data = new Deposit();
         $data->user_id = $user->id;
         $data->method_code = $gate->method_code;
         $data->method_currency = strtoupper($gate->currency);
-        $data->amount = $request->amount;
+        $data->amount = $amount;
+        $data->ride_id = $ride->id;
         $data->charge = $charge;
         $data->rate = $gate->rate;
         $data->final_amount = $finalAmount;
@@ -81,6 +94,14 @@ class PaymentController extends Controller
         $data->btc_wallet = "";
         $data->trx = getTrx();
         $data->save();
+
+        $point = $amount / gs('spend_amount_for_reward') * gs('reward_point');
+
+        $ride->payment_status = Status::PAYMENT_SUCCESS;
+        $ride->payment_type = Status::ONLINE_PAYMENT;
+        $ride->status = Status::RIDE_COMPLETED;
+        $ride->point = $point;
+        $ride->save();
 
         $notify[] =  'Deposit inserted';
         return response()->json([

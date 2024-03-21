@@ -57,5 +57,10 @@ class Ride extends Model
         return $query->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_END]);
     }
 
+    public function scopePaymentPending($query)
+    {
+        return $query->where('payment_status', Status::PAYMENT_PENDING);
+    }
+
 
 }
