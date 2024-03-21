@@ -96,7 +96,7 @@ class RideRequestController extends Controller
     {
         $driver = auth()->user();
         $ride = Ride::where('driver_id', $driver->id)
-            ->where('ride_request_type', Status::RIDE_SERVICE)
+            ->where('service_id', Status::RIDE_SERVICE)
             ->where('status', Status::RIDE_ACTIVE)->first();
 
         if ($ride == null) {

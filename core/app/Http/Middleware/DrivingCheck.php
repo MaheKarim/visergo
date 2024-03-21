@@ -22,7 +22,7 @@ class DrivingCheck
             $driver = auth()->user();
             if ($driver->is_driving != Status::DRIVING) {
                 $ride = Ride::where('driver_id', $driver->id)
-                    ->where('ride_request_type', Status::RIDE)
+                    ->where('service_id', $request->service_id)
                     ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING, Status::RIDE_END])
                     ->first();
 

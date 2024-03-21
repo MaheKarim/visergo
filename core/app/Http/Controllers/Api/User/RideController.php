@@ -212,12 +212,16 @@ class RideController extends Controller
             if ($fare < $base_fare) {
                 $fare = $base_fare;
             }
-            if ($request->tips != 0) {
-                $fare = $fare + $request->tips;
-            }
             $amount = $fare;
             $vatAmount = gs('vat_amount') * $amount / 100;
-            $totalAmount = $amount + $vatAmount;
+
+            if ($request->tips != 0) {
+                $tips = $request->tips;
+            } else {
+                $tips = 0;
+            }
+
+            $totalAmount = $amount + $vatAmount + $tips;
 
             $ride = new Ride();
             $ride->service_id = $request->service_id;

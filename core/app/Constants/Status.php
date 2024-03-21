@@ -66,6 +66,8 @@ class Status{
 
     const DRIVING = 1 ;
     const IDLE = 0 ;
-
+    const CASH_PAYMENT = 1;
+    const ONLINE_PAYMENT = 2;
+    const WALLET_PAYMENT = 3;
 
 }
