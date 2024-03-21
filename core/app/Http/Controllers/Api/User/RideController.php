@@ -338,5 +338,26 @@ class RideController extends Controller
         ], 422);
     }
 
+    public function rideTips(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'tips' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
+
+        $ride = Ride::where('user_id', auth()->user()->id)->rideEnd()->find($id);
+        $ride->tips = $request->tips;
+        $ride->total = $ride->total + $request->tips;
+        $ride->save();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ride Tips Added Successfully',
+            'data' => $ride,
+        ]);
+    }
+
 
 }

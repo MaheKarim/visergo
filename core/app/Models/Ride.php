@@ -47,5 +47,11 @@ class Ride extends Model
         return $query->where('status', Status::RIDE_COMPLETED);
     }
 
+    public function scopeRideEnd($query)
+    {
+        return $query->where('status', Status::RIDE_END);
+
+    }
+
 
 }
