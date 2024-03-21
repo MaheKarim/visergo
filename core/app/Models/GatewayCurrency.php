@@ -35,4 +35,9 @@ class GatewayCurrency extends Model
         return $this->method->crypto == Status::ENABLE ? '$' : $this->symbol;
     }
 
+    public function scopeActive()
+    {
+        return $this->status == Status::ENABLE;
+    }
+
 }

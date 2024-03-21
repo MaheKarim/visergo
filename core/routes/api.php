@@ -167,6 +167,10 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('coupons', 'index')->name('coupon');
                     });
                 });
+                    // Gateway List For User
+                    Route::controller('PaymentController')->name('payment.')->group(function () {
+                        Route::get('methods', 'methods')->name('methods');
+                    });
             });
         });
 

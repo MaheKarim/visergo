@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Constants\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,5 +34,18 @@ class Ride extends Model
     {
         return $this->hasOne(Conversation::class);
     }
+
+    // Scope
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', Status::RIDE_ACTIVE);
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', Status::RIDE_COMPLETED);
+    }
+
 
 }

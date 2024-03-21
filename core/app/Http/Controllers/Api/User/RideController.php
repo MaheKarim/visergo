@@ -124,7 +124,6 @@ class RideController extends Controller
 
     public function rideRequest(Request $request, $id = 0)
     {
-
         $validator = $this->validateRequest($request);
 
         if ($validator->fails()) {
@@ -176,44 +175,11 @@ class RideController extends Controller
                 }
             }
             // Introduce Google MAP Api
-            $apiKey = gs('location_api');
-            $distances_durations = [];
-            $totalDistance = 0;
-            $totalDuration = 0;
-            $previousDestination = "$pickup_lat,$pickup_long";
-
-            $destinationAddress = array();
-
-            foreach ($destination_lat as $index => $lat) {
-                $destination = "$lat,{$destination_long[$index]}";
-
-                $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$previousDestination}&destinations={$destination}&key={$apiKey}";
-                $response = json_decode(file_get_contents($url), true);
-
-                if ($response['status'] == 'OK') {
-                    $element = $response['rows'][0]['elements'][0];
-                    $distance = $element['distance']['value'] / 1000;
-                    $duration = $element['duration']['value'] / 60;
-
-                    $totalDistance += $distance;
-                    $totalDuration += $duration;
-
-                    $pickupAddress = $response['origin_addresses'][0];
-                    $destinationAddress[$index] = $response['destination_addresses'][0];
-
-                    $distances_durations[$index]['destination_addresses'] = $destinationAddress;
-                    $distances_durations[$index]['distance'] = $distance;
-                    $distances_durations[$index]['duration'] = $duration;
-                } else {
-                    return response()->json([
-                        'remark' => 'api_error',
-                        'status' => 'error',
-                        'message' => $response['error_message'],
-                    ]);
-                }
-
-                $previousDestination = "$lat,{$destination_long[$index]}";
-            }
+            $distances_durations = calculateDistancesDurations($request);
+            $totalDistance = $distances_durations['totalDistance'];
+            $totalDuration = $distances_durations['totalDuration'];
+            $pickupAddress = $distances_durations['pickupAddress'];
+            $destinationAddress = $distances_durations['destinationAddress'];
 
             $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
             if ($vehicle == null) {
@@ -253,7 +219,6 @@ class RideController extends Controller
             $vatAmount = gs('vat_amount') * $amount / 100;
             $totalAmount = $amount + $vatAmount;
 
-            // TODO:: Need To Update
             $ride = new Ride();
             $ride->service_id = $request->service_id;
             $ride->vehicle_type_id = $request->vehicle_type_id;
@@ -267,17 +232,16 @@ class RideController extends Controller
             }
             $ride->pickup_lat = $pickup_lat;
             $ride->pickup_long = $pickup_long;
-
-
             $ride->pickup_address = $pickupAddress;
-            $ride->otp = generateOTP();
+
             $ride->distance = $totalDistance;
             $ride->duration = $totalDuration;
+            $ride->otp = generateOTP();
             $ride->base_fare = $base_fare;
+            $ride->vat_amount = $vatAmount;
+            $ride->tips = $request->tips;
 
             $ride->total = $totalAmount;
-            $ride->vat_amount = $vatAmount;
-
             $ride->status = Status::RIDE_INITIATED;
             $ride->save();
 
@@ -313,7 +277,7 @@ class RideController extends Controller
     public function rideCompleted()
     {
         $user = auth()->user();
-        $ride = Ride::where('user_id', $user->id)->where('status', Status::RIDE_COMPLETED)->paginate(10);
+        $ride = Ride::where('user_id', $user->id)->completed()->paginate(10);
         if ($ride == null) {
             return response()->json([
                 'status' => 'error',

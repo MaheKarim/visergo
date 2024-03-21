@@ -14,7 +14,7 @@ class PaymentController extends Controller
     public function methods()
     {
         $gatewayCurrency = GatewayCurrency::whereHas('method', function ($gate) {
-            $gate->where('status', Status::ENABLE);
+            $gate->active();
         })->with('method')->orderby('method_code')->get();
         $notify[] = 'Payment Methods';
         return response()->json([
