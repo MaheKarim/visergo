@@ -89,10 +89,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label>@lang('VAT Value')</label>
+                                <label>@lang('VAT Amount')</label>
                                 <div class="form-group">
                                     <div class="input-group">
-                                        <input class="form-control" type="number" name="vat_value" required min="0" value="{{ showAmount($general->vat_value) }}">
+                                        <input class="form-control" type="number" name="vat_amount" required min="0" value="{{ showAmount($general->vat_amount) }}">
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
