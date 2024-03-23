@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 class ContactListController extends Controller
 {
 
-    public function contact()
+    public function contacts()
     {
         $contacts = ContactList::where('user_id',auth()->user()->id)->get();
 

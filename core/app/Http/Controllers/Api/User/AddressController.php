@@ -9,45 +9,10 @@ use Illuminate\Support\Facades\Validator;
 
 class AddressController extends Controller
 {
-    public function addressInsert(Request $request)
+
+    public function addresses()
     {
-
-        $validator = Validator::make($request->all(), [
-            'address'=>'required',
-            'title'=>'required',
-            'longitude'=>'required',
-            'latitude'=>'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
-            ]);
-        }
-
-        $address = new UserAddress();
-        $address->user_id = auth()->id();
-        $address->address = $request->address;
-        $address->title = strtoupper($request->title);
-        $address->longitude = $request->longitude;
-        $address->latitude = $request->latitude;
-        $address->additional_info = $request->additional_info;
-        $address->save();
-
-        $notify[] = 'Address saved successfully';
-
-        return response()->json([
-            'remark'=>'address_saved',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
-        ]);
-    }
-
-    public function address()
-    {
-        $addresses = UserAddress::where('user_id',auth()->user()->id)->get();
+        $addresses = UserAddress::where('user_id', auth()->id())->get();
 
         return response()->json([
             'remark'=>'address',
@@ -56,22 +21,9 @@ class AddressController extends Controller
         ]);
     }
 
-    public function addressUpdate(Request $request, $id)
+    public function store(Request $request, $id = 0)
     {
-        $address = UserAddress::where('user_id', auth()->user()->id)->find($id);
-        if (!$address) {
-            return response()->json([
-                'remark' => 'address_not_found',
-                'status' => 'error',
-                'message' => ['error' => 'Address not found'],
-            ]);
-        }
-        $validator = Validator::make($request->all(), [
-            'address'=>'required',
-            'title'=>'required',
-            'longitude'=>'required',
-            'latitude'=>'required',
-        ]);
+        $validator = $this->validation($request);
 
         if ($validator->fails()) {
             return response()->json([
@@ -81,25 +33,39 @@ class AddressController extends Controller
             ]);
         }
 
+        if($id) {
+            $address = UserAddress::where('user_id', auth()->id())->find($id);
+
+            if (!$address) {
+                return response()->json([
+                    'remark' => 'address_not_found',
+                    'status' => 'error',
+                    'message' => ['error' => 'Address not found'],
+                ]);
+            }
+            $notify[] = 'Address updated successfully';
+        }else{
+            $address = new UserAddress();
+            $notify[] = 'Address saved successfully';
+        }
+
+        $address->user_id = auth()->id();
         $address->address = $request->address;
-        $address->title = strtoupper($request->title);
+        $address->title = $request->title;
         $address->longitude = $request->longitude;
         $address->latitude = $request->latitude;
         $address->additional_info = $request->additional_info;
         $address->save();
 
-        $notify[] = 'Address updated successfully';
         return response()->json([
-            'remark'=>'address_updated',
+            'remark'=>'address_saved',
             'status'=>'success',
             'message'=>['success'=>$notify],
         ]);
     }
-
-    public function addressDelete($id)
+    public function delete($id)
     {
-
-        $address = UserAddress::where('user_id', auth()->user()->id)->find($id);
+        $address = UserAddress::where('user_id', auth()->id())->find($id);
 
         if(!$address) {
             return response()->json([
@@ -116,7 +82,17 @@ class AddressController extends Controller
         return response()->json([
             'remark'=>'address_deleted',
             'status'=>'success',
-            'message'=>['success'=>$notify],
+            'message'=>['success' => $notify],
+        ]);
+    }
+
+    private function validation($request){
+        return Validator::make($request->all(), [
+            'address'=>'required',
+            'title'=>'required',
+            'longitude'=>'required',
+            'latitude'=>'required',
+            'additional_info'=>'nullable',
         ]);
     }
 

@@ -6,12 +6,9 @@ use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\RideFare;
 use App\Models\Service;
-use App\Models\TypeClass;
 use App\Models\VehicleClass;
-use App\Models\VehicleService;
 use App\Models\VehicleType;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Validator;
 
 class VehicleTypeController extends Controller
 {
@@ -25,6 +22,7 @@ class VehicleTypeController extends Controller
 
     public function store(Request $request, $id = 0)
     {
+
         if ($id) {
             $vehicleType = VehicleType::findOrFail($id);
             $message = 'Vehicle type updated successfully';
@@ -61,12 +59,14 @@ class VehicleTypeController extends Controller
         } else {
             $serviceIds = array_keys($request->fare);
             $vehicleType->vehicleServices()->sync($serviceIds);
+
             foreach ($request->fare as $service => $fare) {
                 if ($request->old_value) {
                     $rideFare = RideFare::find($request->old_value[$service]);
                 } else {
                     $rideFare = new RideFare();
                 }
+
                 $rideFare->vehicle_type_id = $vehicleType->id;
                 $rideFare->service_id = $service;
                 $rideFare->fare = $fare;

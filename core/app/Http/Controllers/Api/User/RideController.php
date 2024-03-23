@@ -16,28 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class RideController extends Controller
 {
 
-    public function ride(Request $request)
+    public function rideSearch(Request $request)
     {
-
         $validator = $this->validateRequest($request);
 
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator);
-        }
-
-        if ($request->has('vehicle_type')) {
-            $validator->after(function ($validator) use ($request) {
-                if (!VehicleType::where('id', $request->vehicle_type)->exists()) {
-                    $validator->errors()->add('vehicle_type', 'Vehicle type not found');
-                }
-            });
-        }
-
-
-        $user = auth()->user();
-
-        if ($this->isDriver($user)) {
-            return $this->driverErrorResponse();
         }
 
         $pickup_lat = $request->pickup_lat;
@@ -46,10 +30,17 @@ class RideController extends Controller
         $destination_long = $request->destination_long;
 
         $zones = Zone::active()->get();
+        $pickupZone = null;
 
         foreach ($zones as $zone) {
-            $pickup_in_zone = underZone($pickup_lat, $pickup_long, $zone);
+            $isUnderThisZone = underZone($pickup_lat, $pickup_long, $zone);
+            if ($isUnderThisZone) {
+                $pickupZone = $zone;
+                break;
+            }
         }
+
+
 
         foreach ($zones as $zone) {
             $destination_in_zone = underZone($destination_lat, $destination_long, $zone);
@@ -67,9 +58,11 @@ class RideController extends Controller
                 'message' => 'Pickup or Destination point not in zone',
             ]);
         }
+
         // Introduce Google MAP Api
         $apiKey = gs()->location_api;
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$pickup_lat},{$pickup_long}&destinations={$destination_lat},{$destination_long}&key={$apiKey}";
+
         $response = json_decode(file_get_contents($url), true);
 
         if ($response['status'] == 'OK') {
@@ -79,11 +72,15 @@ class RideController extends Controller
         }
 
         $vehicleTypes = VehicleType::all();
-        $responses = [
-            'remark' => 'fare_calculated',
-            'status' => 'success',
-            'data' => []
-        ];
+
+        if (empty($vehicleTypes)) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => 'Vehicle types not found',
+            ]);
+        }
+
         foreach ($vehicleTypes as $vehicleType) {
             $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
                 ->where('service_id', $request->service_id)
@@ -110,16 +107,14 @@ class RideController extends Controller
             }
         }
 
-        if (empty($responses)) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => 'Vehicle types not found',
-            ]);
-        }
+
+        $responses = [
+            'remark' => 'fare_calculated',
+            'status' => 'success',
+            'data' => []
+        ];
 
         return response()->json($responses);
-
     }
 
     public function rideRequest(Request $request, $id = 0)
@@ -331,7 +326,7 @@ class RideController extends Controller
         ], 403);
     }
 
-    private function validationErrorResponse(\Illuminate\Validation\Validator $validator)
+    private function validationErrorResponse($validator)
     {
         return response()->json([
             'remark' => 'validation_error',
@@ -386,5 +381,4 @@ class RideController extends Controller
             'data' => $ride,
         ]);
     }
-
 }

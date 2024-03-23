@@ -144,21 +144,22 @@ Route::namespace('Api')->name('api.')->group(function () {
                 Route::namespace('User')->group(function () {
                     // User Address Management
                     Route::controller('AddressController')->group(function () {
-                        Route::get('address', 'address')->name('address');
-                        Route::post('address/insert', 'addressInsert')->name('address.insert');
-                        Route::post('address/update/{id}', 'addressUpdate')->name('address.update');
-                        Route::post('address/delete/{id}', 'addressDelete')->name('address.delete');
+                        Route::get('address', 'addresses')->name('address');
+                        Route::post('address/insert', 'store')->name('address.insert');
+                        Route::post('address/update/{id}', 'store')->name('address.update');
+                        Route::post('address/delete/{id}', 'delete')->name('address.delete');
                     });
+
                     // Contact List Management
                     Route::controller('ContactListController')->name('user.')->group(function () {
-                        Route::get('contact', 'contact')->name('contact');
+                        Route::get('contacts', 'contacts')->name('contact');
                         Route::post('contact/insert', 'contactInsert')->name('contact.insert');
                         Route::post('contact/update/{id}', 'contactUpdate')->name('contact.update');
                         Route::post('contact/delete/{id}', 'contactDelete')->name('contact.delete');
                     });
                     // Ride Request Controller
                     Route::controller('RideController')->name('ride.')->group(function () {
-                        Route::post('ride', 'ride')->name('ride');
+                        Route::post('ride-search', 'rideSearch')->name('ride');
                         Route::post('ride/create/', 'rideRequest')->name('ride.insert');
                         Route::post('ride/{id}/tips/add', 'rideTips')->name('tips.add');
                         Route::get('ride/completed/history', 'rideCompleted')->name('ride.completed');
@@ -168,7 +169,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('CouponListController')->name('coupon.')->group(function () {
                         Route::get('coupons', 'index')->name('coupon');
                     });
-                    // Gateway List For User
+                    // Gateway List For User // WIP Middleware Check
                     Route::controller('PaymentController')->name('payment.')->group(function () {
                         Route::get('methods', 'methods')->name('methods');
                         Route::get('method/{id}', 'method')->name('method');

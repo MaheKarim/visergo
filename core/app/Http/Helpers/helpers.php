@@ -481,12 +481,8 @@ function underZone($lat, $long, $zone)
             $inside = !$inside; // Toggle the inside status
         }
     }
-    // return $inside;
-    return [
-        'inside' => $inside,
-        'coordinates' => $coordinates,
-        'zone' => $zone,
-    ];
+    return $inside;
+
 }
 
 
