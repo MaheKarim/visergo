@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Lib\ZoneHelper;
 use App\Models\Ride;
 use App\Models\RideDestination;
 use App\Models\Zone;
@@ -19,26 +20,15 @@ class RideController extends Controller
     public function rideSearch(Request $request)
     {
         $validator = $this->validateRequest($request);
-
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator);
         }
 
         $pickupLat = $request->pickup_lat;
         $pickupLong = $request->pickup_long;
+        $allDestinations = $request->destinations;
 
-        $zones = Zone::active()->get();
-        $pickupZone = null;
-
-        foreach ($zones as $zone) {
-            $isPickupZone = underZone($pickupLat, $pickupLong, $zone);
-
-            if ($isPickupZone) {
-                $pickupZone  = $zone;
-                break;
-            }
-        }
-
+        $pickupZone = ZoneHelper::getPickupZone($pickupLat, $pickupLong);
         if (!$pickupZone) {
             return response()->json([
                 'remark' => 'validation_error',
@@ -47,30 +37,13 @@ class RideController extends Controller
             ]);
         }
 
-        $allDestinations = $request->destinations;
-
-        foreach ($allDestinations as $index => $destination) {
-            foreach ($zones as $zone) {
-                $isThisZone = underZone($destination['lat'], $destination['long'], $zone);
-                $allDestinations[$index]['zone_id'] = $isThisZone ? $zone->id : null;
-            }
-        }
-
-        foreach ($allDestinations as $destination) {
-            if (!$destination['zone_id']) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Some destination coordinates not matched with any zone',
-                ]);
-            }
-            if ($destination['zone_id'] != $pickupZone->id) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Destination points and pickup point should be same',
-                ]);
-            }
+        $destinationZones = ZoneHelper::getDestinationZones($allDestinations);
+        if (!ZoneHelper::zonesMatch($pickupZone, $destinationZones)) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => 'Some destination coordinates not matched with any zone',
+            ]);
         }
 
         $originArray = $request->destinations;

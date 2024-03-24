@@ -461,31 +461,6 @@ function isHtml($string)
     }
 }
 
-function underZone($lat, $long, $zone)
-{
-    $inside = false;
-    // Prepare the test point
-    $x = $lat;
-    $y = $long;
-    $coordinates = json_decode($zone->coordinates->toJson())->coordinates[0];
-
-    $verticesCount = count($coordinates);
-    for ($i = 0, $j = $verticesCount - 1; $i < $verticesCount; $j = $i++) {
-        $xi = $coordinates[$i][1]; //lat
-        $yi = $coordinates[$i][0]; // lng
-        $xj = $coordinates[$j][1]; //lat
-        $yj = $coordinates[$j][0]; // lng
-        // Check if the test point is between the vertex's y-coordinates
-        $intersect = (($yi > $y) != ($yj > $y)) &&
-            ($x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi);
-        if ($intersect) {
-            $inside = !$inside; // Toggle the inside status
-        }
-    }
-    return $inside;
-
-}
-
 
 if (!function_exists('generateOTP')) {
     function generateOTP($length = 4) {
