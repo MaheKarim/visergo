@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Lib\DistanceMatrix;
+use App\Lib\RideFareSearch;
 use App\Lib\ZoneHelper;
 use App\Models\Ride;
 use App\Models\RideDestination;
@@ -38,6 +40,7 @@ class RideController extends Controller
         }
 
         $destinationZones = ZoneHelper::getDestinationZones($allDestinations);
+
         if (!ZoneHelper::zonesMatch($pickupZone, $destinationZones)) {
             return response()->json([
                 'remark' => 'validation_error',
@@ -52,93 +55,30 @@ class RideController extends Controller
             "lat" => $request->pickup_lat,
             "long" => $request->pickup_long,
         ]);
-
-        $pairs = [];
-
-        for ($i=0; $i < count($originArray)-1; $i++) {
-            $pairs[] = [ $i,  $i+1];
-        }
+        $origins = $originArray;
         array_pop($originArray);
-
         $destinations = $request->destinations;
-        $origins = implode("|", array_map(function ($a) {
-            return implode(",", $a);
-        }, $originArray));
 
-        $destinations = implode("|", array_map(function ($a) {
-            return implode(",", $a);
-        }, $destinations));
+        $distanceMatrix = DistanceMatrix::getTotalDistanceAndDuration($origins, $destinations);
 
-        $apiKey = gs('location_api');
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$origins}&destinations={$destinations}&key={$apiKey}";
+        $totalDistance = $distanceMatrix['total_distance'];
+        $totalDuration = $distanceMatrix['total_duration'];
+        $pickupAddress = $distanceMatrix['pickup_address'];
+        $destinationAddress = $distanceMatrix['destination_address'];
 
-        $response = json_decode(file_get_contents($url), true);
+       $fareDetails = RideFareSearch::getFareDetails(
+           $totalDistance,
+           $totalDuration,
+           $pickupAddress,
+           $destinationAddress,
+           $request->service_id
+       );
 
-        if ($response['status'] != 'OK') {
-            return response()->json([
-                'remark' => 'api_error',
-                'status' => 'error',
-                'message' => $response['status'],
-            ]);
-        }
-        $distances = [];
-        $addresses = array_values(array_unique(array_merge($response['origin_addresses'], $response['destination_addresses'])));
-
-        foreach ($pairs as $pair) {
-            // $distances[]['address'] = $addresses[$pair[0]] . ' to ' .  $addresses[$pair[1]];
-            // $distances[]['info'] = $response['rows'][$pair[0]]['elements'][$pair[1-1]];
-            $distances[] = $response['rows'][$pair[0]]['elements'][$pair[1-1]];
+        if (isset($fareDetails['remark'])) {
+            return response()->json($fareDetails);
         }
 
-        $totalDistance = (collect($distances)->sum('distance.value') / 1000);
-        $totalDuration = (collect($distances)->sum('duration.value') / 60);
-
-        $vehicleTypes = VehicleType::active()->get();
-
-        if (empty($vehicleTypes)) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => 'Vehicle types not found',
-            ]);
-        }
-
-        $responses = [];
-        foreach ($vehicleTypes as $vehicleType) {
-            $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
-                ->where('service_id', $request->service_id)
-                ->with(['vehicleClass'])->get();
-
-            $vehicleTypeData = [];
-            foreach ($multipleClass as $class) {
-
-                $baseFare = $class->fare;
-                $fare = $baseFare * $totalDistance;
-                $getVehicleClass = data_get($class, 'vehicleClass.name');
-                $getVehicleClassId = data_get($class, 'vehicleClass.id');
-
-                $vehicleTypeData[] = [
-                    'id' => $class->id,
-                    'vehicle_type_id' => $vehicleType->id,
-                    'service_id' => $request->service_id,
-                    'class_id' => $getVehicleClassId,
-                    'class' => $getVehicleClass,
-                    'fare' => getAmount($fare) . ' ' . gs('cur_text'),
-                    'vehicle_type' => $vehicleType->name,
-                    'total_duration' => getAmount($totalDuration) . ' minutes',
-                    'pickup_address' => $response['origin_addresses'][0],
-                    'destination_address' => $response['destination_addresses'],
-                ];
-            }
-
-            $responses[] = [
-                'id' => $vehicleType->id,
-                'name' => $vehicleType->name,
-                'data' => $vehicleTypeData,
-            ];
-        }
-
-        return response()->json($responses);
+        return response()->json($fareDetails);
     }
 
     public function rideRequest(Request $request, $id = 0)
