@@ -42,5 +42,8 @@ class VehicleType extends Model
         return $this->hasMany(RideFare::class);
     }
 
-
+    public function scopeActive($query)
+    {
+        return $query->where('status', Status::ENABLE);
+    }
 }

@@ -468,6 +468,7 @@ function underZone($lat, $long, $zone)
     $x = $lat;
     $y = $long;
     $coordinates = json_decode($zone->coordinates->toJson())->coordinates[0];
+
     $verticesCount = count($coordinates);
     for ($i = 0, $j = $verticesCount - 1; $i < $verticesCount; $j = $i++) {
         $xi = $coordinates[$i][1]; //lat
@@ -505,10 +506,10 @@ if (!function_exists('isUniqueOTP')) {
     }
 }
 
-function calculateDistancesDurations($request): \Illuminate\Http\JsonResponse|array
+function calculateDistancesDurations($request)
 {
-    $pickup_lat = $request->pickup_lat;
-    $pickup_long = $request->pickup_long;
+    $pickupLat = $request->pickup_lat;
+    $pickupLong = $request->pickup_long;
     $destination_lat = $request->input('destination_lat');
     $destination_long = $request->input('destination_long');
 
@@ -516,7 +517,7 @@ function calculateDistancesDurations($request): \Illuminate\Http\JsonResponse|ar
     $distances_durations = [];
     $totalDistance = 0;
     $totalDuration = 0;
-    $previousDestination = "$pickup_lat,$pickup_long";
+    $previousDestination = "$pickupLat,$pickupLong";
 
     $destinationAddress = array();
 
