@@ -238,14 +238,8 @@ class RideController extends Controller
 
         // Admin Portion
         // Driver Notification Sent
-
         // TODO:: Coupon Apply Here
-        // Reward Claim After Ride Completed
-        if ($ride->status == Status::RIDE_COMPLETED) {
-            $ride->point = ($ride->total / gs('spend_amount_for_reward')) * gs('reward_point');
-            $user->reward_point += $ride->point;
-            $user->save();
-        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Ride Requested Created Successfully',

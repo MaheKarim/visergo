@@ -161,7 +161,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('RideController')->name('ride.')->group(function () {
                         Route::post('ride-search', 'rideSearch')->name('ride');
                         Route::post('ride/create/', 'rideRequest')->name('ride.insert');
-                        Route::post('ride/{id}/tips/add', 'rideTips')->name('tips.add');
+                        Route::post('ride/tips/add/{id}', 'rideTips')->name('tips.add');
                         Route::get('ride/completed/history', 'rideCompleted')->name('ride.completed');
                         Route::get('ride/ongoing/history', 'rideOngoing')->name('ride.ongoing');
                     });
@@ -173,7 +173,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('PaymentController')->name('payment.')->group(function () {
                         Route::get('methods', 'methods')->name('methods');
                         Route::get('method/{id}', 'method')->name('method');
-                        Route::post('payment/{id}/insert', 'depositInsert')->name('insert');
+                        Route::post('payment/insert/{id}', 'depositInsert')->name('insert');
                     });
                 });
             });
