@@ -13,7 +13,7 @@ class RideFareSearch
         string $pickupAddress,
         array $destinationAddress,
         int $serviceId
-    ): array{
+    ): array {
         $vehicleTypes = VehicleType::active()->get();
 
         if (empty($vehicleTypes)) {

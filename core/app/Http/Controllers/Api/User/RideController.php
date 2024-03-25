@@ -66,13 +66,13 @@ class RideController extends Controller
         $pickupAddress = $distanceMatrix['pickup_address'];
         $destinationAddress = $distanceMatrix['destination_address'];
 
-       $fareDetails = RideFareSearch::getFareDetails(
-           $totalDistance,
-           $totalDuration,
-           $pickupAddress,
-           $destinationAddress,
-           $request->service_id
-       );
+        $fareDetails = RideFareSearch::getFareDetails(
+            $totalDistance,
+            $totalDuration,
+            $pickupAddress,
+            $destinationAddress,
+            $request->service_id
+        );
 
         if (isset($fareDetails['remark'])) {
             return response()->json($fareDetails);
@@ -111,35 +111,50 @@ class RideController extends Controller
 
             $pickupLat = $request->pickup_lat;
             $pickupLong = $request->pickup_long;
-            $destinationLat = $request->destination_lat;
-            $destinationLong = $request->destination_long;
+            $allDestinations = $request->destinations;
 
-            $zones = Zone::active()->get();
-
-            foreach ($zones as $zone) {
-                $pickup_in_zone = underZone($pickupLat, $pickupLong, $zone);
-
-                // Check if any destination is under the zone
-                $destination_in_zone = false;
-                foreach ($destinationLat as $index => $dest_lat) {
-                    $dest_long = $destinationLong[$index];
-                    if (underZone($dest_lat, $dest_long, $zone)) {
-                        $destination_in_zone = true;
-                        break;
-                    }
-                }
-
-                if ($destination_in_zone && $pickup_in_zone) {
-                    $zoneId = $zone->id;
-                    break;
-                }
+            $pickupZone = ZoneHelper::getPickupZone($pickupLat, $pickupLong);
+            if (!$pickupZone) {
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => 'Pickup point not matched with any zone',
+                ]);
             }
-            // Introduce Google MAP Api
-            $distances_durations = calculateDistancesDurations($request);
-            $totalDistance = $distances_durations['totalDistance'];
-            $totalDuration = $distances_durations['totalDuration'];
-            $pickupAddress = $distances_durations['pickupAddress'];
-            $destinationAddress = $distances_durations['destinationAddress'];
+
+            $destinationZone = ZoneHelper::getDestinationZones($allDestinations);
+            if (!$destinationZone) {
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => 'Destination point not matched with any zone',
+                ]);
+            }
+
+            $zoneMatch = ZoneHelper::zonesMatch($pickupZone, $destinationZone);
+            if (!$zoneMatch) {
+                return response()->json([
+                    'remark' => 'validation_error',
+                    'status' => 'error',
+                    'message' => 'Some destination coordinates not matched with any zone',
+                ]);
+            }
+
+            $originArray = $request->destinations;
+
+            array_unshift($originArray, [
+                "lat" => $request->pickup_lat,
+                "long" => $request->pickup_long,
+            ]);
+            $origins = $originArray;
+            array_pop($originArray);
+            $destinations = $request->destinations;
+
+            $distanceMatrix = DistanceMatrix::getTotalDistanceAndDuration($origins, $destinations);
+            $totalDistance = $distanceMatrix['total_distance'];
+            $totalDuration = $distanceMatrix['total_duration'];
+            $pickupAddress = $distanceMatrix['pickup_address'];
+            $destinationAddress = $distanceMatrix['destination_address'];
 
             $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
             if ($vehicle == null) {
@@ -187,7 +202,8 @@ class RideController extends Controller
             $ride->service_id = $request->service_id;
             $ride->vehicle_type_id = $request->vehicle_type_id;
             $ride->user_id = $user->id;
-            $ride->zone_id = $zoneId;
+            $ride->zone_id = $pickupZone->id;
+            $ride->class_id = $request->class_id;
             $ride->ride_for = $request->ride_for;
 
             if ($ride->ride_for == Status::RIDE_FOR_PILLION) {
@@ -203,7 +219,6 @@ class RideController extends Controller
             $ride->otp = generateOTP();
             $ride->base_fare = $base_fare;
             $ride->vat_amount = $vatAmount;
-            //            $ride->tips = $request->tips;
 
             $ride->total = $totalAmount;
             $ride->status = Status::RIDE_INITIATED;
@@ -211,33 +226,33 @@ class RideController extends Controller
             $ride->payment_type = Status::NO;
             $ride->save();
 
-            foreach ($destinationLat as $index => $lat) {
-                $destination = new RideDestination();
-                $destination->ride_id = $ride->id;
-                $destination->destination_lat = $lat;
-                $destination->destination_long = $destinationLong[$index];
-                $destination->destination_address = $destinationAddress[$index];
-                $destination->save();
+            foreach ($destinations as $index => $destination) {
+                $rideDestination = new RideDestination();
+                $rideDestination->ride_id = $ride->id;
+                $rideDestination->destination_lat = $destination['lat'];
+                $rideDestination->destination_long = $destination['long'];
+                $rideDestination->destination_address = $destinationAddress[$index];
+                $rideDestination->save();
             }
-
-            // Admin Portion
-            // Driver Notification Sent
-
-            // TODO:: Coupon Apply Here
-            // Reward Claim After Ride Completed
-            if ($ride->status == Status::RIDE_COMPLETED) {
-                $ride->point = ($ride->total / gs('spend_amount_for_reward')) * gs('reward_point');
-                $user->reward_point += $ride->point;
-                $user->save();
-            }
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Ride Requested Created Successfully',
-                'distance' => $totalDistance,
-                'destination_address' => $destinationAddress,
-                'data' => $ride,
-            ]);
         }
+
+        // Admin Portion
+        // Driver Notification Sent
+
+        // TODO:: Coupon Apply Here
+        // Reward Claim After Ride Completed
+        if ($ride->status == Status::RIDE_COMPLETED) {
+            $ride->point = ($ride->total / gs('spend_amount_for_reward')) * gs('reward_point');
+            $user->reward_point += $ride->point;
+            $user->save();
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ride Requested Created Successfully',
+            'distance' => $totalDistance,
+            'destination_address' => $destinationAddress,
+            'data' => $ride,
+        ]);
     }
 
     public function rideCompleted()
