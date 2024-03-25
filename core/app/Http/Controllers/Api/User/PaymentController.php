@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Deposit;
 use App\Models\GatewayCurrency;
 use App\Models\Ride;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -80,6 +81,7 @@ class PaymentController extends Controller
         $charge = $gate->fixed_charge + ($amount * $gate->percent_charge / 100);
         $payable = $amount + $charge;
         $finalAmount = $payable * $gate->rate;
+        $trx = getTrx();
 
         $data = new Deposit();
         $data->user_id = $user->id;
@@ -92,12 +94,23 @@ class PaymentController extends Controller
         $data->final_amount = $finalAmount;
         $data->btc_amount = 0;
         $data->btc_wallet = "";
-        $data->trx = getTrx();
+        $data->trx = $trx;
         $data->save();
 
-        $point = $amount / gs('spend_amount_for_reward') * gs('reward_point');
+        $transaction = new Transaction();
+        $transaction->user_id = $user->id;
+        $transaction->amount = $finalAmount;
+        $transaction->post_balance =  $finalAmount;
+        $transaction->charge = $charge;
+        $transaction->trx_type = '+';
+        $transaction->details = 'Deposit Via '.$gate->name;
+        $transaction->trx = $trx;
+        $transaction->save();
 
-        $ride->payment_status = Status::PAYMENT_SUCCESS;
+        $point = $amount / gs('spend_amount_for_reward') * gs('reward_point');
+        // Find Driver ID & User ID For Divided Points
+
+        $ride->payment_status = Status::PAYMENT_SUCCESS; // PAYMENT PENDING
         $ride->payment_type = Status::ONLINE_PAYMENT;
         $ride->status = Status::RIDE_COMPLETED;
         $ride->point = $point;

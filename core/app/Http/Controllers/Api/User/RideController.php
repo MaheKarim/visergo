@@ -342,7 +342,7 @@ class RideController extends Controller
 
     public function rideOngoing()
     {
-        $ride = Ride::where('user_id', auth()->user()->id)->ongoingRide()->first();
+        $ride = Ride::where('user_id', auth()->id())->ongoingRide()->first();
         if ($ride == null) {
             return response()->json([
                 'status' => 'error',

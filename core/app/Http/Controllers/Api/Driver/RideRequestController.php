@@ -156,6 +156,7 @@ class RideRequestController extends Controller
         } else {
             $ride->status = Status::RIDE_END;
             $ride->ride_completed_at = Carbon::now();
+            $ride->payment_status = Status::PAYMENT_PENDING;
             $ride->save();
 
             $driver->is_driving = Status::IDLE;

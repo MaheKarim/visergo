@@ -37,13 +37,8 @@ class ProcessController extends Controller
             return json_encode($send);
         }
 
-
-
-
-
         session()->put('payment_id',$payment->id);
         session()->put('deposit_id',$deposit->id);
-
 
         $send['redirect'] = true;
         $send['redirect_url'] = $payment->getCheckoutUrl();
