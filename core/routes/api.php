@@ -164,7 +164,9 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::post('ride/tips/add/{id}', 'rideTips');
                         Route::get('ride/completed/history', 'rideCompleted');
                         Route::get('ride/ongoing/history', 'rideOngoing');
-                        Route::post('ride/cancel/{id}', 'rideCancel');
+                        Route::middleware('userRideCancel')->group(function () {
+                            Route::post('ride/cancel/{id}', 'rideCancel');
+                        });
                     });
                     // Coupon List For User
                     Route::controller('CouponListController')->name('coupon.')->group(function () {

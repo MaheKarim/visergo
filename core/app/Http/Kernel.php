@@ -76,6 +76,7 @@ class Kernel extends HttpKernel
         'kyc' => \App\Http\Middleware\KycMiddleware::class,
         'registration.complete' => \App\Http\Middleware\RegistrationStep::class,
         'maintenance' => \App\Http\Middleware\MaintenanceMode::class,
+        'userRideCancel' => \App\Http\Middleware\UserRideCancelMiddleware::class,
 
         'driver' => \App\Http\Middleware\RedirectIfNotDriver::class,
         'driver.guest' => \App\Http\Middleware\RedirectIfDriver::class,

@@ -12,6 +12,7 @@ use App\Models\Driver;
 use App\Models\RideFare;
 use App\Constants\Status;
 use App\Models\VehicleType;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -353,6 +354,60 @@ class RideController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Ongoing Ride',
+            'data' => $ride,
+        ]);
+    }
+
+    public function rideCancel(Request $request ,$id)
+    {
+        $validator = Validator::make($request->all(), [
+            'cancel_reason' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
+        $user = auth()->user();
+
+
+
+        $ride = Ride::where('user_id', auth()->id())
+            ->whereIn('status', [Status::RIDE_INITIATED, Status::RIDE_ACTIVE])
+            ->find($id);
+
+
+        if ($ride == null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No Ongoing Ride Found',
+                'data' => $ride,
+            ]);
+        }
+
+        if ($ride->status == Status::RIDE_CANCELED) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ride Already Cancelled',
+                'data' => $ride,
+            ]);
+        }
+
+        if ($ride->status == Status::RIDE_COMPLETED) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ride Already Completed',
+                'data' => $ride,
+            ]);
+        }
+        $ride->status = Status::RIDE_CANCELED;
+        $ride->ride_canceled_at = now();
+        $ride->cancel_by_user = auth()->id();
+        $ride->cancel_reason = request()->cancel_reason;
+        $ride->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ride Cancelled Successfully',
             'data' => $ride,
         ]);
     }
