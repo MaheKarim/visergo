@@ -27,6 +27,12 @@ class UserRideCancelMiddleware
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->count();
 
+            $cancelLimit = gs('ride_cancel_limit_user');
+
+            if ($cancelLimit === -1) {
+                return $next($request);
+            }
+
             if ($cancelCount >= gs('ride_cancel_limit_user')) {
                 return response()->json([
                     'status' => 'error',

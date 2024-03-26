@@ -187,9 +187,8 @@ class RideRequestController extends Controller
             ]);
         }
 
-            $driver = auth()->user();
-            $cancelRide = Ride::where('driver_id', $driver->id)
-            ->where('status',[Status::RIDE_ACTIVE])->find($id);
+        $driver = auth()->user();
+        $cancelRide = Ride::where('driver_id', $driver->id)->where('status',[Status::RIDE_ACTIVE])->find($id);
 
         if ($cancelRide == null) {
             return response()->json([
@@ -201,6 +200,15 @@ class RideRequestController extends Controller
                 ]
             ]);
         }
+
+        if ($cancelRide->status == Status::RIDE_CANCELED) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ride Already Cancelled',
+                'data' => $cancelRide,
+            ]);
+        }
+
         if ($cancelRide->status == Status::RIDE_ONGOING) {
             $notify = 'You can not cancel ongoing ride';
             return response()->json([
@@ -210,9 +218,10 @@ class RideRequestController extends Controller
             ]);
         }
         $cancelRide->status = Status::RIDE_INITIATED;
-        $cancelRide->ride_cancelled_at = Carbon::now();
+        $cancelRide->ride_canceled_at = Carbon::now();
         $cancelRide->cancel_reason = $request->cancel_reason;
         $cancelRide->cancel_by_driver = $driver->id;
+
         $driver->is_driving = Status::IDLE;
         $driver->save();
         $cancelRide->save();

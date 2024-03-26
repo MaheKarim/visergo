@@ -253,8 +253,10 @@ Route::namespace('Api')->name('api.')->group(function () {
                             Route::post('ride/requests/{id}/accept', 'rideRequestAccept')->name('ride.requests.accept');
                         });
                         Route::post('ride/requests/{id}/start', 'rideRequestStart')->name('ride.requests.start');
-                        Route::post('ride/requests/{id}/end', 'rideRequestEnd')->name('ride.requests.end');
-                        Route::post('ride/requests/{id}/cancel', 'rideRequestCancel')->name('ride.requests.cancel');
+                        Route::post('ride/requests/{id}/end', 'rideRequestEnd');
+                        Route::middleware('driverRideCancel')->group(function () {
+                            Route::post('ride/requests/cancel/{id}', 'rideRequestCancel');
+                        });
                     });
                 });
                 Route::get('driver-info', function () {

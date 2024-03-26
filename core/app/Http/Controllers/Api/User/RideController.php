@@ -367,14 +367,10 @@ class RideController extends Controller
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator);
         }
-        $user = auth()->user();
-
-
 
         $ride = Ride::where('user_id', auth()->id())
             ->whereIn('status', [Status::RIDE_INITIATED, Status::RIDE_ACTIVE])
             ->find($id);
-
 
         if ($ride == null) {
             return response()->json([

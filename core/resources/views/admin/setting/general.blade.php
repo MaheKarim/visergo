@@ -104,15 +104,23 @@
                                 <label>@lang('Max Ride Cancel By User (per/month)')</label>
                                 <div class="form-group">
                                     <div class="input-group">
-                                        <input class="form-control" type="text" name="ride_cancel_limit_user"  value="{{ getAmount($general->ride_cancel_limit_user) }}" >
+                                        <input class="form-control" type="text" name="ride_cancel_limit_user"  value="{{ getAmount($general->ride_cancel_limit_user) }}" placeholder="-1 value means unlimited">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label>@lang('Max Ride Cancel By Driver (per/month)')</label>
                                 <div class="form-group">
                                     <div class="input-group">
-                                        <input class="form-control" type="number" name="ride_cancel_limit_driver" value="{{ getAmount($general->ride_cancel_limit_driver) }}">
+                                        <input class="form-control" type="number" name="ride_cancel_limit_driver" value="{{ getAmount($general->ride_cancel_limit_driver) }}" placeholder="-1 value means unlimited">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label>@lang('Driver Ban On Ride Cancel (in days)')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="ban_days" value="{{ getAmount($general->ban_days ) }}">
                                     </div>
                                 </div>
                             </div>
