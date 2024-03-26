@@ -39,6 +39,10 @@ class Ride extends Model
         return $this->hasOne(Conversation::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(DriverReview::class);
+    }
     // Scope
 
     public function scopeActive($query)

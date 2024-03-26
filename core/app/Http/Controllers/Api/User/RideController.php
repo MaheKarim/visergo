@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use App\Lib\DistanceMatrix;
 use App\Lib\RideFareSearch;
 use App\Lib\ZoneHelper;
+use App\Models\DriverReview;
 use App\Models\Ride;
 use App\Models\RideDestination;
 use App\Models\Zone;
@@ -405,6 +406,57 @@ class RideController extends Controller
             'status' => 'success',
             'message' => 'Ride Cancelled Successfully',
             'data' => $ride,
+        ]);
+    }
+
+    public function rideReview(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'rating' => 'required|numeric|min:0|max:5',
+            'review' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
+
+        $findIfReviewed = DriverReview::where('ride_id', $id)->first();
+        if ($findIfReviewed != null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ride Already Reviewed',
+                'data' => $findIfReviewed,
+            ]);
+        }
+
+        $ride = Ride::where('user_id', auth()->id())->find($id);
+        $driverId = $ride->driver_id;
+
+        if ($ride == null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No Ride Found',
+                'data' => $ride,
+            ]);
+        }
+
+        $review = new DriverReview();
+        $review->user_id = auth()->user()->id;
+        $review->driver_id = $driverId;
+        $review->ride_id = $ride->id;
+        $review->rating = $request->rating;
+        $review->review = $request->review;
+        $review->save();
+
+        $count    = DriverReview::where('driver_id', $driverId)->avg('rating');
+        $driverId = Driver::find($driverId);
+        $driverId->avg_rating = $count;
+        $driverId->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ride Review Added Successfully',
+            'data' => $review,
         ]);
     }
 }

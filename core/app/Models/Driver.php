@@ -50,6 +50,11 @@ class Driver extends Authenticatable
         return $this->hasMany(Conversation::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(DriverReview::class);
+    }
+
     public function getFullNameAttribute()
     {
         return ucfirst($this->firstname) . ' ' . ucfirst($this->lastname);

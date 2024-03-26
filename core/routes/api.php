@@ -167,6 +167,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::middleware('userRideCancel')->group(function () {
                             Route::post('ride/cancel/{id}', 'rideCancel');
                         });
+                        Route::post('ride/review/{id}', 'rideReview');
                     });
                     // Coupon List For User
                     Route::controller('CouponListController')->name('coupon.')->group(function () {
@@ -252,8 +253,9 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::middleware('drivingCheck')->group(function () {
                             Route::post('ride/requests/{id}/accept', 'rideRequestAccept')->name('ride.requests.accept');
                         });
-                        Route::post('ride/requests/{id}/start', 'rideRequestStart')->name('ride.requests.start');
-                        Route::post('ride/requests/{id}/end', 'rideRequestEnd');
+                        Route::post('ride/requests/start/{id}', 'rideRequestStart')->name('ride.requests.start');
+                        Route::post('ride/requests/end/{id}', 'rideRequestEnd');
+
                         Route::middleware('driverRideCancel')->group(function () {
                             Route::post('ride/requests/cancel/{id}', 'rideRequestCancel');
                         });

@@ -217,6 +217,7 @@ class RideRequestController extends Controller
                'message' => $notify,
             ]);
         }
+        $cancelRide->driver_id = null;
         $cancelRide->status = Status::RIDE_INITIATED;
         $cancelRide->ride_canceled_at = Carbon::now();
         $cancelRide->cancel_reason = $request->cancel_reason;
