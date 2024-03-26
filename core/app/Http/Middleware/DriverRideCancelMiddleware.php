@@ -28,6 +28,11 @@ class DriverRideCancelMiddleware
             ->count();
 
         $cancelLimit = gs('ride_cancel_limit_driver');
+
+        if ($cancelLimit === -1) {
+            return $next($request);
+        }
+
         $banDays = gs('ban_days');
 
         if ($ride >= $cancelLimit) {
