@@ -34,6 +34,8 @@ class GeneralSettingController extends Controller
             'location_api' => 'nullable|string',
             'vat_title' => 'required|string',
             'vat_amount' => 'required|numeric|min:0',
+            'ride_cancel_limit_user' => 'required|numeric',
+            'ride_cancel_limit_driver' => 'required|numeric',
         ]);
 
         $timezones = json_decode(file_get_contents(resource_path('views/admin/partials/timezone.json')));
@@ -50,6 +52,8 @@ class GeneralSettingController extends Controller
         $general->location_api = $request->location_api;
         $general->vat_title = $request->vat_title;
         $general->vat_amount = $request->vat_amount;
+        $general->ride_cancel_limit_user = $request->ride_cancel_limit_user;
+        $general->ride_cancel_limit_driver = $request->ride_cancel_limit_driver;
         $general->save();
 
         $timezoneFile = config_path('timezone.php');

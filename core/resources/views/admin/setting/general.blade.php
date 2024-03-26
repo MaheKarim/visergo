@@ -100,6 +100,25 @@
                         </div>
 
                         <div class="row">
+                            <div class="col-md-6">
+                                <label>@lang('Max Ride Cancel By User (per/month)')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" name="ride_cancel_limit_user"  value="{{ getAmount($general->ride_cancel_limit_user) }}" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>@lang('Max Ride Cancel By Driver (per/month)')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="ride_cancel_limit_driver" value="{{ getAmount($general->ride_cancel_limit_driver) }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-12">
                             <label>@lang('Google Location API Key')</label>
                                 <div class="form-group">
