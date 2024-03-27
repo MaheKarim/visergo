@@ -70,4 +70,7 @@ class Status{
     const ONLINE_PAYMENT = 2;
     const WALLET_PAYMENT = 3;
 
+    const DRIVER_TYPE="driver";
+    const USER_TYPE="user";
+
 }

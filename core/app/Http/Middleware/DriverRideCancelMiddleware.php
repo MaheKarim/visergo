@@ -25,7 +25,7 @@ class DriverRideCancelMiddleware
     {
         $rideId = $request->route()->parameter('id');
         $driver = auth()->id();
-        $cancel = RideCancel::where('driver_id', $driver->id)
+        $cancel = RideCancel::where('driver_id', $driver)
             ->whereMonth('created_at', Carbon::now()->month)
             ->count();
 
@@ -38,7 +38,7 @@ class DriverRideCancelMiddleware
         $banDays = gs('ban_days');
 
         if ($cancel >= $cancelLimit) {
-            $this->cancelRide($rideId, $driver->id, $request->cancel_reason);
+            $this->cancelRide($rideId,Status::DRIVER_TYPE,auth()->id(),$request->cancel_reason);
             $this->banDriver($driver, $cancelLimit ,$banDays);
 
             return response()->json([

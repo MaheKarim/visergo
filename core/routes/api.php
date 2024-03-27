@@ -256,8 +256,9 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::post('ride/requests/start/{id}', 'rideRequestStart')->name('ride.requests.start');
                         Route::post('ride/requests/end/{id}', 'rideRequestEnd');
 
-
-                        Route::post('ride/requests/cancel/{id}', 'rideRequestCancel')->middleware('driverRideCancel');
+                        Route::middleware('driverRideCancel')->group(function () {
+                            Route::post('ride/requests/cancel/{id}', 'rideRequestCancel');
+                        });
 
                     });
                 });

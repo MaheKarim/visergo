@@ -15,6 +15,7 @@ use App\Models\Driver;
 use App\Models\RideFare;
 use App\Constants\Status;
 use App\Models\VehicleType;
+use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
 {
+
+    use RideCancelTrait;
 
     public function rideSearch(Request $request)
     {
@@ -363,6 +366,7 @@ class RideController extends Controller
 
     public function rideCancel(Request $request ,$id)
     {
+
         $validator = Validator::make($request->all(), [
             'cancel_reason' => 'required',
         ]);
@@ -399,12 +403,11 @@ class RideController extends Controller
             ]);
         }
 
-        Driver::updateIsDriving($ride->driver_id, Status::IDLE);
 
-        $ride->status = Status::RIDE_CANCELED;
-        $ride->save();
+//        $ride->status = Status::RIDE_CANCELED;
+//        $ride->save();
 
-        CancelRide::ride($ride->id, auth()->id(),null, $request->cancel_reason);
+        $this->cancelRide($ride->id,Status::USER_TYPE, auth()->id(), $request->cancel_reason);
 
         return response()->json([
             'status' => 'success',
