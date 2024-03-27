@@ -37,8 +37,6 @@ class DriverRideCancelMiddleware
 
         if ($cancel >= $cancelLimit) {
 
-            if ($cancel == $cancelLimit) {
-                // If $ride is equal to $cancelLimit
                 CancelRide::ride($rideId, null, $driver->id, $request->cancel_reason);
                 $ride = Ride::find($rideId);
                 $ride->status = Status::RIDE_INITIATED;
@@ -56,14 +54,7 @@ class DriverRideCancelMiddleware
                     'message' => 'You have been banned from using the platform for ' . $banDays . ' days. You reached the maximum ride cancellation limit for this month.',
                     'status' => 'error',
                 ], 403);
-            }
-            else {
-                // If $ride is greater than $cancelLimit
-                return response()->json([
-                    'message' => 'You have exceeded the maximum ride cancellation limit for this month.',
-                    'status' => 'error',
-                ], 403);
-            }
+
         }
         return $next($request);
     }
