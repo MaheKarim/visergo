@@ -35,7 +35,7 @@ class Driver extends Authenticatable
         'ver_code_send_at' => 'datetime'
     ];
 
-    public static function updateIsDriving($driverId, $isDriving=Status::IDLE)
+    public static function updateIsDriving($driverId, $isDriving = Status::IDLE)
     {
         $driver = Driver::find($driverId);
 

@@ -222,7 +222,7 @@ class RideRequestController extends Controller
             ]);
         }
 
-        $this->cancelRide($ride->id, $driver->id, $request->cancel_reason);
+        $this->cancelRide($ride->id, Status::DRIVER_TYPE, $driver->id, $request->cancel_reason);
 
         return response()->json([
             'remark' => 'ride_cancel',

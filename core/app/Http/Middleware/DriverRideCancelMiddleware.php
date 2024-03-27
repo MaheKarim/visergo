@@ -38,7 +38,7 @@ class DriverRideCancelMiddleware
         $banDays = gs('ban_days');
 
         if ($cancel >= $cancelLimit) {
-            $this->cancelRide($rideId,Status::DRIVER_TYPE,auth()->id(),$request->cancel_reason);
+            $this->cancelRide($rideId,Status::DRIVER_TYPE, auth()->id(),$request->cancel_reason);
             $this->banDriver($driver, $cancelLimit ,$banDays);
 
             return response()->json([

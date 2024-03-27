@@ -20,30 +20,31 @@ trait RideCancelTrait
         $driver->status = Status::DRIVER_BAN;
         $driver->save();
     }
-    protected function cancelRide($rideId,$type,$id, $reason)
+
+    protected function cancelRide($rideId, $type, $id, $reason)
     {
 
         $cancel = new RideCancel();
         $cancel->ride_id = $rideId;
-        if($type=='user'){
+        if ($type == Status::USER_TYPE) {
             $cancel->user_id = $id;
-        }else{
+        } else {
             $cancel->driver_id = $id;
         }
         $cancel->cancel_reason = $reason;
         $cancel->ride_canceled_at = now();
         $cancel->save();
 
-        if ($type=='user') {
+        if ($type == Status::USER_TYPE) {
             $ride = Ride::find($rideId);
             $ride->status = Status::RIDE_CANCELED;
             $ride->save();
         }
 
-
-        if ($type==Status::DRIVER_TYPE) {
+        if ($type == Status::DRIVER_TYPE) {
             $ride = Ride::find($rideId);
             $ride->status = Status::RIDE_INITIATED;
+            $ride->driver_id = null;
             $ride->save();
             Driver::updateIsDriving(auth()->id());
         }
