@@ -7,6 +7,7 @@ use App\Lib\RideFareSearch;
 use App\Lib\ZoneHelper;
 use App\Models\DriverReview;
 use App\Models\Ride;
+use App\Models\RideCancel;
 use App\Models\RideDestination;
 use App\Models\Zone;
 use App\Models\Driver;
@@ -397,10 +398,15 @@ class RideController extends Controller
             ]);
         }
         $ride->status = Status::RIDE_CANCELED;
-        $ride->ride_canceled_at = now();
-        $ride->cancel_by_user = auth()->id();
-        $ride->cancel_reason = request()->cancel_reason;
         $ride->save();
+
+        $rideCancel = new RideCancel();
+        $rideCancel->ride_id = $ride->id;
+        $rideCancel->user_id = auth()->id();
+        $rideCancel->driver_id = null;
+        $rideCancel->cancel_reason = $request->cancel_reason;
+        $rideCancel->ride_canceled_at = now();
+        $rideCancel->save();
 
         return response()->json([
             'status' => 'success',

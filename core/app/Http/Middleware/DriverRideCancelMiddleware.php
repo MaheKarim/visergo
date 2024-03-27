@@ -3,8 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Constants\Status;
-use App\Models\Driver;
-use App\Models\Ride;
+use App\Models\RideCancel;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -22,8 +21,7 @@ class DriverRideCancelMiddleware
     {
         $driver = auth()->user();
 
-        $ride = Ride::where('driver_id', $driver->id)
-            ->where('cancel_by_driver', $driver->id) // true
+        $ride = RideCancel::where('driver_id', $driver->id)
             ->whereMonth('created_at', Carbon::now()->month)
             ->count();
 
@@ -41,9 +39,12 @@ class DriverRideCancelMiddleware
                 $driver->ban_reason = 'You can not cancel more than  ' . gs('ride_cancel_limit_driver') . ' rides per month';
                 $driver->ban_expire = Carbon::now()->days($banDays);
                 $driver->save();
-
-                return $next($request);
             }
+
+            return response()->json([
+                'message' => 'You have reached the maximum ride cancellation limit for this month.',
+            ], 403);
         }
+        return $next($request);
     }
 }

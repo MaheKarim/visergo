@@ -43,6 +43,10 @@ class Ride extends Model
     {
         return $this->hasOne(DriverReview::class);
     }
+    public function rideCancels()
+    {
+        return $this->hasMany(RideCancel::class, 'ride_id', 'id');
+    }
     // Scope
 
     public function scopeActive($query)

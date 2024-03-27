@@ -9,6 +9,7 @@ use App\Models\Conversation;
 use App\Models\ConversationMessage;
 use App\Models\Driver;
 use App\Models\Ride;
+use App\Models\RideCancel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -219,13 +220,19 @@ class RideRequestController extends Controller
         }
         $cancelRide->driver_id = null;
         $cancelRide->status = Status::RIDE_INITIATED;
-        $cancelRide->ride_canceled_at = Carbon::now();
-        $cancelRide->cancel_reason = $request->cancel_reason;
-        $cancelRide->cancel_by_driver = $driver->id;
+        $cancelRide->save();
+
+        $rideCancel = new RideCancel();
+        $rideCancel->ride_id = $cancelRide->id;
+        $rideCancel->user_id = null;
+        $rideCancel->driver_id = $driver->id;
+        $rideCancel->cancel_reason = $request->cancel_reason;
+        $rideCancel->ride_canceled_at = now();
+        $rideCancel->save();
 
         $driver->is_driving = Status::IDLE;
         $driver->save();
-        $cancelRide->save();
+
         return response()->json([
             'remark' => 'ride_cancel',
             'status' => 'success',

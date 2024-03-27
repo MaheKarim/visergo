@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Ride;
+use App\Models\RideCancel;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -22,8 +22,7 @@ class UserRideCancelMiddleware
         if (Auth::check()) {
             $user = auth()->user();
 
-            $cancelCount = Ride::where('user_id', $user->id)
-                ->where('cancel_by_user', $user->id) // true
+            $cancelCount = RideCancel::where('user_id', $user->id)
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->count();
 
