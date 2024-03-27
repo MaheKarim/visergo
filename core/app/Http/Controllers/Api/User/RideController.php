@@ -403,10 +403,6 @@ class RideController extends Controller
             ]);
         }
 
-
-//        $ride->status = Status::RIDE_CANCELED;
-//        $ride->save();
-
         $this->cancelRide($ride->id,Status::USER_TYPE, auth()->id(), $request->cancel_reason);
 
         return response()->json([

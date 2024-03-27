@@ -6,7 +6,6 @@ use App\Models\Conversation;
 use App\Models\ConversationMessage;
 use App\Models\Driver;
 use App\Models\Ride;
-use Illuminate\Http\Request;
 
 class RideChat {
 

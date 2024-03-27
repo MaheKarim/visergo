@@ -4,13 +4,7 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Lib\CancelRide;
-use App\Lib\RideChat;
-use App\Models\Conversation;
-use App\Models\ConversationMessage;
-use App\Models\Driver;
 use App\Models\Ride;
-use App\Models\RideCancel;
 use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
