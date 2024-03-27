@@ -35,6 +35,16 @@ class Driver extends Authenticatable
         'ver_code_send_at' => 'datetime'
     ];
 
+    public static function updateIsDriving($driverId, $isDriving)
+    {
+        $driver = Driver::find($driverId);
+
+        if ($driver) {
+            $driver->is_driving = $isDriving;
+            $driver->save();
+        }
+    }
+
     public function loginLogs()
     {
         return $this->hasMany(DriverLogin::class);

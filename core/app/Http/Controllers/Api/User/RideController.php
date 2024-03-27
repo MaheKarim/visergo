@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Lib\CancelRide;
 use App\Lib\DistanceMatrix;
 use App\Lib\RideFareSearch;
 use App\Lib\ZoneHelper;
@@ -397,16 +398,13 @@ class RideController extends Controller
                 'data' => $ride,
             ]);
         }
+
+        Driver::updateIsDriving($ride->driver_id, Status::IDLE);
+
         $ride->status = Status::RIDE_CANCELED;
         $ride->save();
 
-        $rideCancel = new RideCancel();
-        $rideCancel->ride_id = $ride->id;
-        $rideCancel->user_id = auth()->id();
-        $rideCancel->driver_id = null;
-        $rideCancel->cancel_reason = $request->cancel_reason;
-        $rideCancel->ride_canceled_at = now();
-        $rideCancel->save();
+        CancelRide::ride($ride->id, auth()->id(),null, $request->cancel_reason);
 
         return response()->json([
             'status' => 'success',

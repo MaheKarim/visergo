@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\CancelRide;
 use App\Lib\RideChat;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
@@ -189,28 +190,28 @@ class RideRequestController extends Controller
         }
 
         $driver = auth()->user();
-        $cancelRide = Ride::where('driver_id', $driver->id)->where('status',[Status::RIDE_ACTIVE])->find($id);
+        $ride = Ride::where('driver_id', $driver->id)->where('status', [Status::RIDE_ACTIVE])->find($id);
 
-        if ($cancelRide == null) {
+        if ($ride == null) {
             return response()->json([
                 'remark' => 'no_request_found',
                 'status' => 'error',
                 'message' => [],
                 'data' => [
-                    'ride' => $cancelRide
+                    'ride' => $ride
                 ]
             ]);
         }
 
-        if ($cancelRide->status == Status::RIDE_CANCELED) {
+        if ($ride->status == Status::RIDE_CANCELED) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Ride Already Cancelled',
-                'data' => $cancelRide,
+                'data' => $ride,
             ]);
         }
 
-        if ($cancelRide->status == Status::RIDE_ONGOING) {
+        if ($ride->status == Status::RIDE_ONGOING) {
             $notify = 'You can not cancel ongoing ride';
             return response()->json([
                'remark' => 'ride_cancel_fail',
@@ -218,27 +219,20 @@ class RideRequestController extends Controller
                'message' => $notify,
             ]);
         }
-        $cancelRide->driver_id = null;
-        $cancelRide->status = Status::RIDE_INITIATED;
-        $cancelRide->save();
 
-        $rideCancel = new RideCancel();
-        $rideCancel->ride_id = $cancelRide->id;
-        $rideCancel->user_id = null;
-        $rideCancel->driver_id = $driver->id;
-        $rideCancel->cancel_reason = $request->cancel_reason;
-        $rideCancel->ride_canceled_at = now();
-        $rideCancel->save();
+        $ride->driver_id = null;
+        $ride->status = Status::RIDE_INITIATED;
+        $ride->save();
 
-        $driver->is_driving = Status::IDLE;
-        $driver->save();
+        CancelRide::ride($ride->id,null, $driver->id ?? null, $request->cancel_reason);
+        Driver::updateIsDriving(auth()->id(), Status::IDLE);
 
         return response()->json([
             'remark' => 'ride_cancel',
             'status' => 'success',
             'message' => [],
             'data' => [
-                'ride' => $cancelRide
+                'ride' => $ride
             ]
         ]);
     }
