@@ -11,12 +11,14 @@ use App\Models\ConversationMessage;
 use App\Models\Driver;
 use App\Models\Ride;
 use App\Models\RideCancel;
+use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RideRequestController extends Controller
 {
+    use RideCancelTrait;
 
     public function ongoingRequests()
     {
@@ -220,12 +222,7 @@ class RideRequestController extends Controller
             ]);
         }
 
-        $ride->driver_id = null;
-        $ride->status = Status::RIDE_INITIATED;
-        $ride->save();
-
-        CancelRide::ride($ride->id,null, $driver->id ?? null, $request->cancel_reason);
-        Driver::updateIsDriving(auth()->id(), Status::IDLE);
+        $this->cancelRide($ride->id, $driver->id, $request->cancel_reason);
 
         return response()->json([
             'remark' => 'ride_cancel',
