@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Lib\CancelRide;
 use App\Lib\DistanceMatrix;
 use App\Lib\RideFareSearch;
 use App\Lib\ZoneHelper;
 use App\Models\DriverReview;
 use App\Models\Ride;
-use App\Models\RideCancel;
 use App\Models\RideDestination;
-use App\Models\Zone;
 use App\Models\Driver;
 use App\Models\RideFare;
 use App\Constants\Status;
 use App\Models\VehicleType;
 use App\Traits\RideCancelTrait;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -203,7 +199,7 @@ class RideController extends Controller
                 $tips = 0;
             }
 
-            $adminCharge = gs('admin_fixed_commission') + gs('admin_percentage_commission') * $amount / 100;
+            $adminCharge = (gs('admin_fixed_commission') + (gs('admin_percent_commission') * $amount / 100));
             $driverTotal = ($amount - $adminCharge) + $tips;
             $totalAmount = $amount + $vatAmount + $tips;
 

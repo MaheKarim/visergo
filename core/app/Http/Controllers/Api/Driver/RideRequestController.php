@@ -39,7 +39,7 @@ class RideRequestController extends Controller
     }
     public function rideRequests()
     {
-        $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->latest()->get();
+        $liveRequests = Ride::rideInitiated()->with('destinations')->latest()->get();
 
         if ($liveRequests->isEmpty()) {
             return response()->json([
@@ -52,7 +52,7 @@ class RideRequestController extends Controller
         return response()->json([
             'remark'=>'ride_requests',
             'status'=>'success',
-            'message'=>[],
+            'message'=>'Ride requests list',
             'data'=>[
                 'live_requests'=>$liveRequests
             ]
@@ -126,10 +126,11 @@ class RideRequestController extends Controller
         $ride->ride_start_at = Carbon::now();
         $ride->save();
 
+        $notify[] = 'Ride Started Successfully';
         return response()->json([
             'remark' => 'ride_start',
             'status' => 'success',
-            'message' => [],
+            'message' => $notify,
             'data' => [
                 'ride' => $ride
             ]
@@ -143,10 +144,11 @@ class RideRequestController extends Controller
             ->where('status', Status::RIDE_ONGOING)->find($id);
 
         if ($ride == null) {
+            $notify[] = 'No Ride Found';
             return response()->json([
                 'remark' => 'no_request_found',
                 'status' => 'error',
-                'message' => [],
+                'message' => $notify,
                 'data' => [
                     'ride' => $ride
                 ]
@@ -159,10 +161,12 @@ class RideRequestController extends Controller
 
             $driver->is_driving = Status::IDLE;
             $driver->save();
+
+            $notify[] = 'Ride End Successfully';
             return response()->json([
                 'remark' => 'ride_complete',
                 'status' => 'success',
-                'message' => [],
+                'message' => $notify,
                 'data' => [
                     'ride' => $ride
                 ]
@@ -189,10 +193,11 @@ class RideRequestController extends Controller
         $ride = Ride::where('driver_id', $driver->id)->where('status', [Status::RIDE_ACTIVE])->find($id);
 
         if ($ride == null) {
+            $notify[] = 'No Ride Found';
             return response()->json([
                 'remark' => 'no_request_found',
                 'status' => 'error',
-                'message' => [],
+                'message' => $notify,
                 'data' => [
                     'ride' => $ride
                 ]
@@ -218,10 +223,11 @@ class RideRequestController extends Controller
 
         $this->cancelRide($ride->id, Status::DRIVER_TYPE, $driver->id, $request->cancel_reason);
 
+        $notify[] = 'Ride Cancelled Successfully';
         return response()->json([
             'remark' => 'ride_cancel',
             'status' => 'success',
-            'message' => [],
+            'message' => $notify,
             'data' => [
                 'ride' => $ride
             ]

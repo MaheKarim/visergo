@@ -247,13 +247,13 @@ Route::namespace('Api')->name('api.')->group(function () {
                 Route::middleware('isDriverOnline')->group(function () {
                     Route::controller('RideRequestController')->name('ride.')->prefix('driver')->group(function () {
                         // Live Requests
-                        Route::get('ride/requests', 'rideRequests')->name('ride.requests');
-                        Route::get('ride/ongoing-requests', 'ongoingRequests')->name('ride.ongoing.requests');
+                        Route::get('ride/requests', 'rideRequests');
+                        Route::get('ride/ongoing-requests', 'ongoingRequests');
                         // Can  Not Accept Multiple Ride Requests Middleware
                         Route::middleware('drivingCheck')->group(function () {
-                            Route::post('ride/requests/accept/{id}', 'rideRequestAccept')->name('ride.requests.accept');
+                            Route::post('ride/requests/accept/{id}', 'rideRequestAccept');
                         });
-                        Route::post('ride/requests/start/{id}', 'rideRequestStart')->name('ride.requests.start');
+                        Route::post('ride/requests/start/{id}', 'rideRequestStart');
                         Route::post('ride/requests/end/{id}', 'rideRequestEnd');
 
                         Route::middleware('driverRideCancel')->group(function () {

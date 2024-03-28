@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\RewardPoints;
 use App\Models\Deposit;
 use App\Models\GatewayCurrency;
 use App\Models\Ride;
@@ -107,15 +108,14 @@ class PaymentController extends Controller
         $transaction->trx = $trx;
         $transaction->save();
 
-        $point = $amount / gs('spend_amount_for_reward') * gs('reward_point');
-        // Find Driver ID & User ID For Divided Points
+        $totalPoints = RewardPoints::distribute($ride->id);
 
-        $ride->payment_status = Status::PAYMENT_SUCCESS; // PAYMENT PENDING
+        $ride->payment_status = Status::PAYMENT_PENDING; // PAYMENT PENDING
         $ride->payment_type = Status::ONLINE_PAYMENT;
         $ride->status = Status::RIDE_COMPLETED;
-        $ride->point = $point;
+        $ride->point = $totalPoints;
         $ride->save();
-
+        //TODO:: Add Points Disbursement For Driver
         $notify[] =  'Deposit inserted';
         return response()->json([
             'remark'=>'deposit_inserted',
