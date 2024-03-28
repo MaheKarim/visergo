@@ -140,15 +140,21 @@
                             <div class="col-md-6">
                                 <label>@lang('Admin Fixed Commission')</label>
                                 <div class="form-group">
-                                    <input class="form-control" type="text" name="admin_fixed_commission" required
-                                           value="{{ showAmount($general->admin_fixed_commission) }}">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" name="admin_fixed_commission" required
+                                               value="{{ showAmount($general->admin_fixed_commission) }}">
+                                        <span class="input-group-text">{{ $general->cur_text }}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label>@lang('Admin Percent (%) Commission')</label>
                                 <div class="form-group">
-                                    <input class="form-control" type="text" name="admin_percent_commission" required
-                                           value="{{ showAmount($general->admin_percent_commission) }}">
+                                   <div class="input-group">
+                                       <input class="form-control" type="text" name="admin_percent_commission" required
+                                              value="{{ showAmount($general->admin_percent_commission) }}">
+                                       <span class="input-group-text">%</span>
+                                   </div>
                                 </div>
                             </div>
                         </div>

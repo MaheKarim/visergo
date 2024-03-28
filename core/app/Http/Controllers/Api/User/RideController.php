@@ -203,6 +203,8 @@ class RideController extends Controller
                 $tips = 0;
             }
 
+            $adminCharge = gs('admin_fixed_commission') + gs('admin_percentage_commission') * $amount / 100;
+            $driverTotal = ($amount - $adminCharge) + $tips;
             $totalAmount = $amount + $vatAmount + $tips;
 
             $ride = new Ride();
@@ -228,6 +230,8 @@ class RideController extends Controller
             $ride->vat_amount = $vatAmount;
 
             $ride->total = $totalAmount;
+            $ride->admin_commission = $adminCharge;
+            $ride->driver_total = $driverTotal;
             $ride->status = Status::RIDE_INITIATED;
             $ride->payment_status = Status::PAYMENT_INITIATE;
             $ride->payment_type = Status::NO;
@@ -245,7 +249,6 @@ class RideController extends Controller
 
         // Admin Portion
         // Driver Notification Sent
-        // TODO:: Coupon Apply Here
 
         return response()->json([
             'status' => 'success',
