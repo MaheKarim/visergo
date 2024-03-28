@@ -39,7 +39,7 @@ class RideRequestController extends Controller
     }
     public function rideRequests()
     {
-        $liveRequests = Ride::rideInitiated()->with('destinations')->latest()->get();
+        $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->with('destinations')->latest()->get();
 
         if ($liveRequests->isEmpty()) {
             return response()->json([

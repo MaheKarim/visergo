@@ -54,7 +54,7 @@ class Ride extends Model
         return $query->where('status', Status::RIDE_ACTIVE);
     }
 
-    public function scopeRideInitiated($query)
+    public function scopeInitiated($query)
     {
         return $query->where('status', Status::RIDE_INITIATED);
     }
