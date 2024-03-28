@@ -136,6 +136,23 @@
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>@lang('Admin Fixed Commission')</label>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" name="admin_fixed_commission" required
+                                           value="{{ showAmount($general->admin_fixed_commission) }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>@lang('Admin Percent (%) Commission')</label>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" name="admin_percent_commission" required
+                                           value="{{ showAmount($general->admin_percent_commission) }}">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')</button>
                         </div>

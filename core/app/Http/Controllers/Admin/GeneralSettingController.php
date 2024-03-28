@@ -37,6 +37,8 @@ class GeneralSettingController extends Controller
             'ride_cancel_limit_user' => 'required|numeric',
             'ride_cancel_limit_driver' => 'required|numeric',
             'ban_days' => 'required|numeric|min:0',
+            'admin_fixed_commission' => 'required|numeric|min:0',
+            'admin_percent_commission' => 'required|numeric|min:0',
         ]);
 
         $timezones = json_decode(file_get_contents(resource_path('views/admin/partials/timezone.json')));
@@ -56,6 +58,8 @@ class GeneralSettingController extends Controller
         $general->ride_cancel_limit_user = $request->ride_cancel_limit_user;
         $general->ride_cancel_limit_driver = $request->ride_cancel_limit_driver;
         $general->ban_days = $request->ban_days;
+        $general->admin_percent_commission = $request->admin_percent_commission;
+        $general->admin_fixed_commission = $request->admin_fixed_commission;
         $general->save();
 
         $timezoneFile = config_path('timezone.php');
