@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Gateway;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\DriverOnlinePaymentTransaction;
 use App\Lib\FormProcessor;
 use App\Models\AdminNotification;
 use App\Models\Deposit;
+use App\Models\Driver;
 use App\Models\GatewayCurrency;
 use App\Models\Ride;
 use App\Models\Transaction;
@@ -134,6 +136,8 @@ class PaymentController extends Controller
             $ride->payment_status = Status::PAYMENT_SUCCESS;
             $ride->save();
 
+            DriverOnlinePaymentTransaction::disbursement($ride->id, $deposit);
+
             $transaction = new Transaction();
             $transaction->user_id = $deposit->user_id;
             $transaction->amount = $deposit->amount;
@@ -163,7 +167,6 @@ class PaymentController extends Controller
                 'trx' => $deposit->trx,
                 'post_balance' => showAmount($user->balance)
             ]);
-
 
         }
     }

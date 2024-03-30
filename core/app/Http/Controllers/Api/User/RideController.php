@@ -200,7 +200,7 @@ class RideController extends Controller
             }
 
             $adminCharge = (gs('admin_fixed_commission') + (gs('admin_percent_commission') * $amount / 100));
-            $driverTotal = ($amount - $adminCharge) + $tips;
+            $driverAmount = ($amount - $adminCharge) + $tips;
             $totalAmount = $amount + $vatAmount + $tips;
 
             $ride = new Ride();
@@ -227,7 +227,7 @@ class RideController extends Controller
 
             $ride->total = $totalAmount;
             $ride->admin_commission = $adminCharge;
-            $ride->driver_total = $driverTotal;
+            $ride->driver_amount = $driverAmount;
             $ride->status = Status::RIDE_INITIATED;
             $ride->payment_status = Status::PAYMENT_INITIATE;
             $ride->payment_type = Status::NO;
