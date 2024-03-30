@@ -32,7 +32,7 @@ class PaymentController extends Controller
     public function depositInsert(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric|gt:0',
+//            'amount' => 'required|numeric|gt:0',
             'method_code' => 'required',
             'currency' => 'required',
             'ride_id' => 'required|exists:rides,id',
@@ -115,7 +115,7 @@ class PaymentController extends Controller
         $ride->status = Status::RIDE_COMPLETED;
         $ride->point = $totalPoints;
         $ride->save();
-        //TODO:: Add Points Disbursement For Driver
+
         $notify[] =  'Deposit inserted';
         return response()->json([
             'remark'=>'deposit_inserted',

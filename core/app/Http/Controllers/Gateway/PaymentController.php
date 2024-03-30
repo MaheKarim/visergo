@@ -8,6 +8,7 @@ use App\Lib\FormProcessor;
 use App\Models\AdminNotification;
 use App\Models\Deposit;
 use App\Models\GatewayCurrency;
+use App\Models\Ride;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -127,6 +128,11 @@ class PaymentController extends Controller
             $user = User::find($deposit->user_id);
             $user->balance += $deposit->amount;
             $user->save();
+
+            $ride = Ride::find($deposit->ride_id);
+            $ride->status = Status::RIDE_COMPLETED;
+            $ride->payment_status = Status::PAYMENT_SUCCESS;
+            $ride->save();
 
             $transaction = new Transaction();
             $transaction->user_id = $deposit->user_id;
