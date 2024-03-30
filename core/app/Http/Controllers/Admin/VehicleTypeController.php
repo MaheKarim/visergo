@@ -52,7 +52,7 @@ class VehicleTypeController extends Controller
                     $rideFare->service_id = $service;
                     $rideFare->vehicle_class_id = $class;
                     $rideFare->fare = $fare;
-                    $rideFare->per_km_cost = $request->per_km_cost[$service][$class];
+                    $rideFare->per_km_fare = $request->per_km_fare[$service][$class];
                     $rideFare->save();
                 }
             }
@@ -70,7 +70,7 @@ class VehicleTypeController extends Controller
                 $rideFare->vehicle_type_id = $vehicleType->id;
                 $rideFare->service_id = $service;
                 $rideFare->fare = $fare;
-                $rideFare->per_km_cost = $request->per_km_cost[$service];
+                $rideFare->per_km_fare = $request->per_km_fare[$service];
                 $rideFare->save();
             }
         }

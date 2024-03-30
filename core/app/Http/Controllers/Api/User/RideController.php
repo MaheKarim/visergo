@@ -77,14 +77,17 @@ class RideController extends Controller
             $request->service_id
         );
 
-        if (isset($fareDetails['remark'])) {
-            return response()->json($fareDetails);
+        if ($fareDetails['error']) {
+            return response()->json([
+                'remark' => 'validation_error',
+                'message' =>  $fareDetails['message']
+            ]);
         }
 
-        return response()->json($fareDetails);
+        return response()->json($fareDetails['data']);
     }
 
-    public function rideRequest(Request $request, $id = 0)
+    public function rideRequest(Request $request)
     {
         $validator = $this->validateRequest($request);
 
@@ -94,12 +97,7 @@ class RideController extends Controller
 
         $user = auth()->user();
 
-        if ($this->isDriver($user)) {
-            return $this->driverErrorResponse();
-        }
-
-        $existingRide = Ride::where('user_id', $user->id)
-            ->where('service_id', Status::RIDE_SERVICE)
+        $existingRide = Ride::where('user_id', $user->id)->where('service_id', Status::RIDE_SERVICE)
             ->where('ride_for', Status::RIDE_FOR_OWN)
             ->whereNotIn('status', [Status::RIDE_COMPLETED, Status::RIDE_CANCELED])
             ->first();
@@ -117,6 +115,7 @@ class RideController extends Controller
             $allDestinations = $request->destinations;
 
             $pickupZone = ZoneHelper::getPickupZone($pickupLat, $pickupLong);
+
             if (!$pickupZone) {
                 return response()->json([
                     'remark' => 'validation_error',
@@ -126,6 +125,7 @@ class RideController extends Controller
             }
 
             $destinationZone = ZoneHelper::getDestinationZones($allDestinations);
+
             if (!$destinationZone) {
                 return response()->json([
                     'remark' => 'validation_error',
@@ -185,7 +185,7 @@ class RideController extends Controller
             }
 
             $base_fare = $rideFare->fare;
-            $fare = $totalDistance * $rideFare->per_km_cost;
+            $fare = $totalDistance * $rideFare->per_km_fare;
 
             if ($fare < $base_fare) {
                 $fare = $base_fare;
@@ -272,7 +272,6 @@ class RideController extends Controller
             'data' => $ride,
         ]);
     }
-
 
     private function validateRequest($request)
     {

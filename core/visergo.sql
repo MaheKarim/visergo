@@ -1332,7 +1332,7 @@ CREATE TABLE `ride_fares` (
   `service_id` int UNSIGNED DEFAULT '0',
   `vehicle_class_id` int UNSIGNED DEFAULT '0',
   `fare` decimal(28,8) NOT NULL DEFAULT '0.00000000',
-  `per_km_cost` decimal(28,8) NOT NULL DEFAULT '0.00000000',
+  `per_km_fare` decimal(28,8) NOT NULL DEFAULT '0.00000000',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1341,7 +1341,7 @@ CREATE TABLE `ride_fares` (
 -- Dumping data for table `ride_fares`
 --
 
-INSERT INTO `ride_fares` (`id`, `vehicle_type_id`, `service_id`, `vehicle_class_id`, `fare`, `per_km_cost`, `created_at`, `updated_at`) VALUES
+INSERT INTO `ride_fares` (`id`, `vehicle_type_id`, `service_id`, `vehicle_class_id`, `fare`, `per_km_fare`, `created_at`, `updated_at`) VALUES
 (20, 2, 1, 1, 200.00000000, 40.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),
 (21, 2, 1, 2, 100.00000000, 30.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),
 (22, 2, 4, 1, 120.00000000, 30.00000000, '2024-03-18 09:23:20', '2024-03-18 09:23:20'),

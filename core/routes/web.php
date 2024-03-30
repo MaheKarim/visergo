@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\VehicleType;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/clear', function(){
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
 
+$vehicleTypes = VehicleType::where('status', 500)->get();
 Route::get('cron', 'CronController@cron')->name('cron');
 
 // User Support Ticket

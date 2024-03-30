@@ -27,7 +27,7 @@ class DriverOnlinePaymentTransaction {
         $transaction->remark = 'deposit';
         $transaction->save();
 
-        if ($ride->tips != null) {
+        if ($ride->tips !== 0) {
             $driver->balance += $ride->tips;
             $driver->save();
 

@@ -112,7 +112,7 @@
                                             <div class="form-group">
                                                 <label>{{ $rideFare->service->name  }} - {{ $rideFare->vehicleClass->name  }} @lang('Fare per/km')</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" value="{{ getAmount($rideFare->per_km_cost)  }}" name="per_km_cost[{{ $rideFare->service_id  }}][{{ $rideFare->vehicle_class_id  }}]" class="form-control">
+                                                    <input type="number" step="any" min="0" value="{{ getAmount($rideFare->per_km_fare)  }}" name="per_km_fare[{{ $rideFare->service_id  }}][{{ $rideFare->vehicle_class_id  }}]" class="form-control">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -124,7 +124,7 @@
                                             <div class="form-group">
                                                 <label>{{ $rideFare->service->name  }} @lang('Fare per/km')</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" value="{{ getAmount($rideFare->per_km_cost)  }}" name="per_km_cost[{{ $rideFare->service_id  }}]" class="form-control">
+                                                    <input type="number" step="any" min="0" value="{{ getAmount($rideFare->per_km_fare)  }}" name="per_km_fare[{{ $rideFare->service_id  }}]" class="form-control">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -224,7 +224,7 @@
                                 <div class="form-group">
                                     <label>${serviceName} - ${vehicleClassName} Fare per/km</label>
                                     <div class="input-group">
-                                        <input type="number" step="any" min="0" name="per_km_cost[${serviceId}][${vehicleClassId}]" class="form-control">
+                                        <input type="number" step="any" min="0" name="per_km_fare[${serviceId}][${vehicleClassId}]" class="form-control">
                                         <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                     </div>
                                 </div>
@@ -257,7 +257,7 @@
                                 <div class="form-group">
                                     <label>${serviceName} Fare per/km</label>
                                     <div class="input-group">
-                                        <input type="number" step="any" min="0" name="per_km_cost[${serviceId}]" class="form-control">
+                                        <input type="number" step="any" min="0" name="per_km_fare[${serviceId}]" class="form-control">
                                         <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                     </div>
                                 </div>

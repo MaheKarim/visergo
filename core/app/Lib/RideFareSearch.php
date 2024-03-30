@@ -16,34 +16,32 @@ class RideFareSearch
     ): array {
         $vehicleTypes = VehicleType::active()->get();
 
-        if (empty($vehicleTypes)) {
+        if (blank($vehicleTypes)) {
             return [
-                'remark' => 'validation_error',
-                'status' => 'error',
+                'error' => true,
                 'message' => 'Vehicle types not found',
             ];
         }
 
-        $responses = [];
+        $fareData = [];
+
+        $allRideFares = RideFare::with(['vehicleClass'])->where('service_id', $serviceId)->get();
+
         foreach ($vehicleTypes as $vehicleType) {
-            $multipleClass = RideFare::where('vehicle_type_id', $vehicleType->id)
-                ->where('service_id', $serviceId)
-                ->with(['vehicleClass'])->get();
+            $rideFares = $allRideFares->where('vehicle_type_id', $vehicleType->id);
 
             $vehicleTypeData = [];
-            foreach ($multipleClass as $class) {
-                $baseFare = $class->fare;
-                $fare = $baseFare * $totalDistance;
-                $getVehicleClass = data_get($class, 'vehicleClass.name');
-                $getVehicleClassId = data_get($class, 'vehicleClass.id');
+
+            foreach ($rideFares as $rideFare) {
+                $fare = $rideFare->per_km_fare * $totalDistance;
 
                 $vehicleTypeData[] = [
-                    'id' => $class->id,
+                    'id' => $rideFare->id,
                     'vehicle_type_id' => $vehicleType->id,
                     'service_id' => $serviceId,
-                    'class_id' => $getVehicleClassId,
-                    'class' => $getVehicleClass,
-                    'fare' => getAmount($fare) . ' ' . config('app.currency'),
+                    'class_id' => $rideFare->vehicle_class_id,
+                    'class' => @$rideFare->vehicleClass->name,
+                    'fare' => getAmount($fare),
                     'vehicle_type' => $vehicleType->name,
                     'total_duration' => getAmount($totalDuration) . ' minutes',
                     'pickup_address' => $pickupAddress,
@@ -51,13 +49,16 @@ class RideFareSearch
                 ];
             }
 
-            $responses[] = [
+            $fareData[] = [
                 'id' => $vehicleType->id,
                 'name' => $vehicleType->name,
                 'data' => $vehicleTypeData,
             ];
         }
 
-        return $responses;
+        return [
+            'error' => false,
+            'data' => $fareData
+        ];
     }
 }
