@@ -51,7 +51,7 @@ class DistanceMatrix {
         $totalDistance = (Collection::make($distances)->sum('distance.value') / 1000);
         $totalDuration = (Collection::make($distances)->sum('duration.value') / 60);
 
-        return [
+        return (object) [
             'total_distance' => $totalDistance,
             'total_duration' => $totalDuration,
             'addresses' => $addresses,

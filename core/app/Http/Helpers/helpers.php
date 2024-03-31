@@ -481,57 +481,11 @@ if (!function_exists('isUniqueOTP')) {
     }
 }
 
-function calculateDistancesDurations($request)
-{
-    $pickupLat = $request->pickup_lat;
-    $pickupLong = $request->pickup_long;
-    $destination_lat = $request->input('destination_lat');
-    $destination_long = $request->input('destination_long');
 
-    $apiKey = gs('location_api');
-    $distances_durations = [];
-    $totalDistance = 0;
-    $totalDuration = 0;
-    $previousDestination = "$pickupLat,$pickupLong";
-
-    $destinationAddress = array();
-
-    foreach ($destination_lat as $index => $lat) {
-        $destination = "$lat,{$destination_long[$index]}";
-
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={$previousDestination}&destinations={$destination}&key={$apiKey}";
-        $response = json_decode(file_get_contents($url), true);
-
-        if ($response['status'] == 'OK') {
-            $element = $response['rows'][0]['elements'][0];
-            $distance = $element['distance']['value'] / 1000;
-            $duration = $element['duration']['value'] / 60;
-
-            $totalDistance += $distance;
-            $totalDuration += $duration;
-
-            $pickupAddress = $response['origin_addresses'][0];
-            $destinationAddress[$index] = $response['destination_addresses'][0];
-
-            $distances_durations[$index]['destination_addresses'] = $destinationAddress;
-            $distances_durations[$index]['distance'] = $distance;
-            $distances_durations[$index]['duration'] = $duration;
-        } else {
-            return response()->json([
-                'remark' => 'api_error',
-                'status' => 'error',
-                'message' => $response['error_message'],
-            ]);
-        }
-
-        $previousDestination = "$lat,{$destination_long[$index]}";
-    }
-
-    return [
-        'distances_durations' => $distances_durations,
-        'totalDistance' => $totalDistance,
-        'totalDuration' => $totalDuration,
-        'pickupAddress' => $pickupAddress,
-        'destinationAddress' => $destinationAddress
-    ];
+function errorResponse($remark, $message, $status = 200){
+    return response()->json([
+        'reamark' => $remark,
+        'status' => 'error',
+        'message' => $message,
+    ], $status);
 }

@@ -30,7 +30,7 @@ class ZoneHelper {
         return $inside;
     }
 
-    public static function getPickupZone(float $pickupLat, float $pickupLong): ?Zone
+    public static function getZone(float $pickupLat, float $pickupLong): ?Zone
     {
         $zones = Zone::active()->get();
 
@@ -46,26 +46,18 @@ class ZoneHelper {
     public static function getDestinationZones(array $destinations): array
     {
         $destinationZones = [];
-        $zones = Zone::active()->get();
 
         foreach ($destinations as $index => $destination) {
-            foreach ($zones as $zone) {
-                $isThisZone = self::underZone($destination['lat'], $destination['long'], $zone);
-                $destinationZones[$index]['zone_id'] = $isThisZone ? $zone->id : null;
-            }
+            $destinationZones [] = self::getZone($destination['lat'], $destination['long']);
         }
 
         return $destinationZones;
     }
 
-    public static function zonesMatch(?Zone $pickupZone, array $destinationZones): bool
+    public static function zonesMatch(Zone $pickupZone, array $destinationZones): bool
     {
-        if (!$pickupZone) {
-            return false;
-        }
-
-        foreach ($destinationZones as $destination) {
-            if (!isset($destination['zone_id']) || $destination['zone_id'] !== $pickupZone->id) {
+        foreach ($destinationZones as $destinationZone) {
+            if (@$destinationZone->id != $pickupZone->id) {
                 return false;
             }
         }

@@ -32,7 +32,6 @@ class PaymentController extends Controller
     public function depositInsert(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-//            'amount' => 'required|numeric|gt:0',
             'method_code' => 'required',
             'currency' => 'required',
             'ride_id' => 'required|exists:rides,id',

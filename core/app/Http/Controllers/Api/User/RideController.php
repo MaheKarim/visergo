@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Lib\DistanceMatrix;
-use App\Lib\RideFareSearch;
-use App\Lib\ZoneHelper;
-use App\Models\DriverReview;
 use App\Models\Ride;
-use App\Models\RideDestination;
 use App\Models\Driver;
+use App\Lib\ZoneHelper;
 use App\Models\RideFare;
 use App\Constants\Status;
+use App\Lib\DistanceMatrix;
+use App\Lib\RideFareSearch;
 use App\Models\VehicleType;
-use App\Traits\RideCancelTrait;
+use App\Models\DriverReview;
 use Illuminate\Http\Request;
+use App\Models\RideDestination;
+use App\Traits\RideCancelTrait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -92,151 +92,132 @@ class RideController extends Controller
         $validator = $this->validateRequest($request);
 
         if ($validator->fails()) {
-            return $this->validationErrorResponse($validator);
+            return errorResponse('validation_error', $validator->errors(), 422);
+        }
+
+        $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
+
+        if (!$vehicle) {
+            $notify[] = ['error', 'Vehicle type not found'];
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => $notify,
+            ]);
+        }
+
+        // Search Ride Fare based on vehicle type
+        $rideFare = RideFare::where('vehicle_type_id', $vehicle->id)
+            ->where('service_id', $request->service_id)
+            ->where('vehicle_class_id', $request->class_id)
+            ->first();
+
+        if (!$rideFare) {
+            $notify[] = ['error', 'Ride data not found'];
+            return response()->json([
+                'remark' => 'validation_error',
+                'status' => 'error',
+                'message' => $notify,
+            ]);
         }
 
         $user = auth()->user();
 
-        $existingRide = Ride::where('user_id', $user->id)->where('service_id', Status::RIDE_SERVICE)
+        $existingRide = Ride::where('user_id', $user->id)
+            ->where('service_id', $request->service_id)
             ->where('ride_for', Status::RIDE_FOR_OWN)
             ->whereNotIn('status', [Status::RIDE_COMPLETED, Status::RIDE_CANCELED])
             ->first();
 
         if ($existingRide) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You have already requested a ride',
-                'data' => $request->all(),
-            ]);
-        } else {
+            return errorResponse('error', 'You have already requested a ride');
+        }
 
-            $pickupLat = $request->pickup_lat;
-            $pickupLong = $request->pickup_long;
-            $allDestinations = $request->destinations;
+        $pickupLat = $request->pickup_lat;
+        $pickupLong = $request->pickup_long;
+        $pickupZone = ZoneHelper::getZone($pickupLat, $pickupLong);
 
-            $pickupZone = ZoneHelper::getPickupZone($pickupLat, $pickupLong);
+        if (!$pickupZone) {
+            return errorResponse('validation_error', 'Pickup point not matched with any zone');
+        }
 
-            if (!$pickupZone) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Pickup point not matched with any zone',
-                ]);
-            }
+        $destinationZones = ZoneHelper::getDestinationZones($request->destinations);
 
-            $destinationZone = ZoneHelper::getDestinationZones($allDestinations);
+        if (blank(array_filter($destinationZones))) {
+            return errorResponse('validation_error', 'Destination point not matched with any zone');
+        }
 
-            if (!$destinationZone) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Destination point not matched with any zone',
-                ]);
-            }
+        if($request->service_id == Status::RIDE_SERVICE){
+            $zoneMatch = ZoneHelper::zonesMatch($pickupZone, $destinationZones);
 
-            $zoneMatch = ZoneHelper::zonesMatch($pickupZone, $destinationZone);
             if (!$zoneMatch) {
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => 'Some destination coordinates not matched with any zone',
-                ]);
+                return errorResponse('validation_error', 'Some destination coordinates not matched with any zone');
             }
+        }
 
-            $originArray = $request->destinations;
+        $originArray = $request->destinations;
 
-            array_unshift($originArray, [
-                "lat" => $request->pickup_lat,
-                "long" => $request->pickup_long,
-            ]);
-            $origins = $originArray;
-            array_pop($originArray);
-            $destinations = $request->destinations;
+        array_unshift($originArray, [
+            "lat" => $request->pickup_lat,
+            "long" => $request->pickup_long,
+        ]);
 
-            $distanceMatrix = DistanceMatrix::getTotalDistanceAndDuration($origins, $destinations);
-            $totalDistance = $distanceMatrix['total_distance'];
-            $totalDuration = $distanceMatrix['total_duration'];
-            $pickupAddress = $distanceMatrix['pickup_address'];
-            $destinationAddress = $distanceMatrix['destination_address'];
+        $origins = $originArray;
+        array_pop($originArray);
+        $destinations = $request->destinations;
 
-            $vehicle = VehicleType::where('id', $request->vehicle_type_id)->first();
-            if ($vehicle == null) {
-                $notify[] = ['error', 'Vehicle type not found'];
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => $notify,
-                ]);
-            }
+        $distanceMatrix = DistanceMatrix::getTotalDistanceAndDuration($origins, $destinations);
+        $totalDistance = $distanceMatrix->total_distance;
+        $totalDuration = $distanceMatrix->total_duration;
+        $pickupAddress = $distanceMatrix->pickup_address;
+        $destinationAddress = $distanceMatrix->destination_address;
 
-            // Search Ride Fare based on vehicle type
-            $rideFare = RideFare::where('vehicle_type_id', $vehicle->id)
-                ->where('service_id', $request->service_id)
-                ->where('vehicle_class_id', $request->class_id)
-                ->first();
+        $baseFare = $rideFare->fare;
+        $fare = $totalDistance * $rideFare->per_km_fare;
 
-            if ($rideFare == null) {
-                $notify[] = ['error', 'Ride data not found'];
-                return response()->json([
-                    'remark' => 'validation_error',
-                    'status' => 'error',
-                    'message' => $notify,
-                ]);
-            }
+        if ($fare < $baseFare) {
+            $fare = $baseFare;
+        }
 
-            $base_fare = $rideFare->fare;
-            $fare = $totalDistance * $rideFare->per_km_fare;
+        $vatAmount = gs('vat_amount') * $fare / 100;
 
-            if ($fare < $base_fare) {
-                $fare = $base_fare;
-            }
-            $amount = $fare;
-            $vatAmount = gs('vat_amount') * $amount / 100;
+        $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $fare / 100);
+        $driverAmount = $fare - $adminCommission;
+        $totalAmount = $fare + $vatAmount;
 
-            if ($request->tips != 0) {
-                $tips = $request->tips;
-            } else {
-                $tips = 0;
-            }
+        $ride = new Ride();
+        $ride->service_id = $request->service_id;
+        $ride->vehicle_type_id = $request->vehicle_type_id;
+        $ride->user_id = $user->id;
+        $ride->zone_id = $pickupZone->id;
+        $ride->class_id = $request->class_id;
+        $ride->ride_for = $request->ride_for;
 
-            $adminCharge = (gs('admin_fixed_commission') + (gs('admin_percent_commission') * $amount / 100));
-            $driverAmount = ($amount - $adminCharge) + $tips;
-            $totalAmount = $amount + $vatAmount + $tips;
+        $ride->pickup_lat = $pickupLat;
+        $ride->pickup_long = $pickupLong;
+        $ride->pickup_address = $pickupAddress;
 
-            $ride = new Ride();
-            $ride->service_id = $request->service_id;
-            $ride->vehicle_type_id = $request->vehicle_type_id;
-            $ride->user_id = $user->id;
-            $ride->zone_id = $pickupZone->id;
-            $ride->class_id = $request->class_id;
-            $ride->ride_for = $request->ride_for;
+        $ride->distance = $totalDistance;
+        $ride->duration = $totalDuration;
+        $ride->otp = generateOTP();
+        $ride->base_fare = $baseFare;
+        $ride->vat_amount = $vatAmount;
 
-            $ride->pickup_lat = $pickupLat;
-            $ride->pickup_long = $pickupLong;
-            $ride->pickup_address = $pickupAddress;
+        $ride->total = $totalAmount;
+        $ride->admin_commission = $adminCommission;
+        $ride->driver_amount = $driverAmount;
+        $ride->status = Status::RIDE_INITIATED;
+        $ride->payment_status = Status::PAYMENT_INITIATE;
+        $ride->payment_type = Status::NO;
+        $ride->save();
 
-            $ride->distance = $totalDistance;
-            $ride->duration = $totalDuration;
-            $ride->otp = generateOTP();
-            $ride->base_fare = $base_fare;
-            $ride->vat_amount = $vatAmount;
-
-            $ride->total = $totalAmount;
-            $ride->admin_commission = $adminCharge;
-            $ride->driver_amount = $driverAmount;
-            $ride->status = Status::RIDE_INITIATED;
-            $ride->payment_status = Status::PAYMENT_INITIATE;
-            $ride->payment_type = Status::NO;
-            $ride->save();
-
-            foreach ($destinations as $index => $destination) {
-                $rideDestination = new RideDestination();
-                $rideDestination->ride_id = $ride->id;
-                $rideDestination->destination_lat = $destination['lat'];
-                $rideDestination->destination_long = $destination['long'];
-                $rideDestination->destination_address = $destinationAddress[$index];
-                $rideDestination->save();
-            }
+        foreach ($destinations as $index => $destination) {
+            $rideDestination = new RideDestination();
+            $rideDestination->ride_id = $ride->id;
+            $rideDestination->destination_lat = $destination['lat'];
+            $rideDestination->destination_long = $destination['long'];
+            $rideDestination->destination_address = $destinationAddress[$index];
+            $rideDestination->save();
         }
 
         // Admin Portion
@@ -303,7 +284,7 @@ class RideController extends Controller
             return $this->validationErrorResponse($validator);
         }
 
-        $ride = Ride::where('user_id', auth()->user()->id)->rideEnd()->find($id);
+        $ride = Ride::where('user_id', auth()->id())->rideEnd()->find($id);
         if ($request->tips != 0) {
             return response()->json([
                 'status' => 'success',
@@ -340,7 +321,7 @@ class RideController extends Controller
         ]);
     }
 
-    public function rideCancel(Request $request ,$id)
+    public function rideCancel(Request $request, $id)
     {
 
         $validator = Validator::make($request->all(), [
@@ -379,7 +360,7 @@ class RideController extends Controller
             ]);
         }
 
-        $this->cancelRide($ride->id,Status::USER_TYPE, auth()->id(), $request->cancel_reason);
+        $this->cancelRide($ride->id, Status::USER_TYPE, auth()->id(), $request->cancel_reason);
 
         return response()->json([
             'status' => 'success',
