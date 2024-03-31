@@ -61,8 +61,8 @@ class Status{
     const CANCEL = 1;
     const CANCELABLE = 0;
 
-    const RIDE_FOR_OWN = 1;
-    const RIDE_FOR_PILLION = 2;
+    const RIDE_FOR_OWN = 0;
+    const RIDE_FOR_PILLION = 1;
 
     const DRIVING = 1 ;
     const IDLE = 0 ;

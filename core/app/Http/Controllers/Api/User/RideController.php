@@ -211,10 +211,6 @@ class RideController extends Controller
             $ride->class_id = $request->class_id;
             $ride->ride_for = $request->ride_for;
 
-            if ($ride->ride_for == Status::RIDE_FOR_PILLION) {
-                $ride->pillion_name = $request->pillion_name;
-                $ride->pillion_number = $request->pillion_number;
-            }
             $ride->pickup_lat = $pickupLat;
             $ride->pickup_long = $pickupLong;
             $ride->pickup_address = $pickupAddress;
@@ -282,29 +278,11 @@ class RideController extends Controller
             'destinations.*.lat' => 'required',
             'destinations.*.long' => 'required',
             'ride_for' => 'required',
-            'pillion_name' => [
-                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
-            ],
-            'pillion_number' => [
-                'required_if:ride_for,' . Status::RIDE_FOR_PILLION,
-            ],
             'service_id' => 'required',
         ]);
     }
 
-    private function isDriver($user)
-    {
-        return $user instanceof Driver;
-    }
 
-    private function driverErrorResponse()
-    {
-        return response()->json([
-            'remark' => 'unauthorized_action',
-            'status' => 'error',
-            'message' => 'Drivers are not allowed to make ride requests.'
-        ], 403);
-    }
 
     private function validationErrorResponse($validator)
     {

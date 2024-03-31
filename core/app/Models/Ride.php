@@ -4,8 +4,6 @@ namespace App\Models;
 
 use App\Constants\Status;
 use App\Traits\Uuid;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ride extends Model
@@ -17,6 +15,11 @@ class Ride extends Model
     public function destinations()
     {
         return $this->hasMany(RideDestination::class, 'ride_id', 'id');
+    }
+
+    public function userContact()
+    {
+        return $this->belongsTo(ContactList::class, 'ride_for', 'id');
     }
 
     public function zone()
