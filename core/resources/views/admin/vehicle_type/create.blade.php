@@ -43,7 +43,7 @@
                                         <input class="form-check-input manage_class" type="radio" name="manage_class"
                                             id="yesRadio" value="1" @checked(@$vehicleType->manage_class == 1)>
                                         <label class="form-check-label" for="yesRadio">
-                                           @lang(' Yes')
+                                            @lang(' Yes')
                                         </label>
                                     </div>
                                     <div class="form-check">
@@ -69,7 +69,7 @@
                         </div>
 
                         @foreach ($services as $service)
-                            <div class="row service-{{ $service->id }}"></div>
+                            <div class="row service-fields service-fields-{{ $service->id }}"></div>
                         @endforeach
 
                         <div class="row">
@@ -80,7 +80,7 @@
                                         <input class="form-check-input" type="radio" name="manage_brand"
                                             id="brandYesRadio" value="1" @checked(@$vehicleType->manage_brand == 1)>
                                         <label class="form-check-label" for="brandYesRadio">
-                                           @lang('Yes')
+                                            @lang('Yes')
                                         </label>
                                     </div>
                                     <div class="form-check">
@@ -121,7 +121,9 @@
 
             $(document).on('change', '.services, .classes', function() {
                 let services = $('.services:checked');
+
                 let vehicleClasses = $('.classes').find('option:selected');
+                resetAll();
 
                 if (vehicleClasses.length > 0) {
                     makeServiceClassCombination(services, vehicleClasses);
@@ -137,7 +139,6 @@
                     var serviceName = $(service).siblings('label').text();
 
                     $.each(vehicleClasses, function(i, vehicleClass) {
-
                         var vehicleClassId = $(vehicleClass).val();
                         var vehicleClassName = $(vehicleClass).text();
 
@@ -200,7 +201,7 @@
                         }
                     });
 
-                    $(`.service-${serviceId}`).html(html);
+                    $(`.service-fields-${serviceId}`).html(html);
                 });
             }
 
@@ -210,7 +211,7 @@
                     var serviceId = $(service).val();
                     var serviceName = $(service).siblings('label').text();
 
-                    if(serviceId == 4){
+                    if (serviceId == 4) {
                         html += `<div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-4">
@@ -242,7 +243,7 @@
                                         </div>
                                     </div>
                                 </div>`;
-                    }else{
+                    } else {
                         html += `<div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -266,8 +267,23 @@
                                     </div>
                                 </div>`;
                     }
-                    $(`.service-${serviceId}`).html(html);
+                    $(`.service-fields-${serviceId}`).html(html);
                 });
+            }
+
+            function resetAll() {
+                let serviceIds = @json($services->pluck('id')->toArray());
+
+                let checkedValues = $('.services:checked').map(function() {
+                    return parseInt($(this).val());
+                }).get();
+
+                $.each(serviceIds, function(index, serviceId) {
+                    if (!checkedValues.includes(serviceId)) {
+                        $(`.service-fields-${serviceId}`).html('');
+                    }
+                });
+
             }
         });
     </script>
