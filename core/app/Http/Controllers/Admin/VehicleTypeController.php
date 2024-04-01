@@ -39,20 +39,54 @@ class VehicleTypeController extends Controller
         RideFare::where('vehicle_type_id', $vehicleType->id)->delete();
 
         if ($vehicleType->manage_class == Status::YES) {
-            $serviceIds = array_keys($request->fare);
-            $classIds = array_keys($request->fare[$serviceIds[0]]);
+            if ($request->fare) {
+                $serviceIds = array_keys($request->fare);
+                $classIds = array_keys($request->fare[$serviceIds[0]]);
 
-            $vehicleType->vehicleServices()->sync($serviceIds);
-            $vehicleType->classes()->sync($classIds);
+                $vehicleType->vehicleServices()->sync($serviceIds);
+                $vehicleType->classes()->sync($classIds);
 
-            foreach ($request->fare as $service => $classes) {
+                foreach ($request->fare as $service => $classes) {
+                    foreach ($classes as $class => $fare) {
+                        $rideFare = new RideFare();
+                        $rideFare->vehicle_type_id = $vehicleType->id;
+                        $rideFare->service_id = $service;
+                        $rideFare->vehicle_class_id = $class;
+                        $rideFare->fare = $fare;
+                        $rideFare->per_km_fare = $request->per_km_fare[$service][$class];
+                        $rideFare->save();
+                    }
+                }
+            }
+            foreach ($request->hourly_fare as $service => $classes) {
                 foreach ($classes as $class => $fare) {
                     $rideFare = new RideFare();
                     $rideFare->vehicle_type_id = $vehicleType->id;
                     $rideFare->service_id = $service;
                     $rideFare->vehicle_class_id = $class;
-                    $rideFare->fare = $fare;
-                    $rideFare->per_km_fare = $request->per_km_fare[$service][$class];
+                    $rideFare->hourly_fare = $fare;
+                    $rideFare->save();
+                }
+            }
+
+            foreach ($request->daily_fare as $service => $classes) {
+                foreach ($classes as $class => $fare) {
+                    $rideFare = new RideFare();
+                    $rideFare->vehicle_type_id = $vehicleType->id;
+                    $rideFare->service_id = $service;
+                    $rideFare->vehicle_class_id = $class;
+                    $rideFare->daily_fare = $fare;
+                    $rideFare->save();
+                }
+            }
+
+            foreach ($request->monthly_fare as $service => $classes) {
+                foreach ($classes as $class => $fare) {
+                    $rideFare = new RideFare();
+                    $rideFare->vehicle_type_id = $vehicleType->id;
+                    $rideFare->service_id = $service;
+                    $rideFare->vehicle_class_id = $class;
+                    $rideFare->monthly_fare = $fare;
                     $rideFare->save();
                 }
             }
@@ -71,6 +105,29 @@ class VehicleTypeController extends Controller
                 $rideFare->service_id = $service;
                 $rideFare->fare = $fare;
                 $rideFare->per_km_fare = $request->per_km_fare[$service];
+                $rideFare->save();
+            }
+            foreach ($request->hourly_fare as $service => $fare) {
+                $rideFare = new RideFare();
+                $rideFare->vehicle_type_id = $vehicleType->id;
+                $rideFare->service_id = $service;
+                $rideFare->hourly_fare = $fare;
+                $rideFare->save();
+            }
+
+            foreach ($request->daily_fare as $service => $fare) {
+                $rideFare = new RideFare();
+                $rideFare->vehicle_type_id = $vehicleType->id;
+                $rideFare->service_id = $service;
+                $rideFare->daily_fare = $fare;
+                $rideFare->save();
+            }
+
+            foreach ($request->monthly_fare as $service => $fare) {
+                $rideFare = new RideFare();
+                $rideFare->vehicle_type_id = $vehicleType->id;
+                $rideFare->service_id = $service;
+                $rideFare->monthly_fare = $fare;
                 $rideFare->save();
             }
         }

@@ -33,7 +33,7 @@ class RideController extends Controller
         $pickupLong = $request->pickup_long;
         $allDestinations = $request->destinations;
 
-        $pickupZone = ZoneHelper::getPickupZone($pickupLat, $pickupLong);
+        $pickupZone = ZoneHelper::getZone($pickupLat, $pickupLong);
         if (!$pickupZone) {
             return response()->json([
                 'remark' => 'validation_error',
@@ -64,10 +64,10 @@ class RideController extends Controller
 
         $distanceMatrix = DistanceMatrix::getTotalDistanceAndDuration($origins, $destinations);
 
-        $totalDistance = $distanceMatrix['total_distance'];
-        $totalDuration = $distanceMatrix['total_duration'];
-        $pickupAddress = $distanceMatrix['pickup_address'];
-        $destinationAddress = $distanceMatrix['destination_address'];
+        $totalDistance = $distanceMatrix->total_distance;
+        $totalDuration = $distanceMatrix->total_duration;
+        $pickupAddress = $distanceMatrix->pickup_address;
+        $destinationAddress = $distanceMatrix->destination_address;
 
         $fareDetails = RideFareSearch::getFareDetails(
             $totalDistance,
