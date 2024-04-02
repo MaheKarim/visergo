@@ -8,7 +8,7 @@ use App\Lib\GoogleAuthenticator;
 use App\Models\Form;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Status;
+use App\Constants\Status;
 
 class UserController extends Controller
 {

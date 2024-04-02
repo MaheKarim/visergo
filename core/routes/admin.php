@@ -382,6 +382,12 @@ Route::middleware('admin')->group(function () {
         Route::get('list', 'list')->name('list');
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
     });
+    // SOSAlert Notification
+    Route::controller('SOSController')->name('sos.')->prefix('sos')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('details/{id?}', 'details')->name('details');
+        Route::post('status/{id}', 'status')->name('status');
+    });
 
 });
 

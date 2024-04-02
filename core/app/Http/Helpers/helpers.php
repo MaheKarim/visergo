@@ -481,11 +481,17 @@ if (!function_exists('isUniqueOTP')) {
     }
 }
 
-
 function errorResponse($remark, $message, $status = 200){
     return response()->json([
         'reamark' => $remark,
         'status' => 'error',
         'message' => $message,
     ], $status);
+}
+
+if (!function_exists('getOrderId')) {
+    function getOrderId($uuid)
+    {
+        return substr($uuid, -12);
+    }
 }

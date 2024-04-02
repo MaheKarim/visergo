@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
+use App\Models\AdminNotification;
 use App\Models\CancellationReason;
 use App\Models\Form;
 use App\Models\GeneralSetting;
+use App\Models\Ride;
+use App\Models\SOSAlert;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -262,6 +265,44 @@ class UserController extends Controller
             'data'=>[
                 'reason'=>$reason
             ]
+        ]);
+    }
+
+    public function sosNotify(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'message' => 'required|string|max:191',
+        ]);
+        if ($validator->fails()) {
+            $notify[] = ['error', $validator->errors()->all()];
+
+            return response()->json([
+                'remark'=>'validation_error',
+                'status'=>'error',
+                'message'=>$notify,
+            ]);
+        }
+        $rideId = Ride::where('user_id',auth()->id())->find();
+        $user = auth()->user();
+        $sos = new SOSAlert();
+        $sos->user_id = $user->id;
+        $sos->ride_id = $request->ride_id;
+        $sos->lat = $request->lat;
+        $sos->long = $request->long;
+        $sos->message = $request->message;
+        $sos->save();
+
+        $adminNotification = new AdminNotification();
+        $adminNotification->user_id = $user;
+        $adminNotification->title = 'SOSAlert message sent by '.$user->username;
+        $adminNotification->click_url = urlPath('admin.sos.details',$sos->id);
+        $adminNotification->save();
+
+        $notify[] = 'SOSAlert message sent successfully';
+
+        return response()->json([
+            'remark' => 'sos_sent',
+            'message' => ['success' => $notify],
         ]);
     }
 }

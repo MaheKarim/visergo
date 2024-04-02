@@ -25,11 +25,11 @@ class RideFareSearch
 
         $fareData = [];
 
-        $allRideFares = RideFare::with(['vehicleClass'])->where('service_id', $serviceId)->get();
+        $allRideFares = RideFare::where('service_id', $serviceId)->with(['vehicleClass'])->get();
 
         foreach ($vehicleTypes as $vehicleType) {
             $rideFares = $allRideFares->where('vehicle_type_id', $vehicleType->id);
-
+// need To improve
             $vehicleTypeData = [];
 
             foreach ($rideFares as $rideFare) {

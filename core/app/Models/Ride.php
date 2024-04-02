@@ -12,6 +12,12 @@ class Ride extends Model
 
     protected $guarded = [];
 
+
+    public function scopeOrderId()
+    {
+        return getOrderId($this->attributes['uuid']);
+    }
+
     public function destinations()
     {
         return $this->hasMany(RideDestination::class, 'ride_id', 'id');
@@ -29,7 +35,7 @@ class Ride extends Model
 
     public function driver()
     {
-        return $this->belongsTo(Driver::class);
+        return $this->belongsTo(Driver::class, 'driver_id', 'id');
     }
 
     public function user()

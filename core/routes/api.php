@@ -122,14 +122,9 @@ Route::namespace('Api')->name('api.')->group(function () {
 
                     // Cancellation Reason API
                     Route::get('/cancellation-reasons', 'userCancelReason')->name('user.cancel.reason');
-                });
 
-                // Withdraw
-                Route::controller('WithdrawController')->group(function () {
-                    Route::get('withdraw-method', 'withdrawMethod')->name('withdraw.method')->middleware('kyc');
-                    Route::post('withdraw-request', 'withdrawStore')->name('withdraw.money')->middleware('kyc');
-                    Route::post('withdraw-request/confirm', 'withdrawSubmit')->name('withdraw.submit')->middleware('kyc');
-                    Route::get('withdraw/history', 'withdrawLog')->name('withdraw.history');
+                    // SOSAlert Notify
+                    Route::post('sos', 'sosNotify');
                 });
 
                 // Payment
