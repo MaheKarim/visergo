@@ -15,6 +15,7 @@
                                         value="{{ old('name', @$vehicleType->name) }}" required>
                                 </div>
                             </div>
+                            {{-- @dd($vehicleType) --}}
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="row">
@@ -69,7 +70,168 @@
                         </div>
 
                         @foreach ($services as $service)
-                            <div class="row service-fields service-fields-{{ $service->id }}"></div>
+                            <div class="row service-fields service-fields-{{ $service->id }}">
+                                @php
+                                    $rideFares = @$vehicleType
+                                        ? $vehicleType->rideFares->where('service_id', $service->id)
+                                        : [];
+                                @endphp
+                                @if (count($rideFares))
+                                    @foreach ($rideFares as $rideFare)
+                                        @if ($rideFare->vehicle_class_id)
+                                            @if ($rideFare->service_id == 4)
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) . ' - ' . __($rideFare->vehicleClass->name) }}
+                                                            @lang('Hourly Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="hourly_fare[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->hourly_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) . ' - ' . __($rideFare->vehicleClass->name) }}
+                                                            @lang('Daily Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="daily_fare[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->daily_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) . ' - ' . __($rideFare->vehicleClass->name) }}
+                                                            @lang('Monthly Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="monthly_fare[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->monthly_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) . ' - ' . __($rideFare->vehicleClass->name) }}
+                                                            @lang('Base Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="fare[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) . ' - ' . __($rideFare->vehicleClass->name) }}
+                                                            @lang('Fare per/km')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="per_km_fare[{{ $rideFare->service_id }}][{{ $rideFare->vehicle_class_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->per_km_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @else
+                                            @if ($rideFare->service_id == 4)
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) }}
+                                                            @lang('Hourly Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="hourly_fare[{{ $rideFare->service_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->hourly_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) }}
+                                                            @lang('Daily Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="daily_fare[{{ $rideFare->service_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->daily_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) }}
+                                                            @lang('Monthly Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="monthly_fare[{{ $rideFare->service_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->monthly_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) }}
+                                                            @lang('Base Fare')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="fare[{{ $rideFare->service_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>{{ __($rideFare->service->name) }}
+                                                            @lang('Fare per/km')</label>
+                                                        <div class="input-group">
+                                                            <input type="number" step="any" min="0"
+                                                                name="per_km_fare[{{ $rideFare->service_id }}]"
+                                                                class="form-control"
+                                                                value="{{ getAmount($rideFare->per_km_fare) }}">
+                                                            <span
+                                                                class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </div>
                         @endforeach
 
                         <div class="row">
@@ -84,8 +246,8 @@
                                         </label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="manage_brand" id="brandNoRadio"
-                                            value="0" @checked(@$vehicleType->manage_brand === 0)>
+                                        <input class="form-check-input" type="radio" name="manage_brand"
+                                            id="brandNoRadio" value="0" @checked(@$vehicleType->manage_brand === 0)>
                                         <label class="form-check-label" for="brandNoRadio">
                                             @lang('No')
                                         </label>
@@ -107,6 +269,7 @@
 
 @push('script')
     <script>
+        var vehicleType = @json(@$vehicleType);
         $(document).ready(function() {
             $('select[multiple]').select2();
 
@@ -141,15 +304,33 @@
                     $.each(vehicleClasses, function(i, vehicleClass) {
                         var vehicleClassId = $(vehicleClass).val();
                         var vehicleClassName = $(vehicleClass).text();
+                        var hourlyFare = null;
+                        var dailyFare = null;
+                        var monthlyFare = null;
+                        var baseFare = null;
+                        var perKmFare = null;
+                        var rideFareModel = null;
+
+                        if (vehicleType != null) {
+                            rideFareModel = vehicleType.ride_fares.find(rideFare => rideFare
+                                .service_id == serviceId && rideFare.vehicle_class_id ==
+                                vehicleClassId);
+                        }
 
                         if (serviceId == 4) {
+                            if (rideFareModel) {
+                                hourlyFare = absValue(rideFareModel.hourly_fare);
+                                dailyFare = absValue(rideFareModel.daily_fare);
+                                monthlyFare = absValue(rideFareModel.monthly_fare);
+                            }
+
                             html += `<div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>${serviceName} - ${vehicleClassName} Hourly Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="hourly_fare[${serviceId}][${vehicleClassId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="hourly_fare[${serviceId}][${vehicleClassId}]" class="form-control" value="${hourlyFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -158,7 +339,7 @@
                                             <div class="form-group">
                                                 <label>${serviceName} - ${vehicleClassName} Daily Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="daily_fare[${serviceId}][${vehicleClassId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="daily_fare[${serviceId}][${vehicleClassId}]" class="form-control" value="${dailyFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -167,7 +348,7 @@
                                             <div class="form-group">
                                                 <label>${serviceName} - ${vehicleClassName} Monthly Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="monthly_fare[${serviceId}][${vehicleClassId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="monthly_fare[${serviceId}][${vehicleClassId}]" class="form-control" value="${monthlyFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -175,13 +356,18 @@
                                     </div>
                                 </div>`;
                         } else {
+                            if (rideFareModel) {
+                                baseFare = absValue(rideFareModel.fare);
+                                perKmFare = absValue(rideFareModel.per_km_fare);
+                            }
+
                             html += `<div class="col-md-12">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>${serviceName} - ${vehicleClassName} Base Fare</label>
                                                     <div class="input-group">
-                                                        <input type="number" step="any" min="0" name="fare[${serviceId}][${vehicleClassId}]" class="form-control">
+                                                        <input type="number" step="any" min="0" name="fare[${serviceId}][${vehicleClassId}]" class="form-control" value="${baseFare ?? ''}">
                                                         <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                     </div>
                                                 </div>
@@ -191,7 +377,7 @@
                                                 <div class="form-group">
                                                     <label>${serviceName} - ${vehicleClassName} Fare per/km</label>
                                                     <div class="input-group">
-                                                        <input type="number" step="any" min="0" name="per_km_fare[${serviceId}][${vehicleClassId}]" class="form-control">
+                                                        <input type="number" step="any" min="0" name="per_km_fare[${serviceId}][${vehicleClassId}]" class="form-control" value="${perKmFare ?? ''}">
                                                         <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                     </div>
                                                 </div>
@@ -211,14 +397,33 @@
                     var serviceId = $(service).val();
                     var serviceName = $(service).siblings('label').text();
 
+                    var hourlyFare = null;
+                    var dailyFare = null;
+                    var monthlyFare = null;
+                    var baseFare = null;
+                    var perKmFare = null;
+                    var rideFareModel = null;
+
+                    if (vehicleType != null) {
+                        rideFareModel = vehicleType.ride_fares.find(rideFare => rideFare
+                            .service_id == serviceId);
+                    }
+
+
                     if (serviceId == 4) {
+                        if (rideFareModel) {
+                            hourlyFare = absValue(rideFareModel.hourly_fare);
+                            dailyFare = absValue(rideFareModel.daily_fare);
+                            monthlyFare = absValue(rideFareModel.monthly_fare);
+                        }
+
                         html += `<div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>${serviceName} Hourly Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="hourly_fare[${serviceId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="hourly_fare[${serviceId}]" class="form-control" value="${hourlyFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -227,7 +432,7 @@
                                             <div class="form-group">
                                                 <label>${serviceName} Daily Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="daily_fare[${serviceId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="daily_fare[${serviceId}]" class="form-control" value="${dailyFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -236,7 +441,7 @@
                                             <div class="form-group">
                                                 <label>${serviceName} Monthly Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="monthly_fare[${serviceId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="monthly_fare[${serviceId}]" class="form-control" value="${monthlyFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -244,13 +449,19 @@
                                     </div>
                                 </div>`;
                     } else {
+
+                        if (rideFareModel) {
+                            baseFare = absValue(rideFareModel.fare);
+                            perKmFare = absValue(rideFareModel.per_km_fare);
+                        }
+
                         html += `<div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>${serviceName} Base Fare</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="fare[${serviceId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="fare[${serviceId}]" class="form-control" value="${baseFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -259,7 +470,7 @@
                                             <div class="form-group">
                                                 <label>${serviceName} Fare per/km</label>
                                                 <div class="input-group">
-                                                    <input type="number" step="any" min="0" name="per_km_fare[${serviceId}]" class="form-control">
+                                                    <input type="number" step="any" min="0" name="per_km_fare[${serviceId}]" class="form-control" value="${perKmFare ?? ''}">
                                                     <span class="input-group-text">{{ __($general->cur_text) }}</span>
                                                 </div>
                                             </div>
@@ -284,6 +495,10 @@
                     }
                 });
 
+            }
+
+            function absValue(amount) {
+                return Math.abs(parseFloat(amount).toFixed(2));
             }
         });
     </script>

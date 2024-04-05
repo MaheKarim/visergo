@@ -73,4 +73,7 @@ class Status{
     const DRIVER_TYPE="driver";
     const USER_TYPE="user";
 
+    const PENDING = 0 ;
+    const RESOLVED = 1;
+
 }
