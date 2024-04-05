@@ -16,7 +16,7 @@ class SOSAlert extends Model
 
     public function ride()
     {
-        return $this->belongsTo(Ride::class, 'user_id', 'id');
+        return $this->belongsTo(Ride::class, 'ride_id', 'id');
     }
 
     public function statusBadge(): Attribute

@@ -12,6 +12,10 @@ class Ride extends Model
 
     protected $guarded = [];
 
+    public function sosAlerts()
+    {
+        return $this->hasMany(SosAlert::class, 'ride_id');
+    }
 
     public function scopeOrderId()
     {

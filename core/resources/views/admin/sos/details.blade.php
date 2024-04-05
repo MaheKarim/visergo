@@ -11,9 +11,8 @@
                             <div class="d-flex align-items-center mb-3">
                                 <div class="rounded-circle bg-warning mr-3" style="width: 60px; height: 60px;"></div>
                                 <div>
-                                    <h6 class="mb-0"></h6>
-                                    {{ $sos->ride->id }}
-                                    <small>Rating: 4.8</small>
+                                    <h6 class="mb-0">{{ $sos->ride->driver->fullName }}</h6>
+                                    <small>Rating: {{ $sos->ride->driver->avg_rating }}</small>
                                 </div>
                             </div>
                             <div class="mb-3">

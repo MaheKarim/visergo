@@ -19,7 +19,7 @@ class SOSController extends Controller
     public function details($id)
     {
         $pageTitle = 'SOS Alert Details';
-        $sos = SOSAlert::where('id',$id)->with(['ride','ride.user', 'ride.driver'])->firstOrFail();
+        $sos = SOSAlert::with(['ride'])->findOrFail($id);
 
         return view('admin.sos.details', compact('pageTitle','sos'));
     }

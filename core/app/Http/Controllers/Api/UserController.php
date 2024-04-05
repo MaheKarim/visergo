@@ -282,7 +282,8 @@ class UserController extends Controller
                 'message'=>$notify,
             ]);
         }
-        $rideId = Ride::where('user_id',auth()->id())->find();
+
+
         $user = auth()->user();
         $sos = new SOSAlert();
         $sos->user_id = $user->id;

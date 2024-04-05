@@ -9,8 +9,9 @@
                         <table class="table table--light style--two">
                             <thead>
                             <tr>
-                                <th>@lang('Name')</th>
                                 <th>@lang('Ride ID')</th>
+                                <th>@lang('User Name')</th>
+                                <th>@lang('Driver Name')</th>
                                 <th>@lang('Created At')</th>
                                 <th>@lang('is contacted ?')</th>
                                 <th>@lang('Action')</th>
@@ -19,10 +20,18 @@
                             <tbody>
                             @forelse($soss as $sos)
                                 <tr>
+                                    <td>{{ getOrderId($sos->ride->uuid) }}</td>
                                     <td>
                                         {{ __(data_get($sos, 'ride.user.fullName') .' -  ' ) }} <a href="tel:{{data_get($sos, 'ride.user.mobile')}}"><i class="las la-phone"></i>   {{ data_get($sos, 'ride.user.mobile') }}</a>
                                     </td>
-                                    <td>{{ getOrderId($sos->ride->uuid) }}</td>
+                                    <td>
+                                        @if($sos->ride->driver)
+                                            {{ $sos->ride->driver->fullName }}
+                                            <a href="tel:{{data_get($sos, 'ride.driver.mobile')}}"><i class="las la-phone"></i> {{ data_get($sos, 'ride.driver.mobile') }}</a>
+                                        @else
+                                            @lang('Not assigned')
+                                        @endif
+                                    </td>
                                     <td>
                                         {{ showDateTime($sos->created_at) }}
                                     </td>
