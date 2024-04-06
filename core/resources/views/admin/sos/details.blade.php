@@ -53,7 +53,6 @@
                         </div>
                         <div class="mb-3">
                             <div class="mb-2">Ride ID: <span class="text-muted">{{ getOrderId($sos->ride->uuid) }}</span></div>
-                            <div class="mb-2">Start At: <span class="text-muted">{{ showDateTime($sos->ride_start_at) }}</span></div>
                         </div>
                         <div class="mb-3">
                             <div class="mb-2">@lang('Pickup Location:')</div>
@@ -61,10 +60,16 @@
                                 <li>{{ $sos->ride->pickup_address }}</li>
                             </ul>
                         </div>
-                        <div>
+                        <div class="mb-3">
                             <div class="mb-2">@lang('Current Locations:')</div>
                             <ul class="list-unstyled">
                                 <li>{{ __($sos->lat) }}, {{ __($sos->long) }}</li>
+                            </ul>
+                        </div>
+                        <div class="div">
+                            <div class="mb-2">@lang('SOS Message:')</div>
+                            <ul class="list-unstyled">
+                                <li>{{ __($sos->message) }}</li>
                             </ul>
                         </div>
                         <!-- Add your user details content here -->

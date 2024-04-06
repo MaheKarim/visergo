@@ -492,6 +492,6 @@ function errorResponse($remark, $message, $status = 200){
 if (!function_exists('getOrderId')) {
     function getOrderId($uuid)
     {
-        return substr($uuid, -12);
+        return strtoupper(substr($uuid, -12));
     }
 }
