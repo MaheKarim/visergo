@@ -265,6 +265,8 @@ class RideController extends Controller
             'destinations.*.long' => 'required',
             'ride_for' => 'required',
             'service_id' => 'required',
+            'vehicle_type_id' => 'required',
+            'departure_time' => 'required_if:service_id,' . Status::INTER_CITY_SERVICE . '|date_format:Y-m-d H:i',
         ]);
     }
 
