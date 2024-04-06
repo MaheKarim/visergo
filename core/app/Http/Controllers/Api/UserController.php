@@ -10,6 +10,7 @@ use App\Models\CancellationReason;
 use App\Models\Form;
 use App\Models\GeneralSetting;
 use App\Models\Ride;
+use App\Models\Service;
 use App\Models\SOSAlert;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -304,6 +305,21 @@ class UserController extends Controller
         return response()->json([
             'remark' => 'sos_sent',
             'message' => ['success' => $notify],
+        ]);
+    }
+
+    public function services()
+    {
+        $services = Service::active()->get();
+
+        $notify[] = 'Services data';
+        return response()->json([
+            'remark'=>'services',
+            'status'=>'success',
+            'message'=> $notify,
+            'data'=>[
+                'services'=>$services
+            ]
         ]);
     }
 }

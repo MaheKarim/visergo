@@ -125,6 +125,8 @@ Route::namespace('Api')->name('api.')->group(function () {
 
                     // SOSAlert Notify
                     Route::post('sos', 'sosNotify');
+                    // Services
+                    Route::get('services', 'services');
                 });
 
                 // Payment
