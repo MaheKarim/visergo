@@ -20,13 +20,13 @@
                             <tbody>
                             @forelse($soss as $sos)
                                 <tr>
-                                    <td>{{ getOrderId($sos->ride->uuid) }}</td>
+                                    <td>{{ getOrderId(data_get($sos, 'ride.uuid')) }}</td>
                                     <td>
                                         {{ __(data_get($sos, 'ride.user.fullName') .' -  ' ) }} <a href="tel:{{data_get($sos, 'ride.user.mobile')}}"><i class="las la-phone"></i>   {{ data_get($sos, 'ride.user.mobile') }}</a>
                                     </td>
                                     <td>
-                                        @if($sos->ride->driver)
-                                            {{ $sos->ride->driver->fullName }}
+                                        @if(data_get($sos, 'ride.driver'))
+                                            {{ data_get($sos, 'ride.driver.fullName') }}
                                             <a href="tel:{{data_get($sos, 'ride.driver.mobile')}}"><i class="las la-phone"></i> {{ data_get($sos, 'ride.driver.mobile') }}</a>
                                         @else
                                             @lang('Not assigned')
