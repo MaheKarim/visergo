@@ -32,5 +32,10 @@ class SOSAlert extends Model
             return $html;
         });
     }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', Status::PENDING);
+    }
 }
 

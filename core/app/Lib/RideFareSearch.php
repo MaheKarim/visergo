@@ -29,7 +29,6 @@ class RideFareSearch
 
         foreach ($vehicleTypes as $vehicleType) {
             $rideFares = $allRideFares->where('vehicle_type_id', $vehicleType->id);
-// need To improve
             $vehicleTypeData = [];
 
             foreach ($rideFares as $rideFare) {

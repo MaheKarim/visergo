@@ -277,6 +277,9 @@
                        data-default-url="{{ route('admin.sos.index') }}">
                         <i class="menu-icon las la-headset"></i>
                         <span class="menu-title">@lang('SOS Alert') </span>
+                        @if($pendingSosAlertsCount)
+                            <span class="menu-badge pill bg--danger ms-auto">{{$pendingSosAlertsCount}}</span>
+                        @endif
                     </a>
                 </li>
 
