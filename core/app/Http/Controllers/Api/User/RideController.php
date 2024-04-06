@@ -87,6 +87,9 @@ class RideController extends Controller
         return response()->json($fareDetails['data']);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function rideRequest(Request $request)
     {
         $validator = $this->validateRequest($request);
@@ -125,8 +128,10 @@ class RideController extends Controller
 
         $existingRide = Ride::where('user_id', $user->id)
             ->where('service_id', $request->service_id)
+            ->where('class_id', $request->class_id)
+            ->where('vehicle_type_id', $request->vehicle_type_id)
             ->where('ride_for', Status::RIDE_FOR_OWN)
-            ->whereNotIn('status', [Status::RIDE_COMPLETED, Status::RIDE_CANCELED])
+            ->where('status', [Status::RIDE_INITIATED, Status::RIDE_ACTIVE])
             ->first();
 
         if ($existingRide) {
