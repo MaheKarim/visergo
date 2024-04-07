@@ -74,4 +74,9 @@ class Status{
     const PENDING = 0 ;
     const RESOLVED = 1;
 
+    const RENTAL_HOURLY = 1;
+    const RENTAL_DAILY = 2;
+    const RENTAL_MONTHLY= 3;
+
+
 }
