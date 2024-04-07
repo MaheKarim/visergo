@@ -127,12 +127,18 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                             <label>@lang('Google Location API Key')</label>
                                 <div class="form-group">
                                     <input class="form-control" type="text" name="location_api" required
                                            value="{{$general->location_api}}">
                                 </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>@lang('Maximum Booking Ahead Time')</label>
+                                <div class="form-group">
+                                    <input class="form-control" type="text" name="pre_booking_time" required
+                                           value="{{$general->pre_booking_time }}">
                             </div>
                         </div>
 

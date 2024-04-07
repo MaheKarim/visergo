@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\RideDestination;
 use App\Traits\RideCancelTrait;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
@@ -266,7 +267,15 @@ class RideController extends Controller
             'ride_for' => 'required',
             'service_id' => 'required',
             'vehicle_type_id' => 'required',
-            'departure_time' => 'required_if:service_id,' . Status::INTER_CITY_SERVICE . '|date_format:Y-m-d H:i',
+            'departure_time' => [
+                'required_if:service_id,' . Status::INTER_CITY_SERVICE . '|date_format:Y-m-d H:i',
+                function ($attribute, $value, $fail) {
+                    $bookingLimit = Carbon::now()->addDays(gs('pre_booking_time'));
+                    if (Carbon::parse($value)->isAfter($bookingLimit)) {
+                        $fail('The departure time must be within ' . gs('pre_booking_time') . ' days from now');
+                    }
+                },
+            ],
         ]);
     }
 
