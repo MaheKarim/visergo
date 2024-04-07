@@ -217,7 +217,7 @@ class RideController extends Controller
 
         $ride->distance = $totalDistance;
         $ride->duration = $totalDuration;
-        $ride->otp = generateOTP();
+        $ride->otp = generateOTP(4);
         $ride->base_fare = $baseFare;
         $ride->vat_amount = $vatAmount;
 

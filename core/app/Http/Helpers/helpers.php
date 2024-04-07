@@ -463,15 +463,18 @@ function isHtml($string)
 
 
 if (!function_exists('generateOTP')) {
-    function generateOTP($length = 4) {
+    /**
+     * @throws \Random\RandomException
+     */
+    function generateOTP($length) {
         $numbers = '0123456789';
         $otp = '';
 
         for ($i = 0; $i < $length; $i++) {
-            $otp .= $numbers[rand(0, strlen($numbers) - 1)];
+            $otp .= $numbers[random_int(0, strlen($numbers) - 1)];
         }
 
-        return $otp;
+        return str_pad($otp, $length, '0', STR_PAD_LEFT);
     }
 }
 
