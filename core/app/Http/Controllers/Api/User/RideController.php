@@ -168,8 +168,8 @@ class RideController extends Controller
 
             $activeZoneIds = Zone::active()->pluck('id')->toArray();
 
-            if (!in_array($pickupZoneId, $activeZoneIds) || !array_diff($destinationZoneIds, $activeZoneIds)) {
-                return errorResponse('validation_error', 'Pickup and/or destination zones are not active');
+            if (!in_array($pickupZoneId, $activeZoneIds) || !array_intersect($destinationZoneIds, $activeZoneIds)) {
+                return errorResponse('validation_error', 'Pickup or destination zones are not active');
             }
         }
 
