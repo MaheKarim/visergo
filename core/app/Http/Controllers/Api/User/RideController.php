@@ -11,6 +11,7 @@ use App\Lib\DistanceMatrix;
 use App\Lib\RideFareSearch;
 use App\Models\VehicleType;
 use App\Models\DriverReview;
+use App\Models\Zone;
 use Illuminate\Http\Request;
 use App\Models\RideDestination;
 use App\Traits\RideCancelTrait;
@@ -153,11 +154,22 @@ class RideController extends Controller
             return errorResponse('validation_error', 'Destination point not matched with any zone');
         }
 
-        if($request->service_id == Status::RIDE_SERVICE){
+        if($request->service_id == Status::RIDE_SERVICE || $request->service_id == Status::RESERVE_SERVICE){
             $zoneMatch = ZoneHelper::zonesMatch($pickupZone, $destinationZones);
 
             if (!$zoneMatch) {
                 return errorResponse('validation_error', 'Some destination coordinates not matched with any zone');
+            }
+        }
+
+        if($request->service_id == Status::INTER_CITY_SERVICE){
+            $pickupZoneId = $pickupZone->id;
+            $destinationZoneIds = array_column($destinationZones, 'id');
+
+            $activeZoneIds = Zone::active()->pluck('id')->toArray();
+
+            if (!in_array($pickupZoneId, $activeZoneIds) || !array_diff($destinationZoneIds, $activeZoneIds)) {
+                return errorResponse('validation_error', 'Pickup and/or destination zones are not active');
             }
         }
 
@@ -268,7 +280,7 @@ class RideController extends Controller
             'service_id' => 'required',
             'vehicle_type_id' => 'required',
             'departure_time' => [
-                'required_if:service_id,' . Status::INTER_CITY_SERVICE . '|date_format:Y-m-d H:i',
+                'required_if:service_id,' .  Status::RESERVE_SERVICE .',' . Status::INTER_CITY_SERVICE . '|date_format:Y-m-d H:i',
                 function ($attribute, $value, $fail) {
                     $bookingLimit = Carbon::now()->addDays(gs('pre_booking_time'));
                     if (Carbon::parse($value)->isAfter($bookingLimit)) {
@@ -278,7 +290,6 @@ class RideController extends Controller
             ],
         ]);
     }
-
 
 
     private function validationErrorResponse($validator)
