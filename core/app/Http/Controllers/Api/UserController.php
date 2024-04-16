@@ -286,6 +286,17 @@ class UserController extends Controller
 
 
         $user = auth()->user();
+        $ride = Ride::find($request->ride_id);
+
+        // Check if the ride status is not 2
+        if ($ride->status != Status::RIDE_ACTIVE) {
+            return response()->json([
+                'remark' => 'sos_not_allowed',
+                'status' => 'error',
+                'message' => ['SOS request not allowed for this ride'],
+            ]);
+        }
+
         $sos = new SOSAlert();
         $sos->user_id = $user->id;
         $sos->ride_id = $request->ride_id;
