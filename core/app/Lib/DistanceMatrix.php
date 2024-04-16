@@ -21,7 +21,7 @@ class DistanceMatrix {
             ]);
         }
 
-        return $response;
+        return $response ?? [];
     }
 
     public static function getTotalDistanceAndDuration(array $origins, array $destinations)

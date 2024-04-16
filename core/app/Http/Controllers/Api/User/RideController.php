@@ -12,6 +12,7 @@ use App\Lib\RideFareSearch;
 use App\Models\VehicleType;
 use App\Models\DriverReview;
 use App\Models\Zone;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\RideDestination;
 use App\Traits\RideCancelTrait;
@@ -90,7 +91,7 @@ class RideController extends Controller
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function rideRequest(Request $request)
     {
@@ -147,11 +148,14 @@ class RideController extends Controller
         if (!$pickupZone) {
             return errorResponse('validation_error', 'Pickup point not matched with any zone');
         }
+        $destinationZones = null;
 
-        $destinationZones = ZoneHelper::getDestinationZones($request->destinations);
+        if (!$request->service_id == Status::RENTAL_SERVICE) {
+            $destinationZones = ZoneHelper::getDestinationZones($request->destinations);
 
-        if (blank(array_filter($destinationZones))) {
-            return errorResponse('validation_error', 'Destination point not matched with any zone');
+            if (blank(array_filter($destinationZones))) {
+                return errorResponse('validation_error', 'Destination point not matched with any zone');
+            }
         }
 
         if($request->service_id == Status::RIDE_SERVICE || $request->service_id == Status::RESERVE_SERVICE){
@@ -173,7 +177,7 @@ class RideController extends Controller
             }
         }
 
-        $originArray = $request->destinations;
+        $originArray = $request->destinations ?: [];
 
         array_unshift($originArray, [
             "lat" => $request->pickup_lat,
@@ -182,7 +186,7 @@ class RideController extends Controller
 
         $origins = $originArray;
         array_pop($originArray);
-        $destinations = $request->destinations;
+        $destinations = $request->destinations ?: [];
 
         $distanceMatrix = DistanceMatrix::getTotalDistanceAndDuration($origins, $destinations);
         $totalDistance = $distanceMatrix->total_distance;
@@ -216,7 +220,7 @@ class RideController extends Controller
         $ride->pickup_address = $pickupAddress;
 
         $ride->distance = $totalDistance;
-        $ride->duration = $totalDuration;
+        $ride->duration = showAmount($totalDuration);
         $ride->otp = generateOTP(4);
         $ride->base_fare = $baseFare;
         $ride->vat_amount = $vatAmount;
@@ -229,13 +233,15 @@ class RideController extends Controller
         $ride->payment_type = Status::NO;
         $ride->save();
 
-        foreach ($destinations as $index => $destination) {
-            $rideDestination = new RideDestination();
-            $rideDestination->ride_id = $ride->id;
-            $rideDestination->destination_lat = $destination['lat'];
-            $rideDestination->destination_long = $destination['long'];
-            $rideDestination->destination_address = $destinationAddress[$index];
-            $rideDestination->save();
+        if ($request->service_id != Status::RENTAL_SERVICE) {
+            foreach ($destinations as $index => $destination) {
+                $rideDestination = new RideDestination();
+                $rideDestination->ride_id = $ride->id;
+                $rideDestination->destination_lat = $destination['lat'];
+                $rideDestination->destination_long = $destination['long'];
+                $rideDestination->destination_address = $destinationAddress[$index];
+                $rideDestination->save();
+            }
         }
 
         // Admin Portion
@@ -274,8 +280,8 @@ class RideController extends Controller
             'pickup_lat' => 'required',
             'pickup_long' => 'required',
             'destinations' => 'array|min:1',
-            'destinations.*.lat' => 'required',
-            'destinations.*.long' => 'required',
+            'destinations.*.lat' => 'required_unless:service_id,' . Status::RENTAL_SERVICE,
+            'destinations.*.long' => 'required_unless:service_id,' . Status::RENTAL_SERVICE,
             'ride_for' => 'required',
             'service_id' => 'required',
             'vehicle_type_id' => 'required',
@@ -288,6 +294,8 @@ class RideController extends Controller
                     }
                 },
             ],
+            'rental_type' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
+            'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
         ]);
     }
 
