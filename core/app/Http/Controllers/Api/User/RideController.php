@@ -156,7 +156,6 @@ class RideController extends Controller
             if (blank(array_filter($destinationZones))) {
                 return errorResponse('validation_error', 'Destination point not matched with any zone');
             }
-        }
 
         if($request->service_id == Status::RIDE_SERVICE || $request->service_id == Status::RESERVE_SERVICE){
             $zoneMatch = ZoneHelper::zonesMatch($pickupZone, $destinationZones);
@@ -193,19 +192,52 @@ class RideController extends Controller
         $totalDuration = $distanceMatrix->total_duration;
         $pickupAddress = $distanceMatrix->pickup_address;
         $destinationAddress = $distanceMatrix->destination_address;
+            } else {
+            $totalDistance = 0;
+            $totalDuration = 0;
+            $pickupAddress = $request->pickup_address;
+            $destinationAddress = "No Destination Address Set";
 
-        $baseFare = $rideFare->fare;
-        $fare = $totalDistance * $rideFare->per_km_fare;
+            // Base Fare
+            if ($request->service_id == Status::RENTAL_SERVICE) {
+                if ($request->rental_type == Status::RENTAL_HOURLY) {
+                    $baseFare = $rideFare->hourly_fare;
+                    $totalFare = $request->rental_time * $baseFare;
 
-        if ($fare < $baseFare) {
-            $fare = $baseFare;
+                } elseif ($request->rental_type == Status::RENTAL_DAILY) {
+                    $baseFare = $rideFare->daily_fare;
+                    $totalFare = $request->rental_time * $baseFare;
+
+                } else{
+                    $baseFare = $rideFare->monthly_fare;
+                    $totalFare = $request->rental_time * $baseFare;
+                }
+                // Ride Time Calculation
+
+                /*
+                    1. Calculate total time
+                    2. Calculate total fare
+                */
+                $vatAmount = gs('vat_amount') * $totalFare / 100;
+                $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $totalFare / 100);
+                $driverAmount = $totalFare - $adminCommission;
+                $totalAmount = $totalFare + $vatAmount;
+            } else {
+                $baseFare = $rideFare->fare;
+                $fare = $totalDistance * $rideFare->per_km_fare;
+
+                if ($fare < $baseFare) {
+                    $fare = $baseFare;
+                }
+
+                $vatAmount = gs('vat_amount') * $fare / 100;
+
+                $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $fare / 100);
+                $driverAmount = $fare - $adminCommission;
+                $totalAmount = $fare + $vatAmount;
+            }
         }
 
-        $vatAmount = gs('vat_amount') * $fare / 100;
-
-        $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $fare / 100);
-        $driverAmount = $fare - $adminCommission;
-        $totalAmount = $fare + $vatAmount;
 
         $ride = new Ride();
         $ride->service_id = $request->service_id;
@@ -224,6 +256,10 @@ class RideController extends Controller
         $ride->otp = generateOTP(4);
         $ride->base_fare = $baseFare;
         $ride->vat_amount = $vatAmount;
+
+        // rental_type && rental_amount
+        $ride->rental_type = $request->rental_type;
+        $ride->rental_time = $request->rental_time;
 
         $ride->total = $totalAmount;
         $ride->admin_commission = $adminCommission;
@@ -295,7 +331,7 @@ class RideController extends Controller
                 },
             ],
             'rental_type' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
-            'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
+//            'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
         ]);
     }
 
