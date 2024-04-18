@@ -212,12 +212,7 @@ class RideController extends Controller
                     $baseFare = $rideFare->monthly_fare;
                     $totalFare = $request->rental_time * $baseFare;
                 }
-                // Ride Time Calculation
 
-                /*
-                    1. Calculate total time
-                    2. Calculate total fare
-                */
                 $vatAmount = gs('vat_amount') * $totalFare / 100;
                 $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $totalFare / 100);
                 $driverAmount = $totalFare - $adminCommission;
