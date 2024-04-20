@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Driver;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Ride;
-use App\Models\RideFare;
 use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

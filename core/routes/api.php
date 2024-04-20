@@ -130,13 +130,13 @@ Route::namespace('Api')->name('api.')->group(function () {
                 });
 
                 // Payment
-                Route::controller('PaymentController')->group(function () {
-                    Route::get('deposit/methods', 'methods')->name('deposit');
-                    Route::post('deposit/insert', 'depositInsert')->name('deposit.insert');
-                    Route::get('deposit/confirm', 'depositConfirm')->name('deposit.confirm');
-                    Route::get('deposit/manual', 'manualDepositConfirm')->name('deposit.manual.confirm');
-                    Route::post('deposit/manual', 'manualDepositUpdate')->name('deposit.manual.update');
-                });
+//                Route::controller('PaymentController')->group(function () {
+//                    Route::get('deposit/methods', 'methods')->name('deposit');
+//                    Route::post('deposit/insert', 'depositInsert')->name('deposit.insert');
+//                    Route::get('deposit/confirm', 'depositConfirm')->name('deposit.confirm');
+//                    Route::get('deposit/manual', 'manualDepositConfirm')->name('deposit.manual.confirm');
+//                    Route::post('deposit/manual', 'manualDepositUpdate')->name('deposit.manual.update');
+//                });
 
                 Route::namespace('User')->group(function () {
                     // User Address Management
@@ -171,10 +171,12 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('coupons', 'index')->name('coupon');
                     });
                     // Gateway List For User
-                    Route::controller('PaymentController')->name('payment.')->group(function () {
-                        Route::get('methods', 'methods');
-                        Route::get('method/{id}', 'method');
-                        Route::post('payment/insert/{id}', 'depositInsert');
+                    Route::namespace('Gateway')->group(function () {
+                        Route::controller('PaymentController')->name('payment.')->group(function () {
+                            Route::get('methods', 'methods');
+                            Route::get('method/{id}', 'method');
+                            Route::post('payment/insert/{id}', 'depositInsert');
+                        });
                     });
                 });
             });
