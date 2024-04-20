@@ -150,7 +150,7 @@ class RideController extends Controller
         }
         $destinationZones = null;
 
-        if (!$request->service_id == Status::RENTAL_SERVICE) {
+        if ($request->service_id != Status::RENTAL_SERVICE) {
             $destinationZones = ZoneHelper::getDestinationZones($request->destinations);
 
             if (blank(array_filter($destinationZones))) {
@@ -192,14 +192,28 @@ class RideController extends Controller
         $totalDuration = $distanceMatrix->total_duration;
         $pickupAddress = $distanceMatrix->pickup_address;
         $destinationAddress = $distanceMatrix->destination_address;
-            } else {
+
+        $baseFare = $rideFare->fare;
+        $fare = $totalDistance * $rideFare->per_km_fare;
+
+        if ($fare < $baseFare) {
+            $fare = $baseFare;
+        }
+
+        $vatAmount = gs('vat_amount') * $fare / 100;
+
+        $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $fare / 100);
+        $driverAmount = $fare - $adminCommission;
+        $totalAmount = $fare + $vatAmount;
+
+        } else {
+            $destinations = [];
             $totalDistance = 0;
             $totalDuration = 0;
             $pickupAddress = $request->pickup_address;
             $destinationAddress = "No Destination Address Set";
 
             // Base Fare
-            if ($request->service_id == Status::RENTAL_SERVICE) {
                 if ($request->rental_type == Status::RENTAL_HOURLY) {
                     $baseFare = $rideFare->hourly_fare;
                     $totalFare = $request->rental_time * $baseFare;
@@ -217,20 +231,6 @@ class RideController extends Controller
                 $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $totalFare / 100);
                 $driverAmount = $totalFare - $adminCommission;
                 $totalAmount = $totalFare + $vatAmount;
-            } else {
-                $baseFare = $rideFare->fare;
-                $fare = $totalDistance * $rideFare->per_km_fare;
-
-                if ($fare < $baseFare) {
-                    $fare = $baseFare;
-                }
-
-                $vatAmount = gs('vat_amount') * $fare / 100;
-
-                $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $fare / 100);
-                $driverAmount = $fare - $adminCommission;
-                $totalAmount = $fare + $vatAmount;
-            }
         }
 
 
