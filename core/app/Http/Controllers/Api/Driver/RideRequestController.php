@@ -78,6 +78,7 @@ class RideRequestController extends Controller
         $ride->status = Status::RIDE_ACTIVE;
         $ride->driver_id = auth()->user()->id;
         $ride->save();
+
         $driver->is_driving = Status::DRIVING;
         $driver->save();
         $notify = 'Ride Accepted Successfully';
@@ -95,8 +96,7 @@ class RideRequestController extends Controller
     {
         $driver = auth()->user();
         $ride = Ride::where('driver_id', $driver->id)
-            ->where('service_id', Status::RIDE_SERVICE)
-            ->where('status', Status::RIDE_ACTIVE)->first();
+            ->where('status', Status::RIDE_ACTIVE)->find($id);
 
         if ($ride == null) {
             return response()->json([
