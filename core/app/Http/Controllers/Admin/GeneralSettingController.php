@@ -40,7 +40,6 @@ class GeneralSettingController extends Controller
             'admin_fixed_commission' => 'required|numeric|min:0',
             'admin_percent_commission' => 'required|numeric|min:0',
             'pre_booking_time' => 'required|numeric|min:0',
-            'extra_ride_time' => 'required|numeric|min:0',
         ]);
 
         $timezones = json_decode(file_get_contents(resource_path('views/admin/partials/timezone.json')));
@@ -63,7 +62,6 @@ class GeneralSettingController extends Controller
         $general->admin_percent_commission = $request->admin_percent_commission;
         $general->admin_fixed_commission = $request->admin_fixed_commission;
         $general->pre_booking_time = $request->pre_booking_time;
-        $general->extra_ride_time = $request->extra_ride_time;
         $general->save();
 
         $timezoneFile = config_path('timezone.php');

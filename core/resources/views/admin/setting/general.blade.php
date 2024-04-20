@@ -135,7 +135,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label>@lang('Maximum Booking Ahead Time')</label>
+                                <label>@lang('Maximum Booking Ahead Day')</label>
                                 <div class="form-group">
                                     <input class="form-control" type="text" name="pre_booking_time" required
                                            value="{{$general->pre_booking_time }}">
@@ -143,7 +143,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>@lang('Admin Fixed Commission')</label>
                                 <div class="form-group">
                                     <div class="input-group">
@@ -153,7 +153,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label>@lang('Admin Percent (%) Commission')</label>
                                 <div class="form-group">
                                    <div class="input-group">
@@ -163,16 +163,7 @@
                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label>@lang('Extra Ride Time (minute)')</label>
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <input class="form-control" type="text" name="extra_ride_time" required
-                                               value="{{ getAmount($general->extra_ride_time) }}">
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
 
                         <div class="form-group">
