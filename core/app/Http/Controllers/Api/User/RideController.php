@@ -288,23 +288,6 @@ class RideController extends Controller
         ]);
     }
 
-    public function rideCompleted()
-    {
-        $user = auth()->user();
-        $ride = Ride::where('user_id', $user->id)->completed()->paginate(10);
-        if ($ride == null) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No Completed Ride Found',
-                'data' => $ride,
-            ]);
-        }
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Completed Ride',
-            'data' => $ride,
-        ]);
-    }
 
     private function validateRequest($request)
     {
@@ -486,4 +469,40 @@ class RideController extends Controller
             'data' => $review,
         ]);
     }
+
+    public function rideHistory(Request $request, $flag = 0)
+    {
+        $user = auth()->user();
+
+        if ($flag == Status::RIDE_COMPLETED) {
+            $rides = Ride::where('user_id', $user->id)->completed()->paginate(10);
+
+            $message = 'Completed Rides';
+
+        } elseif ($flag == Status::RIDE_CANCELED) {
+            $rides = Ride::where('user_id', $user->id)->canceled()->paginate(10);
+
+            $message = 'Canceled Rides';
+        } else {
+            $rides = Ride::where('user_id', $user->id)->paginate(10);
+
+            $message = 'All Rides';
+        }
+
+
+        if ($rides->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No ' . $message . ' Found',
+                'data' => [],
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $message,
+            'data' => $rides,
+        ]);
+    }
+
 }

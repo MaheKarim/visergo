@@ -44,6 +44,7 @@ class Status{
     const RIDE_SERVICE = 1;
     const INTER_CITY_SERVICE = 2;
     const RESERVE_SERVICE = 3;
+
     const RENTAL_SERVICE = 4;
 
     const FIXED = 1;

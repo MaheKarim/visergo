@@ -17,10 +17,7 @@ class Ride extends Model
         return $this->hasMany(SosAlert::class, 'ride_id');
     }
 
-    public function scopeOrderId()
-    {
-        return getOrderId($this->attributes['uuid']);
-    }
+
 
     public function destinations()
     {
@@ -72,6 +69,11 @@ class Ride extends Model
         return $query->where('status', Status::RIDE_INITIATED);
     }
 
+    public function scopeOngoingRide($query)
+    {
+        return $query->whereIn('status', [Status::RIDE_INITIATED, Status::RIDE_END]);
+    }
+
     public function scopeCompleted($query)
     {
         return $query->where('status', Status::RIDE_COMPLETED);
@@ -82,9 +84,9 @@ class Ride extends Model
         return $query->where('status', Status::RIDE_END);
     }
 
-    public function scopeOngoingRide($query)
+    public function scopeCanceled($query)
     {
-        return $query->whereIn('status', [Status::RIDE_INITIATED, Status::RIDE_END]);
+        return $query->where('status', Status::RIDE_CANCELED);
     }
 
     public function scopePaymentPending($query)
@@ -92,5 +94,8 @@ class Ride extends Model
         return $query->where('payment_status', Status::PAYMENT_PENDING);
     }
 
-
+    public function scopeOrderId()
+    {
+        return getOrderId($this->attributes['uuid']);
+    }
 }

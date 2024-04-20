@@ -159,7 +159,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::post('ride-search', 'rideSearch');
                         Route::post('ride/create/', 'rideRequest');
                         Route::post('ride/tips/add/{id}', 'rideTips');
-                        Route::get('ride/completed/history', 'rideCompleted');
+                        Route::get('ride/history/{flag}', 'rideHistory');
                         Route::get('ride/ongoing/history', 'rideOngoing');
                         Route::middleware('userRideCancel')->group(function () {
                             Route::post('ride/cancel/{id}', 'rideCancel');
