@@ -467,12 +467,18 @@ if (!function_exists('generateOTP')) {
      * @throws \Random\RandomException
      */
     function generateOTP($length) {
-        $numbers = '0123456789';
-        $otp = '';
+        $numbers = '123456789';  // Exclude 0 from the first digit
+        $otpChars = [];
 
-        for ($i = 0; $i < $length; $i++) {
-            $otp .= $numbers[random_int(0, strlen($numbers) - 1)];
+        // Generate the first digit (non-zero)
+        $otpChars[] = $numbers[random_int(0, strlen($numbers) - 1)];
+
+        // Generate the remaining digits
+        for ($i = 1; $i < $length; $i++) {
+            $otpChars[] = random_int(0, 9);
         }
+
+        $otp = implode('', $otpChars);
 
         return str_pad($otp, $length, '0', STR_PAD_LEFT);
     }
