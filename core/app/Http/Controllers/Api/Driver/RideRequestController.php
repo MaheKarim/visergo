@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Driver;
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Ride;
+use App\Models\RideFare;
 use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -154,6 +155,44 @@ class RideRequestController extends Controller
                 ]
             ]);
         } else {
+            if ($ride->service_id == Status::RENTAL_SERVICE && $ride->rental_type == Status::RENTAL_HOURLY) {
+                $rideTime = $ride->ride_complete_at->diffInHours($ride->ride_start_at);
+
+                $rideFare = RideFare::where('ride_id', $ride->id)->first();
+
+                if ($rideTime > (($ride->rental_time * 60) + (gs('extra_ride_time')*60))) {
+                    $extraRideTime = $rideTime - $ride->rental_time;
+
+                    if ($extraRideTime > gs('extra_ride_time')) {
+                        $extraHours = ceil(($extraRideTime - gs('extra_ride_time')) / 60);
+                        $totalRentalTime = $ride->rental_time + gs('extra_ride_time') + ($extraHours * 60);
+                    } else {
+                        $totalRentalTime = $ride->rental_time + $extraRideTime;
+                    }
+                } else {
+                    $totalRentalTime = $ride->rental_time;
+                }
+
+                $baseFare = $rideFare->hourly_fare;
+                $totalFare = $totalRentalTime * $baseFare;
+
+                $vatAmount = gs('vat_amount') * $totalFare / 100;
+                $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $totalFare / 100);
+                $driverAmount = $totalFare - $adminCommission;
+                $totalAmount = $totalFare + $vatAmount;
+
+                $ride->total = $totalAmount;
+                $ride->driver_amount = $driverAmount;
+                $ride->status = Status::RIDE_END;
+                $ride->ride_completed_at = Carbon::now();
+                $ride->payment_status = Status::PAYMENT_PENDING;
+                $ride->save();
+
+                $driver->is_driving = Status::IDLE;
+                $driver->save();
+
+            } else {
+            // The existing logic for non-rental services
             $ride->status = Status::RIDE_END;
             $ride->ride_completed_at = Carbon::now();
             $ride->payment_status = Status::PAYMENT_PENDING;
@@ -171,9 +210,10 @@ class RideRequestController extends Controller
                     'ride' => $ride
                 ]
             ]);
+            }
+
         }
     }
-
 
     public function rideRequestCancel(Request $request, $id)
     {

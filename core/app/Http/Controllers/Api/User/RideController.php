@@ -250,15 +250,16 @@ class RideController extends Controller
         $ride->duration = showAmount($totalDuration);
         $ride->otp = generateOTP(4);
         $ride->base_fare = $baseFare;
-        $ride->vat_amount = $vatAmount;
 
         // rental_type && rental_amount
         $ride->rental_type = $request->rental_type;
         $ride->rental_time = $request->rental_time;
 
-        $ride->total = $totalAmount;
         $ride->admin_commission = $adminCommission;
         $ride->driver_amount = $driverAmount;
+        $ride->vat_amount = $vatAmount;
+        $ride->total = $totalAmount;
+
         $ride->status = Status::RIDE_INITIATED;
         $ride->payment_status = Status::PAYMENT_INITIATE;
         $ride->payment_type = Status::NO;
@@ -326,7 +327,7 @@ class RideController extends Controller
                 },
             ],
             'rental_type' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
-//            'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
+            'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
         ]);
     }
 
