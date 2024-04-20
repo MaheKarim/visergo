@@ -28,7 +28,7 @@ class AdminController extends Controller
         $widget['verified_users']          = User::active()->count();
         $widget['email_unverified_users']  = User::emailUnverified()->count();
         $widget['mobile_unverified_users'] = User::mobileUnverified()->count();
-        
+
 
         // user Browsing, Country, Operating Log
         $userLoginData = UserLogin::where('created_at', '>=', Carbon::now()->subDay(30))->get(['browser', 'os', 'country']);
@@ -135,7 +135,7 @@ class AdminController extends Controller
 
     public function profileUpdate(Request $request)
     {
-        $this->validate($request, [
+        $request->validate( [
             'name' => 'required',
             'email' => 'required|email',
             'image' => ['nullable','image',new FileTypeValidate(['jpg','jpeg','png'])]
@@ -168,7 +168,7 @@ class AdminController extends Controller
 
     public function passwordUpdate(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'old_password' => 'required',
             'password' => 'required|min:5|confirmed',
         ]);

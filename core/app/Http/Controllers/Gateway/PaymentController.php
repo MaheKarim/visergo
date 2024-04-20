@@ -14,6 +14,7 @@ use App\Models\Ride;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -30,8 +31,11 @@ class PaymentController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|gt:0',
+            'method_code' => 'required',
             'gateway' => 'required',
             'currency' => 'required',
+            'ride_id' => 'required',
+            'payment_type' => 'required',
         ]);
 
 
@@ -78,8 +82,21 @@ class PaymentController extends Controller
             return "Sorry, invalid URL.";
         }
         $data = Deposit::where('id', $id)->where('status', Status::PAYMENT_INITIATE)->orderBy('id', 'DESC')->firstOrFail();
-        $user = User::findOrFail($data->user_id);
-        auth()->login($user);
+
+        if ($data->driver_id) {
+            $driver = Driver::find($data->driver_id);
+            if (auth()->check()) {
+                auth()->logout();
+            }
+            Auth::guard('driver')->login($driver);
+        } else {
+            $user = User::findOrFail($data->user_id);
+            if (auth()->guard('driver')->check()) {
+                auth()->guard('driver')->logout();
+            }
+            auth()->login($user);
+        }
+
         session()->put('Track', $data->trx);
         return to_route('user.deposit.confirm');
     }
@@ -88,7 +105,8 @@ class PaymentController extends Controller
     public function depositConfirm()
     {
         $track = session()->get('Track');
-        $deposit = Deposit::where('trx', $track)->where('status',Status::PAYMENT_INITIATE)->orderBy('id', 'DESC')->with('gateway')->firstOrFail();
+        $deposit = Deposit::where('trx', $track)->where('status',Status::PAYMENT_INITIATE)
+            ->orderBy('id', 'DESC')->with('gateway')->firstOrFail();
 
         if ($deposit->method_code >= 1000) {
             return to_route('user.deposit.manual.confirm');

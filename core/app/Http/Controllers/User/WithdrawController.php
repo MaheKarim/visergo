@@ -23,7 +23,7 @@ class WithdrawController extends Controller
 
     public function withdrawStore(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'method_code' => 'required',
             'amount' => 'required|numeric'
         ]);

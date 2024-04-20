@@ -38,10 +38,12 @@ class UserController extends Controller
     public function create2fa(Request $request)
     {
         $user = auth()->user();
-        $this->validate($request, [
+
+        $request->validate([
             'key' => 'required',
             'code' => 'required',
         ]);
+
         $response = verifyG2fa($user,$request->code,$request->key);
         if ($response) {
             $user->tsc = $request->key;
@@ -57,7 +59,7 @@ class UserController extends Controller
 
     public function disable2fa(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'code' => 'required',
         ]);
 
@@ -73,7 +75,6 @@ class UserController extends Controller
         }
         return back()->withNotify($notify);
     }
-
     public function transactions()
     {
         $pageTitle = 'Transactions';

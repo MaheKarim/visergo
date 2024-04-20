@@ -45,7 +45,7 @@ class SiteController extends Controller
 
     public function contactSubmit(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => 'required',
             'email' => 'required',
             'subject' => 'required|string|max:255',

@@ -58,7 +58,7 @@ class ProfileController extends Controller
             $passwordValidation = $passwordValidation->mixedCase()->numbers()->symbols()->uncompromised();
         }
 
-        $this->validate($request, [
+        $request->validate([
             'current_password' => 'required',
             'password' => ['required','confirmed',$passwordValidation]
         ]);

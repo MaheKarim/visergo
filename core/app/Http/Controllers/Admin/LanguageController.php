@@ -211,7 +211,7 @@ class LanguageController extends Controller
 
     public function updateLanguageJson(Request $request, $id)
     {
-        $this->validate($request, [
+        $request->validate([
             'key' => 'required',
             'value' => 'required'
         ]);

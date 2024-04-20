@@ -19,7 +19,8 @@ class RideRequestController extends Controller
     {
         $driver = auth()->user();
         $ride = Ride::where('driver_id', $driver->id)
-            ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING])->first();
+            ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING, Status::RIDE_END])->first();
+
         if ($ride == null) {
             return response()->json([
                 'remark' => 'no_ride_found',
