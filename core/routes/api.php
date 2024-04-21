@@ -129,14 +129,6 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::get('services', 'services');
                 });
 
-                // Payment
-//                Route::controller('PaymentController')->group(function () {
-//                    Route::get('deposit/methods', 'methods')->name('deposit');
-//                    Route::post('deposit/insert', 'depositInsert')->name('deposit.insert');
-//                    Route::get('deposit/confirm', 'depositConfirm')->name('deposit.confirm');
-//                    Route::get('deposit/manual', 'manualDepositConfirm')->name('deposit.manual.confirm');
-//                    Route::post('deposit/manual', 'manualDepositUpdate')->name('deposit.manual.update');
-//                });
 
                 Route::namespace('User')->group(function () {
                     // User Address Management

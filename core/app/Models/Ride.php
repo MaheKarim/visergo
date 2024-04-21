@@ -17,8 +17,6 @@ class Ride extends Model
         return $this->hasMany(SosAlert::class, 'ride_id');
     }
 
-
-
     public function destinations()
     {
         return $this->hasMany(RideDestination::class, 'ride_id', 'id');

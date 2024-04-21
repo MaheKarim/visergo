@@ -143,7 +143,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label>@lang('Admin Fixed Commission')</label>
                                 <div class="form-group">
                                     <div class="input-group">
@@ -153,7 +153,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label>@lang('Admin Percent (%) Commission')</label>
                                 <div class="form-group">
                                    <div class="input-group">
@@ -161,6 +161,17 @@
                                               value="{{ showAmount($general->admin_percent_commission) }}">
                                        <span class="input-group-text">%</span>
                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label>@lang('Driver Minimum Due')</label>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" name="driver_min_due" required
+                                               value="{{ showAmount($general->driver_min_due) }}">
+                                        <span class="input-group-text">{{ $general->cur_text }}</span>
+                                    </div>
                                 </div>
                             </div>
 
