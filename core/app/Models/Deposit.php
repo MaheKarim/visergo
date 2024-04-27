@@ -31,6 +31,12 @@ class Deposit extends Model
         return $this->belongsTo(Gateway::class, 'method_code', 'code');
     }
 
+    public function ride()
+    {
+        return $this->belongsTo(Ride::class);
+    }
+
+
     public function statusBadge(): Attribute
     {
         return new Attribute(function(){
@@ -87,5 +93,19 @@ class Deposit extends Model
     public function scopeInitiated($query)
     {
         return $query->where('status', Status::PAYMENT_INITIATE);
+    }
+
+    public function saveDeposit($gateway)
+    {
+        $charge = $gateway->totalCharge($this->amount);
+        $this->method_code = $gateway->method_code;
+        $this->method_currency = strtoupper($gateway->currency);
+        $this->charge = $charge;
+        $this->rate = $gateway->rate;
+        $this->final_amount = ($this->amount + $charge) * $gateway->rate;
+        $this->btc_amount = 0;
+        $this->btc_wallet = "";
+        $this->trx = getTrx();
+        $this->save();
     }
 }

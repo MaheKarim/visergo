@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
 use App\Models\Ride;
 use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
@@ -38,6 +39,7 @@ class RideRequestController extends Controller
             ]);
         }
     }
+
     public function rideRequests()
     {
         $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->with('destinations')->latest()->get();
@@ -51,11 +53,11 @@ class RideRequestController extends Controller
             ]);
         }
         return response()->json([
-            'remark'=>'ride_requests',
-            'status'=>'success',
-            'message'=>'Ride requests list',
-            'data'=>[
-                'live_requests'=>$liveRequests
+            'remark' => 'ride_requests',
+            'status' => 'success',
+            'message' => 'Ride requests list',
+            'data' => [
+                'live_requests' => $liveRequests
             ]
         ]);
     }
@@ -215,9 +217,9 @@ class RideRequestController extends Controller
         if ($ride->status == Status::RIDE_ONGOING) {
             $notify = 'You can not cancel ongoing ride';
             return response()->json([
-               'remark' => 'ride_cancel_fail',
-               'status' => 'error',
-               'message' => $notify,
+                'remark' => 'ride_cancel_fail',
+                'status' => 'error',
+                'message' => $notify,
             ]);
         }
 
@@ -232,6 +234,43 @@ class RideRequestController extends Controller
                 'ride' => $ride
             ]
         ]);
+    }
+
+    public function rideRequestCashAccept(Request $request, $id)
+    {
+        $ride = Ride::where('status', Status::RIDE_END)->where('payment_type', Status::CASH_PAYMENT)->find($id);
+
+        if ($ride == null) {
+            $notify[] = 'No Ride Found';
+            return response()->json([
+                'remark' => 'no_request_found',
+                'status' => 'error',
+                'message' => $notify,
+                'data' => [
+                    'ride' => $ride
+                ]
+            ]);
+        }
+
+        $ride->payment_status = Status::PAYMENT_SUCCESS;
+        $ride->is_cash_accept = Status::YES;
+        $ride->status = Status::RIDE_COMPLETED;
+        $ride->save();
+
+        $driver = Driver::find($ride->driver_id);
+        $driver->is_driving = Status::IDLE;
+        $driver->save();
+
+        $notify[] = 'Ride Completed Successfully';
+        return response()->json([
+            'remark' => 'ride_request_accept',
+            'status' => 'success',
+            'message' => $notify,
+            'data' => [
+                'ride' => $ride
+            ]
+        ]);
+
     }
 
 }

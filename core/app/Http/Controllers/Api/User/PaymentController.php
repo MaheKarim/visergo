@@ -29,104 +29,6 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function depositInsert(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'method_code' => 'required',
-            'currency' => 'required',
-            'ride_id' => 'required|exists:rides,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
-            ]);
-        }
-
-        $user = auth()->user();
-        $ride = Ride::where('user_id', $user->id)->ongoingRide()->paymentPending()->find($id);
-
-        if ($ride == null) {
-            $notify[] = 'Invalid ride request';
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
-            ]);
-        }
-
-        $gate = GatewayCurrency::whereHas('method', function ($gate) {
-            $gate->where('status', Status::ENABLE);
-        })->where('method_code', $request->method_code)->where('currency', $request->currency)->first();
-        if (!$gate) {
-            $notify[] = 'Invalid gateway';
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
-            ]);
-        }
-        $amount = $ride->total;
-        if ($gate->min_amount > $amount || $gate->max_amount < $amount) {
-            $notify[] =  'Please follow deposit limit';
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
-            ]);
-        }
-
-        $charge = $gate->fixed_charge + ($amount * $gate->percent_charge / 100);
-        $payable = $amount + $charge;
-        $finalAmount = $payable * $gate->rate;
-        $trx = getTrx();
-
-        $data = new Deposit();
-        $data->user_id = $user->id;
-        $data->method_code = $gate->method_code;
-        $data->method_currency = strtoupper($gate->currency);
-        $data->amount = $amount;
-        $data->ride_id = $ride->id;
-        $data->charge = $charge;
-        $data->rate = $gate->rate;
-        $data->final_amount = $finalAmount;
-        $data->btc_amount = 0;
-        $data->btc_wallet = "";
-        $data->trx = $trx;
-        $data->save();
-
-        $transaction = new Transaction();
-        $transaction->user_id = $user->id;
-        $transaction->amount = $finalAmount;
-        $transaction->post_balance =  $finalAmount;
-        $transaction->charge = $charge;
-        $transaction->trx_type = '+';
-        $transaction->details = 'Deposit Via '.$gate->name;
-        $transaction->trx = $trx;
-        $transaction->save();
-
-        $totalPoints = RewardPoints::distribute($ride->id);
-
-        $ride->payment_status = Status::PAYMENT_PENDING; // PAYMENT PENDING
-        $ride->payment_type = Status::ONLINE_PAYMENT;
-        $ride->status = Status::RIDE_COMPLETED;
-        $ride->point = $totalPoints;
-        $ride->save();
-
-        $notify[] =  'Deposit inserted';
-        return response()->json([
-            'remark'=>'deposit_inserted',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
-            'data'=>[
-                'deposit' => $data,
-                'redirect_url' => route('deposit.app.confirm', encrypt($data->id))
-            ]
-        ]);
-    }
-
     public function method($id)
     {
         $gatewayCurrency = GatewayCurrency::whereHas('method', function ($gate) {
@@ -141,4 +43,109 @@ class PaymentController extends Controller
             ],
         ]);
     }
+
+
+    public function initPayment(Request $request)
+    {
+        $validator = Validator::make($request->all(), $this->paymentValidation());
+
+        if ($validator->fails()) {
+            return response()->json(errorResponse('payment_validation_error', $validator->errors()->first()), 422);
+        }
+
+        $ride = Ride::where('user_id', auth()->id())->ongoingRide()->paymentPending()->find($request->ride_id);
+
+        if ($ride == null) {
+            return response()->json(errorResponse('ride_not_found', 'No Ride Found'), 404);
+        }
+
+        $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
+        /* Coupon Disbursement */
+
+        $gateway = $this->paymentGateway($request, $amount);
+
+        if (!$gateway instanceof GatewayCurrency) {
+            return response()->json($gateway, 422);
+        }
+
+        $deposit = new Deposit();
+        $deposit->user_id = $ride->user_id;
+        $deposit->ride_id = $ride->id;
+        $deposit->amount = $amount;
+        $deposit->saveDeposit($gateway);
+
+        $ride->payment_type = $request->payment_type;
+        $ride->save();
+
+        if ($request->payment_type == Status::CASH_PAYMENT) {
+            return $this->cashPayment();
+        }  else {
+            return $this->gatewayPayment($deposit);
+        }
+    }
+
+    private function paymentValidation()
+    {
+        $paymentTypes = implode(',', [Status::CASH_PAYMENT, Status::ONLINE_PAYMENT, Status::WALLET_PAYMENT]);
+
+        return [
+            'payment_type' => 'required|in:' . $paymentTypes,
+            'method_code'  => 'required_if:payment_type,2',
+            'currency'     => 'required_if:payment_type,2',
+            'ride_id'      => 'required',
+        ];
+    }
+
+    private function paymentGateway($request, $amount)
+    {
+        if ($request->payment_type == Status::CASH_PAYMENT) {
+            $gateway = new GatewayCurrency();
+            $gateway->manualGateway(Status::CASH_PAYMENT);
+
+        } else {
+            $gateway = GatewayCurrency::whereHas('method', function ($gateway) {
+                $gateway->where('status', Status::ENABLE);
+            })->where('method_code', $request->method_code)->where('currency', $request->currency)->first();
+
+            if (!$gateway) {
+                return errorResponse('invalid_gateway_selected', 'Invalid gateway selected');
+            }
+
+            if ($gateway->min_amount > $amount) {
+                return errorResponse('min_limit_check', 'Minimum limit for this gateway is ' . $gateway->min_amount);
+            }
+
+            if ($gateway->max_amount < $amount) {
+                return errorResponse('max_limit_check', 'Maximum limit for this gateway is ' . $gateway->max_amount);
+            }
+        }
+
+        return $gateway;
+    }
+
+    private function cashPayment()
+    {
+        $notify[] =  'Cash payment request placed successfully';
+
+        return response()->json([
+            'remark'  => 'cash_payment',
+            'status'  => 'success',
+            'message' => ['success' => $notify],
+        ]);
+    }
+
+    private function gatewayPayment($deposit)
+    {
+        $notify[] =  'Payment inserted';
+        return response()->json([
+            'remark'  => 'payment_inserted',
+            'status'  => 'success',
+            'message' => ['success' => $notify],
+            'data'    => [
+                'payment' => $deposit,
+                'redirect_url' => route('deposit.app.confirm', encrypt($deposit->id))
+            ]
+        ]);
+    }
+
 }

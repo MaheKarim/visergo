@@ -214,23 +214,23 @@ class RideController extends Controller
             $destinationAddress = "No Destination Address Set";
 
             // Base Fare
-                if ($request->rental_type == Status::RENTAL_HOURLY) {
-                    $baseFare = $rideFare->hourly_fare;
-                    $totalFare = $request->rental_time * $baseFare;
+            if ($request->rental_type == Status::RENTAL_HOURLY) {
+                $baseFare = $rideFare->hourly_fare;
+                $totalFare = $request->rental_time * $baseFare;
 
-                } elseif ($request->rental_type == Status::RENTAL_DAILY) {
-                    $baseFare = $rideFare->daily_fare;
-                    $totalFare = $request->rental_time * $baseFare;
+            } elseif ($request->rental_type == Status::RENTAL_DAILY) {
+                $baseFare = $rideFare->daily_fare;
+                $totalFare = $request->rental_time * $baseFare;
 
-                } else{
-                    $baseFare = $rideFare->monthly_fare;
-                    $totalFare = $request->rental_time * $baseFare;
-                }
+            } else{
+                $baseFare = $rideFare->monthly_fare;
+                $totalFare = $request->rental_time * $baseFare;
+            }
 
-                $vatAmount = gs('vat_amount') * $totalFare / 100;
-                $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $totalFare / 100);
-                $driverAmount = $totalFare - $adminCommission;
-                $totalAmount = $totalFare + $vatAmount;
+            $vatAmount = gs('vat_amount') * $totalFare / 100;
+            $adminCommission = gs('admin_fixed_commission') + (gs('admin_percent_commission') * $totalFare / 100);
+            $driverAmount = $totalFare - $adminCommission;
+            $totalAmount = $totalFare + $vatAmount;
         }
 
 
@@ -261,8 +261,8 @@ class RideController extends Controller
         $ride->total = $totalAmount;
 
         $ride->status = Status::RIDE_INITIATED;
+        $ride->payment_type = $request->payment_type;
         $ride->payment_status = Status::PAYMENT_INITIATE;
-        $ride->payment_type = Status::NO;
         $ride->save();
 
         if ($request->service_id != Status::RENTAL_SERVICE) {
@@ -301,7 +301,7 @@ class RideController extends Controller
             'service_id' => 'required',
             'vehicle_type_id' => 'required',
             'departure_time' => [
-                'required_if:service_id,' .  Status::RESERVE_SERVICE .',' . Status::INTER_CITY_SERVICE . '|date_format:Y-m-d H:i',
+                'required_if:service_id,' .  Status::RESERVE_SERVICE .',' . Status::INTER_CITY_SERVICE . ',' . Status::RENTAL_SERVICE .'date_format:Y-m-d H:i',
                 function ($attribute, $value, $fail) {
                     $bookingLimit = Carbon::now()->addDays(gs('pre_booking_time'));
                     if (Carbon::parse($value)->isAfter($bookingLimit)) {
@@ -311,6 +311,7 @@ class RideController extends Controller
             ],
             'rental_type' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
             'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
+            'payment_type' => 'required',
         ]);
     }
 

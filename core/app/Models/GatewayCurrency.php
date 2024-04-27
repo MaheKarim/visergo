@@ -35,9 +35,21 @@ class GatewayCurrency extends Model
         return $this->method->crypto == Status::ENABLE ? '$' : $this->symbol;
     }
 
+    function totalCharge($amount){
+        return $this->fixed_charge + ($amount * $this->percent_charge / 100);
+    }
+
     public function scopeActive()
     {
         return $this->status == Status::ENABLE;
+    }
+
+    public function manualGateway($methodCode){
+        $this->fixed_charge = 0;
+        $this->percent_charge = 0;
+        $this->method_code = $methodCode;
+        $this->currency = gs('cur_text');
+        $this->rate = 1;
     }
 
 }

@@ -163,12 +163,12 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('coupons', 'index')->name('coupon');
                     });
                     // Gateway List For User
-                    Route::namespace('Gateway')->group(function () {
-                        Route::controller('PaymentController')->name('payment.')->group(function () {
-                            Route::get('methods', 'methods');
-                            Route::get('method/{id}', 'method');
-                            Route::post('payment/insert/{id}', 'depositInsert');
-                        });
+                    Route::controller('PaymentController')->name('payment.')->group(function () {
+                        Route::get('methods', 'methods');
+                        Route::get('method/{id}', 'method');
+                        // Route::post('payment/insert/{id}', 'depositInsert');
+                        /** Payment Initialize test **/
+                        Route::post('payment/init', 'initPayment');
                     });
                 });
             });
@@ -250,7 +250,8 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::middleware('driverRideCancel')->group(function () {
                             Route::post('ride/requests/cancel/{id}', 'rideRequestCancel');
                         });
-
+                        // Cash Payment Accept
+                        Route::post('ride/requests/cash-accept/{id}', 'rideRequestCashAccept');
                     });
                 });
                 Route::get('driver-info', function () {
