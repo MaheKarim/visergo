@@ -84,6 +84,7 @@ class PaymentController extends Controller
              $deposit->save();
 
             if ($deposit->ride_id) {
+                dd('asdfasdf'); // Ekhane Aste Hbe
                 $paymentManager = new RidePaymentManager($deposit);
             } else {
                 if ($deposit->driver_id) {

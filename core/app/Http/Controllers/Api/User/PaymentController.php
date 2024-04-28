@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Lib\DriverCashPaymentDisbursement;
-use App\Lib\RewardPoints;
 use App\Models\Deposit;
 use App\Models\GatewayCurrency;
 use App\Models\Ride;
@@ -62,7 +60,7 @@ class PaymentController extends Controller
         $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
         /* Coupon Disbursement Task Incomplete */
 
-        $gateway = $this->paymentGateway($request, $amount, $ride);
+        $gateway = $this->paymentGateway($request, $amount);
 
         if (!$gateway instanceof GatewayCurrency) {
             return response()->json($gateway, 422);
@@ -102,7 +100,7 @@ class PaymentController extends Controller
         if ($request->payment_type == Status::CASH_PAYMENT) {
             $gateway = new GatewayCurrency();
             $gateway->manualGateway(Status::CASH_PAYMENT);
-
+//            (new \App\Lib\RidePaymentManager)->completeRidePayment($request, $gateway, $amount); // Need This
         } else {
             $gateway = GatewayCurrency::whereHas('method', function ($gateway) {
                 $gateway->where('status', Status::ENABLE);

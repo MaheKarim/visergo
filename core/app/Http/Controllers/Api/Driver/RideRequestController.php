@@ -272,7 +272,6 @@ class RideRequestController extends Controller
             $deposit->amount = $ride->total;
             $deposit->detail = 'Cash Payment Accept by  ' . $ride->driver->fullName;
             $deposit->saveDeposit($gateway);
-
         }
         // Driver Balance & Points Disbursement
         RewardPoints::distribute($ride->id);
