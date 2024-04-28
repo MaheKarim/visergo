@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\DriverCashPaymentDisbursement;
 use App\Lib\RewardPoints;
 use App\Models\Deposit;
 use App\Models\GatewayCurrency;
 use App\Models\Ride;
-use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -60,9 +60,9 @@ class PaymentController extends Controller
         }
 
         $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
-        /* Coupon Disbursement */
+        /* Coupon Disbursement Task Incomplete */
 
-        $gateway = $this->paymentGateway($request, $amount);
+        $gateway = $this->paymentGateway($request, $amount, $ride);
 
         if (!$gateway instanceof GatewayCurrency) {
             return response()->json($gateway, 422);
@@ -72,6 +72,7 @@ class PaymentController extends Controller
         $deposit->user_id = $ride->user_id;
         $deposit->ride_id = $ride->id;
         $deposit->amount = $amount;
+        $deposit->detail = 'Payment sent by ' . $ride->user->fullName;
         $deposit->saveDeposit($gateway);
 
         $ride->payment_type = $request->payment_type;

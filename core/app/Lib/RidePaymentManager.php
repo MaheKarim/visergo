@@ -14,23 +14,24 @@ class RidePaymentManager
     public function __construct($deposit)
     {
         $this->deposit = $deposit;
-        $this->ride = $deposit->ride; // Add Relationship
+        $this->ride = $deposit->ride;
         $this->driver = $deposit->ride->driver;
         $this->completeRidePayment();
     }
 
     public function completeRidePayment()
     {
-        $deposit              = $this->deposit;
-        $ride                 = $deposit->ride;
-        $ride->status         = Status::RIDE_COMPLETED;
-        $ride->payment_status = Status::PAYMENT_SUCCESS;
-        $ride->ride_completed_at   = now();
+        $deposit                    = $this->deposit;
+        $ride                       = $deposit->ride;
+        $ride->status               = Status::RIDE_COMPLETED;
+        $ride->payment_status       = Status::PAYMENT_SUCCESS;
+        $ride->ride_completed_at    = now();
 
         $totalPoint = RewardPoints::distribute($ride->id);
 
         $ride->point = $totalPoint;
         $ride->save();
+        DriverCashPaymentDisbursement::balanceDisbursement($ride->id);
 
 
         if ($deposit->method_code == Status::WALLET_PAYMENT) {

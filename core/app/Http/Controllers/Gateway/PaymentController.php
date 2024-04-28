@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gateway;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\DriverPaymentManager;
 use App\Lib\RidePaymentManager;
 use App\Models\Deposit;
 use App\Models\Driver;
@@ -80,14 +81,16 @@ class PaymentController extends Controller
 
         if ($deposit->status == Status::PAYMENT_INITIATE || $deposit->status == Status::PAYMENT_PENDING) {
             $deposit->status = Status::PAYMENT_SUCCESS;
-            // $deposit->save();
+             $deposit->save();
 
             if ($deposit->ride_id) {
-                // Add Money Manager
                 $paymentManager = new RidePaymentManager($deposit);
+            } else {
+                if ($deposit->driver_id) {
+                    $paymentManager = new DriverPaymentManager($deposit->driver, 'driver_id');
+                    $paymentManager->completeDriverPayment($deposit);
+                }
             }
-
-            // Need To Work For Driver
 
         }
     }
@@ -146,6 +149,5 @@ class PaymentController extends Controller
         session()->put('Track', $data->trx);
         return to_route('user.deposit.confirm');
     }
-
 
 }

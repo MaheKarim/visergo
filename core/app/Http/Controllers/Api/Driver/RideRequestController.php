@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\DriverCashPaymentDisbursement;
+use App\Lib\RewardPoints;
+use App\Models\Deposit;
 use App\Models\Driver;
+use App\Models\GatewayCurrency;
 use App\Models\Ride;
 use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
@@ -240,7 +244,7 @@ class RideRequestController extends Controller
     {
         $ride = Ride::where('status', Status::RIDE_END)->where('payment_type', Status::CASH_PAYMENT)->find($id);
 
-        if ($ride == null) {
+        if (!$ride) {
             $notify[] = 'No Ride Found';
             return response()->json([
                 'remark' => 'no_request_found',
@@ -251,6 +255,28 @@ class RideRequestController extends Controller
                 ]
             ]);
         }
+
+        $deposit = Deposit::where('ride_id', $ride->id)->orderBy('id', 'desc')->first();
+
+        if (!$deposit) {
+            $gateway = new GatewayCurrency();
+            $gateway->manualGateway(Status::CASH_PAYMENT);
+
+            if (!($gateway instanceof GatewayCurrency)) {
+                return response()->json($gateway, 422);
+            }
+
+            $deposit = new Deposit();
+            $deposit->driver_id = $ride->driver_id;
+            $deposit->ride_id = $ride->id;
+            $deposit->amount = $ride->total;
+            $deposit->detail = 'Cash Payment Accept by  ' . $ride->driver->fullName;
+            $deposit->saveDeposit($gateway);
+
+        }
+        // Driver Balance & Points Disbursement
+        RewardPoints::distribute($ride->id);
+        DriverCashPaymentDisbursement::balanceDisbursement($ride->id);
 
         $ride->payment_status = Status::PAYMENT_SUCCESS;
         $ride->is_cash_accept = Status::YES;
