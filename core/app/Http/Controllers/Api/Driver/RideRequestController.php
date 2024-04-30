@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Lib\DriverCashPaymentDisbursement;
+use App\Lib\DriverPaymentDisbursement;
 use App\Lib\RewardPoints;
 use App\Models\Deposit;
 use App\Models\Driver;
@@ -274,8 +274,8 @@ class RideRequestController extends Controller
             $deposit->saveDeposit($gateway);
         }
         // Driver Balance & Points Disbursement
-        RewardPoints::distribute($ride->id);
-        DriverCashPaymentDisbursement::balanceDisbursement($ride->id);
+//        RewardPoints::distribute($ride->id);
+//        DriverPaymentDisbursement::cashPaymentDisbursement($ride->id);
 
         $ride->payment_status = Status::PAYMENT_SUCCESS;
         $ride->is_cash_accept = Status::YES;

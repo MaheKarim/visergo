@@ -9,6 +9,7 @@ use App\Models\GatewayCurrency;
 use App\Models\Ride;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Gateway\PaymentController as GatewayPaymentController;
 
 class PaymentController extends Controller
 {
@@ -59,13 +60,11 @@ class PaymentController extends Controller
 
         $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
         /* Coupon Disbursement Task Incomplete */
-
-        $gateway = $this->paymentGateway($request, $amount);
+        $gateway = $this->paymentGateway($request, $amount, $ride);
 
         if (!$gateway instanceof GatewayCurrency) {
             return response()->json($gateway, 422);
         }
-
         $deposit = new Deposit();
         $deposit->user_id = $ride->user_id;
         $deposit->ride_id = $ride->id;
@@ -95,11 +94,13 @@ class PaymentController extends Controller
         ];
     }
 
-    private function paymentGateway($request, $amount)
+    private function paymentGateway($request, $amount, $deposit)
     {
         if ($request->payment_type == Status::CASH_PAYMENT) {
             $gateway = new GatewayCurrency();
             $gateway->manualGateway(Status::CASH_PAYMENT);
+            // Call the userUpdate method
+            GatewayPaymentController::userDataUpdate($deposit);
         } else {
             $gateway = GatewayCurrency::whereHas('method', function ($gateway) {
                 $gateway->where('status', Status::ENABLE);
