@@ -13,7 +13,6 @@ class RidePaymentManager
 
     public function __construct($deposit)
     {
-        dd('asdfasdf');
         $this->deposit = $deposit;
         $this->ride = $deposit->ride;
         $this->driver = $deposit->ride->driver;
@@ -31,7 +30,6 @@ class RidePaymentManager
         $totalPoint = RewardPoints::distribute($ride->id);
 
         $ride->point = $totalPoint;
-        dd($ride);
         $ride->save();
         DriverCashPaymentDisbursement::balanceDisbursement($ride->id);
 

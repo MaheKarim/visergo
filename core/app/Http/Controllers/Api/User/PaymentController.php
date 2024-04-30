@@ -100,12 +100,10 @@ class PaymentController extends Controller
         if ($request->payment_type == Status::CASH_PAYMENT) {
             $gateway = new GatewayCurrency();
             $gateway->manualGateway(Status::CASH_PAYMENT);
-//            (new \App\Lib\RidePaymentManager)->completeRidePayment($request, $gateway, $amount); // Need This
         } else {
             $gateway = GatewayCurrency::whereHas('method', function ($gateway) {
                 $gateway->where('status', Status::ENABLE);
             })->where('method_code', $request->method_code)->where('currency', $request->currency)->first();
-
             if (!$gateway) {
                 return errorResponse('invalid_gateway_selected', 'Invalid gateway selected');
             }
