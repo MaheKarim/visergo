@@ -47,11 +47,11 @@ class RidePaymentManager
             $this->completeWalletPayment($deposit, $ride);
         }
 
-        if ($deposit->method_code == Status::ONLINE_PAYMENT) {
+        if ($deposit->method_code >= 100) {
             $this->completeOnlinePayment();
         }
 
-        $this->payAdminCommission();
+//        $this->payAdminCommission();
 
     }
 
@@ -60,7 +60,10 @@ class RidePaymentManager
         $driver = $this->driver;
         $ride = $this->ride;
 
-        DriverPaymentDisbursement::cashPaymentDisbursement($ride->id);
+        $driver->total_earning      += $ride->driver_amount;
+        $driver->balance            -= ($ride->admin_commission + $ride->vat_amount);
+        $driver->save();
+
 
         $transaction               = new Transaction();
         $transaction->user_id      = $ride->user->id;
@@ -88,8 +91,9 @@ class RidePaymentManager
     {
         $driver = $this->driver;
         $ride = $this->ride;
-
-        DriverPaymentDisbursement::onlinePaymentDisbursement($ride->id);
+        $driver->total_earning += $ride->driver_amount;
+        $driver->balance += $ride->driver_amount;
+        $driver->save();
 
         $transaction               = new Transaction();
         $transaction->driver_id    = $driver->id;
