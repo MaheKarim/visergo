@@ -38,7 +38,6 @@ class RidePaymentManager
         $ride->point = $totalPoint;
         $ride->save();
 
-
         if($deposit->method_code == Status::CASH_PAYMENT){
             $this->completeCashPayment();
         }
@@ -51,7 +50,7 @@ class RidePaymentManager
             $this->completeOnlinePayment();
         }
 
-//        $this->payAdminCommission();
+        $this->payAdminCommission();
 
     }
 
@@ -122,16 +121,12 @@ class RidePaymentManager
         $driver = $this->driver;
         $ride = $this->ride;
 
-        $driver->balance -= $ride->admin_commission;
-        $driver->balance -= $ride->vat_amount;
-        $driver->save();
-
         $transaction               = new Transaction();
         $transaction->driver_id    = $driver->id;
         $transaction->amount       = $ride->admin_commission + $ride->vat_amount;
         $transaction->post_balance = $driver->balance;
         $transaction->charge       = 0;
-        $transaction->trx_type     = '-';
+        $transaction->trx_type     = '+';
         $transaction->trx          = $this->deposit->trx;
         $transaction->remark       = 'ride_commission';
         $transaction->details      = 'Ride commission paid';

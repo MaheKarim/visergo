@@ -84,7 +84,7 @@ class PaymentController extends Controller
              $deposit->save();
 
             if ($deposit->ride_id) {
-                $paymentManager = new RidePaymentManager($deposit);
+                 new RidePaymentManager($deposit);
             } else {
                 if ($deposit->driver_id) {
                     $paymentManager = new DriverPaymentManager($deposit->driver, 'driver_id');
