@@ -76,6 +76,7 @@ class PaymentController extends Controller
         $ride->save();
 
         if ($request->payment_type == Status::CASH_PAYMENT) {
+            GatewayPaymentController::userDataUpdate($deposit);
             return $this->cashPayment();
         }  else {
             return $this->gatewayPayment($deposit);
@@ -99,8 +100,6 @@ class PaymentController extends Controller
         if ($request->payment_type == Status::CASH_PAYMENT) {
             $gateway = new GatewayCurrency();
             $gateway->manualGateway(Status::CASH_PAYMENT);
-            // Call the userUpdate method
-            GatewayPaymentController::userDataUpdate($deposit);
         } else {
             $gateway = GatewayCurrency::whereHas('method', function ($gateway) {
                 $gateway->where('status', Status::ENABLE);

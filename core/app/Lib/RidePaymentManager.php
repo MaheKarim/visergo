@@ -24,13 +24,11 @@ class RidePaymentManager
         $deposit                    = $this->deposit;
         $ride                       = $deposit->ride;
 
-//        if ($ride->payment_type == Status::ONLINE_PAYMENT) {
-//            $ride->status = Status::RIDE_COMPLETED;
-//        } else {
-//            $ride->status = Status::RIDE_END;
-//        }
-
-        $ride->status = Status::RIDE_COMPLETED;
+        if ($ride->payment_type == Status::ONLINE_PAYMENT) {
+            $ride->status = Status::RIDE_COMPLETED;
+        } else {
+            $ride->status = Status::RIDE_END;
+        }
 
         $ride->payment_status       = Status::PAYMENT_SUCCESS;
         $ride->ride_completed_at    = now();
