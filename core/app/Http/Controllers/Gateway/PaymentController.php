@@ -78,7 +78,6 @@ class PaymentController extends Controller
 
     public static function userDataUpdate($deposit)
     {
-
         if ($deposit->status == Status::PAYMENT_INITIATE || $deposit->status == Status::PAYMENT_PENDING) {
             $deposit->status = Status::PAYMENT_SUCCESS;
              $deposit->save();
@@ -91,7 +90,6 @@ class PaymentController extends Controller
                     $paymentManager->completeDriverPayment($deposit);
                 }
             }
-
         }
     }
 

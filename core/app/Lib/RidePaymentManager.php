@@ -37,7 +37,6 @@ class RidePaymentManager
 
         $ride->point = $totalPoint;
         $ride->save();
-
         if($deposit->method_code == Status::CASH_PAYMENT){
             $this->completeCashPayment();
         }
@@ -58,6 +57,7 @@ class RidePaymentManager
     {
         $driver = $this->driver;
         $ride = $this->ride;
+        $ride->save();
 
         $driver->total_earning      += $ride->driver_amount;
         $driver->balance            -= ($ride->admin_commission + $ride->vat_amount);

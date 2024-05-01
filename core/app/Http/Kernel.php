@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\DriverDueMiddleware;
 use App\Http\Middleware\DriverVerificationStatus;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -85,6 +86,7 @@ class Kernel extends HttpKernel
         'isDriverOnline' => \App\Http\Middleware\DriverOnlineStatus::class,
         'drivingCheck' => \App\Http\Middleware\DrivingCheck::class,
         'driverRideCancel' => \App\Http\Middleware\DriverRideCancelMiddleware::class,
+        'driverDueCheck' => DriverDueMiddleware::class
 
     ];
 }

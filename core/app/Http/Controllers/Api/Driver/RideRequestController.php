@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\Driver;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
-use App\Lib\DriverPaymentDisbursement;
-use App\Lib\RewardPoints;
 use App\Models\Deposit;
 use App\Models\Driver;
 use App\Models\GatewayCurrency;
@@ -14,6 +12,7 @@ use App\Traits\RideCancelTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Gateway\PaymentController as GatewayPaymentController;
 
 class RideRequestController extends Controller
 {
@@ -242,7 +241,7 @@ class RideRequestController extends Controller
 
     public function rideRequestCashAccept(Request $request, $id)
     {
-        $ride = Ride::where('status', Status::RIDE_END)->where('payment_type', Status::CASH_PAYMENT)->find($id);
+        $ride = Ride::where('status', Status::RIDE_END)->find($id);
 
         if (!$ride) {
             $notify[] = 'No Ride Found';
@@ -273,11 +272,9 @@ class RideRequestController extends Controller
             $deposit->detail = 'Cash Payment Accept by  ' . $ride->driver->fullName;
             $deposit->saveDeposit($gateway);
         }
-        // Driver Balance & Points Disbursement
-//        RewardPoints::distribute($ride->id);
-//        DriverPaymentDisbursement::cashPaymentDisbursement($ride->id);
 
         $ride->payment_status = Status::PAYMENT_SUCCESS;
+        $ride->payment_type = Status::CASH_PAYMENT;
         $ride->is_cash_accept = Status::YES;
         $ride->status = Status::RIDE_COMPLETED;
         $ride->save();
@@ -286,7 +283,18 @@ class RideRequestController extends Controller
         $driver->is_driving = Status::IDLE;
         $driver->save();
 
-        $notify[] = 'Ride Completed Successfully';
+
+        try {
+          GatewayPaymentController::userDataUpdate($deposit);
+        } catch (\Exception $e) {
+            return response()->json([
+                'remark'  => 'driver_data_update_error',
+                'status'  => 'error',
+                'message' => ['error' => $e->getMessage()],
+            ]);
+        }
+
+        $notify[] = 'Payment Accepted Successfully';
         return response()->json([
             'remark' => 'ride_request_accept',
             'status' => 'success',
