@@ -257,9 +257,19 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::controller('PaymentController')->prefix('driver')->name('payment.')->group(function () {
                         Route::get('methods', 'methods')->name('methods');
                         Route::get('method/{id}', 'method');
-
                         Route::post('payment/add-money', 'addMoney');
+                        // Cash Payment Received - WIP
+                      // Route::post('payment/cash/{id}', 'acceptCash');
                     });
+
+                    // Withdraw Features
+                    Route::controller('WithdrawController')->prefix('driver')->group(function () {
+                        Route::get('withdraw-method', 'withdrawMethod');
+                        Route::post('withdraw-request', 'withdrawStore');
+                        Route::post('withdraw-request/confirm', 'withdrawSubmit');
+                        Route::get('withdraw/history', 'withdrawLog');
+                    });
+
                 Route::get('driver-info', function () {
                     $user = auth()->user();
                     if ($user instanceof Driver) {

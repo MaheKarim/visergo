@@ -9,6 +9,7 @@ use App\Lib\DriverPaymentManager;
 use App\Models\Deposit;
 use App\Models\Driver;
 use App\Models\GatewayCurrency;
+use App\Models\Ride;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -53,5 +54,43 @@ class PaymentController extends Controller
             ],
         ]);
     }
-
+//    public function acceptCash($id)
+//    {
+//        $ride = Ride::ongoingRide()->where('driver_id', auth()->id())->find($id);
+//
+//        if($ride->payment_status != Status::PAYMENT_PENDING){
+//            $notify[] = 'Not eligible for payment';
+//            return response()->json(errorResponse('not_eligible',$notify));
+//        }
+//
+//        if (!$ride) {
+//            $notify[] = 'The ride is invalid';
+//            return response()->json(errorResponse('ride_invalid',$notify));
+//        }
+//
+//        $deposit = Deposit::where('ride_id', $ride->id)->orderBy('id', 'desc')->first();
+//
+//        if (!$deposit || @$deposit->status == Status::PAYMENT_SUCCESS) {
+//            $notify[] = 'Invalid request';
+//            return response()->json(errorResponse('invalid_request',$notify));
+//        }
+//
+//        try {
+//            GatewayPaymentController::userDataUpdate($deposit);
+//        } catch (\Exception $e) {
+//            return response()->json([
+//                'remark'  => 'driver_data_update_error',
+//                'status'  => 'error',
+//                'message' => ['error' => $e->getMessage()],
+//            ]);
+//        }
+//
+//        $notify[] = 'Payment accepted successfully';
+//
+//        return response()->json([
+//            'remark'  => 'payment_accepted',
+//            'status'  => 'success',
+//            'message' => ['success' => $notify]
+//        ]);
+//    }
 }
