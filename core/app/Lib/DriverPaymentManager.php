@@ -2,13 +2,14 @@
 
 namespace App\Lib;
 
-use App\Constants\Status;
-use App\Models\AdminNotification;
 use App\Models\Deposit;
-use App\Models\GatewayCurrency;
+use App\Constants\Status;
 use App\Models\Transaction;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Validator;
+use Illuminate\Http\Request;
+use App\Models\GatewayCurrency;
+use App\Models\AdminNotification;
+use Illuminate\Support\Facades\Validator;
 
 class DriverPaymentManager
 {
@@ -91,7 +92,7 @@ class DriverPaymentManager
         $adminNotification = new AdminNotification();
         $adminNotification->$column    = $user->id;
         $adminNotification->title     = 'Add money successful via ' . $deposit->gatewayCurrency()->name;
-        $adminNotification->click_url = urlPath('admin.deposit.user.successful');
+        $adminNotification->click_url = urlPath('admin.deposit.pending');
         $adminNotification->save();
 
         notify($user, $user_type == 'user' ? 'USER_ADD_MONEY' : 'DRIVER_ADD_MONEY', [

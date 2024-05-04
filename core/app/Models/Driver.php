@@ -65,6 +65,21 @@ class Driver extends Authenticatable
         return $this->hasMany(DriverReview::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class)->orderBy('id', 'desc');
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(Deposit::class)->where('status', '!=', Status::PAYMENT_INITIATE);
+    }
+
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class)->where('status', '!=', Status::PAYMENT_INITIATE);
+    }
+
     public function getFullNameAttribute()
     {
         return ucfirst($this->firstname) . ' ' . ucfirst($this->lastname);
@@ -118,5 +133,10 @@ class Driver extends Authenticatable
     public function scopeWithBalance($query)
     {
         return $query->where('balance','>', 0);
+    }
+
+    public function getImageWithPathAttribute(): string
+    {
+        return getImage(getFilePath('driverProfile'). '/' . $this->avatar);
     }
 }

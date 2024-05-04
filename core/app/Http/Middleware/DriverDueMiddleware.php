@@ -23,10 +23,10 @@ class DriverDueMiddleware
 
         $dueLimit = gs('driver_min_due');
 
-        if (!$driver->balance >= $dueLimit) {
+        if ($driver->balance >= $dueLimit) {
             return $next($request);
         } else {
-            $notify[] = 'You reached the maximum due limit.';
+            $notify[] = 'You reached the maximum due limit. Your balance is ' . showAmount($driver->balance) .  ' ' .gs('cur_text');
             return response()->json([
                 'message' => $notify,
                 'status' => 'error',

@@ -39,7 +39,7 @@ class PaymentController extends Controller
         }
 
         session()->put('Track', $data->trx);
-        return to_route('user.deposit.confirm');
+        return to_route(currentGuard('type') . '.deposit.confirm');
     }
 
     public function depositConfirm()
@@ -72,7 +72,7 @@ class PaymentController extends Controller
             $deposit->save();
         }
 
-        $pageTitle = 'Payment Confirm';
+        $pageTitle = currentGuard('type') == 'user' ? 'Payment Confirm' : 'Add Money Confirm';
         return view($this->activeTemplate . $data->view, compact('data', 'pageTitle', 'deposit'));
     }
 

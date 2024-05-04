@@ -254,6 +254,12 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::post('ride/requests/cash-accept/{id}', 'rideRequestCashAccept');
                     });
                 });
+                    Route::controller('PaymentController')->prefix('driver')->name('payment.')->group(function () {
+                        Route::get('methods', 'methods')->name('methods');
+                        Route::get('method/{id}', 'method');
+
+                        Route::post('payment/add-money', 'addMoney');
+                    });
                 Route::get('driver-info', function () {
                     $user = auth()->user();
                     if ($user instanceof Driver) {

@@ -16,7 +16,7 @@ class RegistrationStep
      */
     public function handle(Request $request, Closure $next)
     {
-        $user = auth()->user();
+        $user = currentGuard('user');
         if (!$user->profile_complete) {
             if ($request->is('api/*')) {
                 $notify[] = 'Please complete your profile to go next';
@@ -26,7 +26,7 @@ class RegistrationStep
                     'message'=>['error'=>$notify],
                 ]);
             }else{
-                return to_route('user.data');
+                return to_route(currentGuard('type').'.data');
             }
         }
         return $next($request);

@@ -43,7 +43,6 @@ Route::middleware('admin')->group(function () {
 
         Route::get('download-attachments/{file_hash}', 'downloadAttachment')->name('download.attachment');
     });
-
     // Users Manager
     Route::controller('ManageUsersController')->name('users.')->prefix('users')->group(function () {
         Route::get('/', 'allUsers')->name('all');
@@ -73,7 +72,6 @@ Route::middleware('admin')->group(function () {
         Route::get('list', 'list')->name('list');
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
     });
-
     // Subscriber
     Route::controller('SubscriberController')->prefix('subscriber')->name('subscriber.')->group(function () {
         Route::get('/', 'index')->name('index');
@@ -81,7 +79,6 @@ Route::middleware('admin')->group(function () {
         Route::post('remove/{id}', 'remove')->name('remove');
         Route::post('send-email', 'sendEmail')->name('send.email');
     });
-
     // Deposit Gateway
     Route::name('gateway.')->prefix('gateway')->group(function () {
         // Automatic Gateway
@@ -104,7 +101,6 @@ Route::middleware('admin')->group(function () {
             Route::post('status/{id}', 'status')->name('status');
         });
     });
-
     // DEPOSIT SYSTEM
     Route::controller('DepositController')->prefix('deposit')->name('deposit.')->group(function () {
         Route::get('/', 'deposit')->name('list');
@@ -118,7 +114,6 @@ Route::middleware('admin')->group(function () {
         Route::post('approve/{id}', 'approve')->name('approve');
 
     });
-
     // WITHDRAW SYSTEM
     Route::name('withdraw.')->prefix('withdraw')->group(function () {
 
@@ -143,7 +138,6 @@ Route::middleware('admin')->group(function () {
             Route::post('status/{id}', 'status')->name('status');
         });
     });
-
     // Report
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
         Route::get('transaction', 'transaction')->name('transaction');
@@ -152,7 +146,6 @@ Route::middleware('admin')->group(function () {
         Route::get('notification/history', 'notificationHistory')->name('notification.history');
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
     });
-
     // Admin Support
     Route::controller('SupportTicketController')->prefix('ticket')->name('ticket.')->group(function () {
         Route::get('/', 'tickets')->name('index');
@@ -165,7 +158,6 @@ Route::middleware('admin')->group(function () {
         Route::get('download/{ticket}', 'ticketDownload')->name('download');
         Route::post('delete/{id}', 'ticketDelete')->name('delete');
     });
-
     // Language Manager
     Route::controller('LanguageController')->prefix('language')->name('language.')->group(function () {
         Route::get('/', 'langManage')->name('manage');
@@ -179,7 +171,6 @@ Route::middleware('admin')->group(function () {
         Route::post('update/key/{id}', 'updateLanguageJson')->name('update.key');
         Route::get('get-keys', 'getKeys')->name('get.key');
     });
-
 
     Route::controller('GeneralSettingController')->group(function () {
         // General Setting
@@ -208,7 +199,6 @@ Route::middleware('admin')->group(function () {
 
     });
 
-
     Route::controller('CronConfigurationController')->name('cron.')->prefix('cron')->group(function () {
         Route::get('index', 'cronJobs')->name('index');
         Route::post('store', 'cronJobStore')->name('store');
@@ -222,13 +212,11 @@ Route::middleware('admin')->group(function () {
         Route::post('schedule/log/resolved/{id}', 'scheduleLogResolved')->name('schedule.log.resolved');
         Route::post('schedule/log/flush/{id}', 'logFlush')->name('log.flush');
     });
-
     //KYC setting
     Route::controller('KycController')->group(function () {
         Route::get('kyc-setting/{act?}', 'setting')->name('kyc.setting');
         Route::post('kyc-setting/{act?}', 'settingUpdate')->name('settingUpdate');
     });
-
     //Notification Setting
     Route::name('setting.notification.')->controller('NotificationController')->prefix('notification')->group(function () {
         //Template Setting
@@ -248,14 +236,12 @@ Route::middleware('admin')->group(function () {
         Route::post('sms/setting', 'smsSettingUpdate');
         Route::post('sms/test', 'smsTest')->name('sms.test');
     });
-
     // Plugin
     Route::controller('ExtensionController')->prefix('extensions')->name('extensions.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('update/{id}', 'update')->name('update');
         Route::post('status/{id}', 'status')->name('status');
     });
-
     //System Information
     Route::controller('SystemController')->name('system.')->prefix('system')->group(function () {
         Route::get('info', 'systemInfo')->name('info');
@@ -265,10 +251,8 @@ Route::middleware('admin')->group(function () {
         Route::get('system-update', 'systemUpdate')->name('update');
         Route::post('update-upload', 'updateUpload')->name('update.upload');
     });
-
     // SEO
     Route::get('seo', 'FrontendController@seoEdit')->name('seo');
-
     // Frontend
     Route::name('frontend.')->prefix('frontend')->group(function () {
 
@@ -292,7 +276,6 @@ Route::middleware('admin')->group(function () {
         });
 
     });
-
     // Vehicle Type
     Route::controller('VehicleTypeController')->name('vehicle.type.')->prefix('vehicle-type')->group(function () {
         Route::get('/', 'index')->name('index');

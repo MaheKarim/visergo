@@ -8,7 +8,6 @@ use App\Lib\FormProcessor;
 use App\Models\CancellationReason;
 use App\Models\Form;
 use App\Models\GeneralSetting;
-use App\Models\Ride;
 use App\Models\Transaction;
 use App\Models\Vehicle;
 use App\Models\VehicleModel;
@@ -409,6 +408,24 @@ class DriverController extends Controller
             'message'=>['success'=>$notify],
             'data'=>[
                 'reason'=>$reason
+            ]
+        ]);
+    }
+
+    public function depositHistory(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $deposits = auth()->user('driver')->deposits();
+        if ($request->search) {
+            $deposits = $deposits->where('trx', $request->search);
+        }
+        $deposits = $deposits->with(['gateway'])->orderBy('id', 'desc')->paginate(getPaginate());
+        $notify[] = 'Deposit data';
+        return response()->json([
+            'remark' => 'deposits',
+            'status' => 'success',
+            'message' => ['success' => $notify],
+            'data' => [
+                'deposits' => $deposits
             ]
         ]);
     }

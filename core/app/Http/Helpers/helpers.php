@@ -335,9 +335,9 @@ function getContent($dataKeys, $singleQuery = false, $limit = null, $orderById =
 function gatewayRedirectUrl($type = false)
 {
     if ($type) {
-        return 'user.deposit.history';
+        return currentGuard('type') . '.deposit.history';
     } else {
-        return 'user.deposit.index';
+        return currentGuard('type').'.deposit.index';
     }
 }
 
@@ -503,4 +503,27 @@ if (!function_exists('getOrderId')) {
     {
         return strtoupper(substr($uuid, -12));
     }
+}
+
+function currentGuard($name)
+{
+    if (!in_array($name, ['type', 'user'])) {
+        return false;
+    };
+
+    if (request()->is('api/*')) {
+        $user = auth()->user();
+        $model = $user->getModel();
+        $type = strtolower(class_basename($model));
+        return $$name;
+    }
+
+    if (auth()->check()) {
+        $user = auth()->user();
+        $type = 'user';
+    } elseif (auth()->guard('driver')->check()) {
+        $user = auth()->guard('driver')->user();
+        $type = 'driver';
+    }
+    return $$name;
 }

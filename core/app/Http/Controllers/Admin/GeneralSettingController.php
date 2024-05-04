@@ -40,7 +40,7 @@ class GeneralSettingController extends Controller
             'admin_fixed_commission' => 'required|numeric|min:0',
             'admin_percent_commission' => 'required|numeric|min:0',
             'pre_booking_time' => 'required|numeric|min:0',
-            'driver_min_due' => 'required|numeric|min:0',
+            'driver_min_due' => 'required|numeric',
         ]);
 
         $timezones = json_decode(file_get_contents(resource_path('views/admin/partials/timezone.json')));

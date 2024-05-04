@@ -41,6 +41,7 @@
                                 </div>
                             </div>
                             <br>
+                            {{ currentGuard('type') }}
                             <button class="btn btn--base w-100" type="submit"> @lang('Submit')</button>
                         </form>
                     </div>
