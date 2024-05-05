@@ -82,7 +82,7 @@ class RideController extends Controller
 
         if ($fareDetails['error']) {
             return response()->json([
-                'remark' => 'validation_error',
+                'remark' => 'ride_search_error',
                 'message' =>  $fareDetails['message']
             ]);
         }
@@ -307,11 +307,7 @@ class RideController extends Controller
 
     private function validationErrorResponse($validator)
     {
-        return response()->json([
-            'remark' => 'validation_error',
-            'status' => 'error',
-            'message' => $validator->errors()->first(),
-        ], 422);
+        return formatResponse('validation_error', 'error', $validator->errors()->first());
     }
 
     public function rideTips(Request $request, $id)
