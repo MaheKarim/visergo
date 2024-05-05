@@ -527,3 +527,28 @@ function currentGuard($name)
     }
     return $$name;
 }
+
+    if (!function_exists('formatResponse')) {
+        function formatResponse($remark, $status, $message, $data = null): \Illuminate\Http\JsonResponse
+        {
+            $response = [
+                'remark' => $remark,
+                'status' => $status,
+                'message' => [
+                    $status => (array) $message,
+                ],
+            ];
+
+            if ($data !== null) {
+                $response['data'] = $data;
+            }
+
+            if ($remark !== null) {
+                $response['remark'] = $remark;
+            }
+
+            return response()->json($response);
+        }
+    }
+
+
