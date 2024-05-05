@@ -157,6 +157,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                             Route::post('ride/cancel/{id}', 'rideCancel');
                         });
                         Route::post('ride/review/{id}', 'rideReview');
+                        Route::get('ride/details/{id}', 'rideDetails');
                     });
                     // Coupon List For User
                     Route::controller('CouponListController')->name('coupon.')->group(function () {
@@ -240,7 +241,6 @@ Route::namespace('Api')->name('api.')->group(function () {
                         // Live Requests
                         Route::get('ride/requests', 'rideRequests');
                         Route::get('ride/ongoing-requests', 'ongoingRequests');
-                        // Can  Not Accept Multiple Ride Requests Middleware
                         Route::middleware(['drivingCheck', 'driverDueCheck'])->group(function () {
                             Route::post('ride/requests/accept/{id}', 'rideRequestAccept');
                         });

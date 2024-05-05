@@ -506,4 +506,28 @@ class RideController extends Controller
         ]);
     }
 
+
+    public function rideDetails($id)
+    {
+        $ride = Ride::with('destinations')->where('user_id', auth()->id())->find($id);
+
+        if ($ride == null) {
+            return response()->json([
+                'remark' => 'ride_not_found',
+                'status' => 'error',
+                'message' => 'No Ongoing Ride Found',
+                'data' => $ride,
+            ]);
+        }
+        $notify[] = 'Ride Details';
+        return response()->json([
+            'remark' => 'ride_details',
+            'status' => 'success',
+            'message' => [
+                'success' => $notify,
+            ],
+            'data' => $ride->load('destinations'),
+        ]);
+    }
+
 }
