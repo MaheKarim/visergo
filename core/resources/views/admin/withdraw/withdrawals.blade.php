@@ -65,9 +65,9 @@
                                 </td>
 
                                 <td>
-                                    <span class="fw-bold">{{ $withdraw->user->fullname }}</span>
+                                    <span class="fw-bold">{{ $withdraw->driver->fullname }}</span>
                                     <br>
-                                    <span class="small"> <a href="{{ appendQuery('search',@$withdraw->user->username) }}"><span>@</span>{{ $withdraw->user->username }}</a> </span>
+                                    <span class="small"> <a href="{{ appendQuery('search',@$withdraw->driver->username) }}"><span>@</span>{{ $withdraw->driver->username }}</a> </span>
                                 </td>
 
 

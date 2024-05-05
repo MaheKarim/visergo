@@ -21,7 +21,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('Username')
                             <span class="fw-bold">
-                                <a href="{{ route('admin.users.detail', $withdrawal->user_id) }}">{{ @$withdrawal->user->username }}</a>
+                                <a href="{{ route('admin.drivers.detail', $withdrawal->driver_id) }}">{{ @$withdrawal->driver->username }}</a>
                             </span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">

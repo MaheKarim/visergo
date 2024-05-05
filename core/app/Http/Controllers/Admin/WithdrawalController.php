@@ -86,7 +86,7 @@ class WithdrawalController extends Controller
     public function details($id)
     {
         $withdrawal = Withdrawal::where('id',$id)->where('status', '!=', Status::PAYMENT_INITIATE)->with(['user','method'])->firstOrFail();
-        $pageTitle = $withdrawal->user->username.' Withdraw Requested ' . showAmount($withdrawal->amount) . ' '.gs('cur_text');
+        $pageTitle = $withdrawal->driver->username.' Withdraw Requested ' . showAmount($withdrawal->amount) . ' '.gs('cur_text');
         $details = $withdrawal->withdraw_information ? json_encode($withdrawal->withdraw_information) : null;
 
         return view('admin.withdraw.detail', compact('pageTitle', 'withdrawal','details'));

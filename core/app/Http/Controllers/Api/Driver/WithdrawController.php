@@ -53,7 +53,7 @@ class WithdrawController extends Controller
             ]);
         }
 
-        $driver = currentGuard('user');
+        $driver = auth()->user();
         if ($request->amount < $method->min_limit) {
             $notify[] =  'Your requested amount is smaller than minimum amount.';
             return response()->json([
@@ -163,7 +163,7 @@ class WithdrawController extends Controller
 
         $userData = $formProcessor->processFormData($request, $formData);
 
-        $driver = currentGuard('user');
+        $driver = auth()->user();
         if ($driver->ts) {
             if (!$request->authenticator_code) {
                 $notify[] = 'Google authentication is required';
@@ -238,7 +238,7 @@ class WithdrawController extends Controller
 
     public function withdrawLog(Request $request)
     {
-        $withdraws = Withdrawal::where('driver_id', currentGuard('user')->id ?? 0);
+        $withdraws = Withdrawal::where('driver_id', auth()->id() ?? 0);
         if ($request->search) {
             $withdraws = $withdraws->where('trx', $request->search);
         }
