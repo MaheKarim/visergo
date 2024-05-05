@@ -490,11 +490,14 @@ if (!function_exists('isUniqueOTP')) {
     }
 }
 
-function errorResponse($remark, $message, $status = 200){
+function errorResponse($remark, $message, $status = 200): \Illuminate\Http\JsonResponse
+{
     return response()->json([
-        'reamark' => $remark,
+        'remark' => $remark,
         'status' => 'error',
-        'message' => $message,
+        'message' => [
+            'error' => (array) $message,
+        ],
     ], $status);
 }
 

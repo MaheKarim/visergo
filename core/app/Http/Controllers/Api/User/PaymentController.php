@@ -55,7 +55,7 @@ class PaymentController extends Controller
         $ride = Ride::where('user_id', auth()->id())->ongoingRide()->paymentPending()->find($request->ride_id);
 
         if ($ride == null) {
-            return response()->json(errorResponse('ride_not_found', 'No Ride Found'), 404);
+            return formatResponse('ride_not_found', 'error', 'No Ride Found', $ride);
         }
 
         $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
@@ -113,7 +113,7 @@ class PaymentController extends Controller
             }
 
             if ($gateway->max_amount < $amount) {
-                return errorResponse('max_limit_check', 'Maximum limit for this gateway is ' . $gateway->max_amount);
+                return errorResponse('max_limit_check','Maximum limit for this gateway is ' . $gateway->max_amount);
             }
         }
 
@@ -124,11 +124,7 @@ class PaymentController extends Controller
     {
         $notify[] =  'Cash payment request placed successfully';
 
-        return response()->json([
-            'remark'  => 'cash_payment',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
+        return formatResponse('cash_payment', 'success', $notify, []);
     }
 
     private function gatewayPayment($deposit)

@@ -158,6 +158,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                         });
                         Route::post('ride/review/{id}', 'rideReview');
                         Route::get('ride/details/{id}', 'rideDetails');
+                        Route::get('ride/accepted', 'acceptedRides');
                     });
                     // Coupon List For User
                     Route::controller('CouponListController')->name('coupon.')->group(function () {

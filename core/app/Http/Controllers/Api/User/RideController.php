@@ -274,7 +274,7 @@ class RideController extends Controller
         // Admin Portion
         // Driver Notification Sent
 
-        return formatResponse('ride_request_created', 'success', 'Ride Request Created Successfully', $ride->load('destinations'));
+        return formatResponse('ride_request_created', 'success', 'Ride request created successfully', $ride->load('destinations'));
     }
 
 
@@ -328,14 +328,14 @@ class RideController extends Controller
 
         if ($request->tips != 0) {
 
-            return formatResponse('ride_tips', 'error', 'Ride Tips Already Added', $ride);
+            return formatResponse('ride_tips', 'error', 'Ride tips already added', $ride);
 
         } else {
             $ride->tips = $request->tips;
             $ride->total = $ride->total + $request->tips;
             $ride->save();
 
-            return formatResponse('ride_tips', 'success', 'Ride Tips Added Successfully', $ride);
+            return formatResponse('ride_tips', 'success', 'Ride tips added successfully', $ride);
         }
     }
 
@@ -445,7 +445,7 @@ class RideController extends Controller
             return formatResponse('ride_history', 'error', 'No ' . $message . ' Found', []);
         }
 
-        return formatResponse('ride_history', $message, 'Ride History', $rides);
+        return formatResponse('ride_history', $message, 'Ride history', $rides);
     }
 
     public function rideDetails($id)
@@ -457,6 +457,17 @@ class RideController extends Controller
         }
 
         return formatResponse('ride_details', 'success', 'Ride Details', $ride->load('destinations'));
+    }
+
+    public function acceptedRides()
+    {
+        $rides = Ride::where('user_id', auth()->id())->accepted()->with('destinations', 'driver:id,firstname,lastname,avg_rating,mobile,reward_points,license_expire')->paginate(10);
+
+        if ($rides->isEmpty()) {
+            return formatResponse('no_accepted_rides', 'error', 'No accepted rides found', $rides);
+        }
+
+        return formatResponse('accepted_rides', 'success', 'Accepted rides', $rides);
     }
 
 }
