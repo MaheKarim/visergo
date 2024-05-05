@@ -211,7 +211,7 @@ class WithdrawController extends Controller
         $transaction->save();
 
         $adminNotification = new AdminNotification();
-        $adminNotification->user_id = $driver->id;
+        $adminNotification->driver_id = $driver->id;
         $adminNotification->title = 'New withdraw request from ' . $driver->username;
         $adminNotification->click_url = urlPath('admin.withdraw.details', $withdraw->id);
         $adminNotification->save();
