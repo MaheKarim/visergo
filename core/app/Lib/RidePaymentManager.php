@@ -3,6 +3,7 @@
 namespace App\Lib;
 
 use App\Constants\Status;
+use App\Models\Driver;
 use App\Models\Transaction;
 
 class RidePaymentManager
@@ -25,6 +26,8 @@ class RidePaymentManager
         $ride                       = $deposit->ride;
 
         if ($ride->payment_type == Status::ONLINE_PAYMENT) {
+            $ride->status = Status::RIDE_COMPLETED;
+        } elseif ($ride->payment_type == Status::CASH_PAYMENT && (auth()->user() instanceof Driver)) {
             $ride->status = Status::RIDE_COMPLETED;
         } else {
             $ride->status = Status::RIDE_END;

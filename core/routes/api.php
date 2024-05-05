@@ -258,8 +258,7 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('methods', 'methods')->name('methods');
                         Route::get('method/{id}', 'method');
                         Route::post('payment/add-money', 'addMoney');
-                        // Cash Payment Received - WIP
-                      // Route::post('payment/cash/{id}', 'acceptCash');
+                        Route::post('payment/cash/{id}', 'acceptCashPayment');
                     });
 
                     // Withdraw Features

@@ -81,7 +81,6 @@ class PaymentController extends Controller
         if ($deposit->status == Status::PAYMENT_INITIATE || $deposit->status == Status::PAYMENT_PENDING) {
             $deposit->status = Status::PAYMENT_SUCCESS;
              $deposit->save();
-
             if ($deposit->ride_id) {
                  new RidePaymentManager($deposit);
             } else {
