@@ -9,39 +9,25 @@ use Illuminate\Support\Facades\Validator;
 
 class AddressController extends Controller
 {
-
     public function addresses()
     {
         $addresses = UserAddress::where('user_id', auth()->id())->get();
 
-        return response()->json([
-            'remark'=>'address',
-            'status'=>'success',
-            'data'=>$addresses,
-        ]);
+        return formatResponse('address_list', 'success', 'Address list', $addresses);
     }
-
     public function store(Request $request, $id = 0)
     {
         $validator = $this->validation($request);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
-            ]);
+            return formatResponse('validation_error', 'error', $validator->errors()->all(), []);
         }
 
         if($id) {
             $address = UserAddress::where('user_id', auth()->id())->find($id);
 
             if (!$address) {
-                return response()->json([
-                    'remark' => 'address_not_found',
-                    'status' => 'error',
-                    'message' => ['error' => 'Address not found'],
-                ]);
+                return formatResponse('address_not_found', 'error', 'Address not found', []);
             }
             $notify[] = 'Address updated successfully';
         }else{
@@ -57,35 +43,20 @@ class AddressController extends Controller
         $address->additional_info = $request->additional_info;
         $address->save();
 
-        return response()->json([
-            'remark'=>'address_saved',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
-        ]);
+        return formatResponse('address_saved', 'success', $notify, $address);
     }
     public function delete($id)
     {
         $address = UserAddress::where('user_id', auth()->id())->find($id);
 
         if(!$address) {
-            return response()->json([
-                'remark'=>'address_not_found',
-                'status'=>'error',
-                'message'=>['error'=>'Address not found'],
-            ]);
+            return formatResponse('address_not_found', 'error', 'Address not found', []);
         }
 
         $address->delete();
 
-        $notify[] = 'Address deleted successfully';
-
-        return response()->json([
-            'remark'=>'address_deleted',
-            'status'=>'success',
-            'message'=>['success' => $notify],
-        ]);
+        return formatResponse('address_deleted', 'success', 'Address deleted successfully', []);
     }
-
     private function validation($request){
         return Validator::make($request->all(), [
             'address'=>'required',

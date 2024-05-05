@@ -13,22 +13,13 @@ class ContactListController extends Controller
 
     public function contacts()
     {
-        $contacts = ContactList::where('user_id',auth()->user()->id)->get();
+        $contacts = ContactList::where('user_id',auth()->id())->get();
 
         if ($contacts->isEmpty()) {
-            $notify[] = 'No contact found';
-            return response()->json([
-                'remark'=>'no_contact',
-                'status'=>'error',
-                'message'=>['error'=>$notify],
-            ]);
+            return formatResponse('no_contact', 'error', 'No contact found', []);
         }
 
-        return response()->json([
-            'remark'=>'contact',
-            'status'=>'success',
-            'data'=>$contacts,
-        ]);
+        return formatResponse('contact_list', 'success', 'Contact list', $contacts);
     }
 
     public function contactInsert(Request $request)
@@ -45,11 +36,7 @@ class ContactListController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>['error'=>$validator->errors()->all()],
-            ]);
+            return formatResponse('validation_error', 'error', $validator->errors()->all(), []);
         }
 
         $contact = new ContactList();
@@ -58,12 +45,7 @@ class ContactListController extends Controller
         $contact->mobile = $request->mobile;
         $contact->save();
 
-        $notify[] = 'Contact saved successfully';
-        return response()->json([
-            'remark'=>'contact_added',
-            'status'=>'success',
-            'message'=>$notify,
-        ]);
+        return formatResponse('contact_added', 'success', 'Contact saved successfully', $contact);
     }
 
     public function contactUpdate(Request $request, $id)
@@ -71,11 +53,7 @@ class ContactListController extends Controller
         $contact = ContactList::where('user_id', auth()->id())->find($id);
 
         if (!$contact) {
-            return response()->json([
-                'remark' => 'contact_not_found',
-                'status' => 'error',
-                'message' => ['error' => 'Contact not found'],
-            ]);
+            return formatResponse('contact_not_found', 'error', 'Contact not found', []);
         }
 
         $validator = Validator::make($request->all(), [
@@ -90,22 +68,14 @@ class ContactListController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return formatResponse('validation_error', 'error', $validator->errors()->all(), []);
         }
 
         $contact->name = $request->name;
         $contact->mobile = $request->mobile;
         $contact->save();
 
-        return response()->json([
-            'remark' => 'contact_updated',
-            'status' => 'success',
-            'message' => ['Contact updated successfully'],
-        ]);
+        return formatResponse('contact_updated', 'success', 'Contact updated successfully', $contact);
     }
 
     public function contactDelete($id)
@@ -114,20 +84,10 @@ class ContactListController extends Controller
         $contact = ContactList::where('user_id', auth()->id())->find($id);
 
         if(!$contact) {
-            return response()->json([
-                'remark' => 'contact_not_found',
-                'status' => 'error',
-                'message' => ['error' => 'Contact not found'],
-            ]);
+            return formatResponse('contact_not_found', 'error', 'Contact not found', []);
         }
         $contact->delete();
 
-        $notify[] = 'Contact deleted successfully';
-
-        return response()->json([
-            'remark' => 'contact_deleted',
-            'status' => 'success',
-            'message' => $notify,
-        ]);
+        return formatResponse('contact_deleted', 'success', 'Contact deleted successfully', []);
     }
 }

@@ -274,14 +274,7 @@ class RideController extends Controller
         // Admin Portion
         // Driver Notification Sent
 
-        return response()->json([
-            'remark' => 'ride_requested_created',
-            'status' => 'success',
-            'message' => 'Ride Requested Created Successfully',
-            'distance' => $totalDistance,
-            'destination_address' => $destinationAddress,
-            'data' => $ride,
-        ]);
+        return formatResponse('ride_request_created', 'success', 'Ride Request Created Successfully', $ride->load('destinations'));
     }
 
 
@@ -457,7 +450,7 @@ class RideController extends Controller
 
     public function rideDetails($id)
     {
-        $ride = Ride::with('destinations')->where('user_id', auth()->id())->find($id);
+        $ride = Ride::with(['destinations', 'driver:id,firstname,lastname,avg_rating,mobile,reward_points'])->where('user_id', auth()->id())->find($id);
 
         if ($ride == null) {
             return formatResponse('ride_not_found', 'error', 'No Ongoing Ride Found', $ride);
