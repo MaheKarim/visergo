@@ -59,7 +59,10 @@ class PaymentController extends Controller
         }
 
         $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
+        // $ride->appliedCoupon ? $ride->amount - $ride->appliedCoupon->amount : $ride->amount;
         /* Coupon Disbursement Task Incomplete */
+
+        // TODO:: Coupon + Tips API Check
         $gateway = $this->paymentGateway($request, $amount, $ride);
 
         if (!$gateway instanceof GatewayCurrency) {

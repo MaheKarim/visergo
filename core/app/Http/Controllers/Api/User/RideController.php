@@ -319,17 +319,19 @@ class RideController extends Controller
 
         $ride = Ride::where('user_id', auth()->id())->with('destinations','driver')->rideEnd()->find($id);
 
-        if ($request->tips != 0) {
-
-            return formatResponse('ride_tips', 'error', 'Ride tips already added', $ride);
-
-        } else {
-            $ride->tips = $request->tips;
-            $ride->total = $ride->total + $request->tips;
-            $ride->save();
-
-            return formatResponse('ride_tips', 'success', 'Ride tips added successfully', $ride);
+        if ($ride == null) {
+            return formatResponse('ride_not_found', 'error', 'No Ride Found', $ride);
         }
+
+        if (!is_null($ride->tips) && $ride->tips != 0.00) {
+            return formatResponse('ride_tips', 'error', 'Ride tips already added', $ride->tips);
+        }
+
+        $ride->tips = $request->tips;
+        $ride->total = $ride->total + $request->tips;
+        $ride->save();
+
+        return formatResponse('ride_tips', 'success', 'Ride tips added successfully', $ride);
     }
 
     public function rideOngoing()
