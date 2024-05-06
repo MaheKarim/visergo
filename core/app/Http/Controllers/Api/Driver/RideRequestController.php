@@ -22,24 +22,14 @@ class RideRequestController extends Controller
     {
         $driver = auth()->user();
         $ride = Ride::where('driver_id', $driver->id)
-            ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING, Status::RIDE_END])->first();
+            ->whereIn('status', [Status::RIDE_ACTIVE, Status::RIDE_ONGOING, Status::RIDE_END])
+            ->with(['destinations', 'user'])
+            ->first();
 
         if ($ride == null) {
-            return response()->json([
-                'remark' => 'no_ride_found',
-                'status' => 'error',
-                'data' => [
-                    'ride' => $ride
-                ]
-            ]);
+            return formatResponse('no_ride_found', 'error', 'No ride found');
         } else {
-            return response()->json([
-                'remark' => 'ride_found',
-                'status' => 'success',
-                'data' => [
-                    'ride' => $ride
-                ]
-            ]);
+            return formatResponse('ride_found', 'success', 'Ride found', $ride);
         }
     }
 
@@ -48,21 +38,11 @@ class RideRequestController extends Controller
         $liveRequests = Ride::where('status', Status::RIDE_INITIATED)->with('destinations')->latest()->get();
 
         if ($liveRequests->isEmpty()) {
-            return response()->json([
-                'remark' => 'ride_requests',
-                'status' => 'success',
-                'message' => 'There are no ride requests at this moment.',
-                'data' => []
-            ]);
+
+            return formatResponse('no_ride_requests', 'error', 'There are no ride requests at this moment');
         }
-        return response()->json([
-            'remark' => 'ride_requests',
-            'status' => 'success',
-            'message' => 'Ride requests list',
-            'data' => [
-                'live_requests' => $liveRequests
-            ]
-        ]);
+
+        return formatResponse('ride_requests', 'success', 'Ride requests list', $liveRequests);
     }
 
     public function rideRequestAccept(Request $request, $id)
@@ -71,30 +51,17 @@ class RideRequestController extends Controller
         $ride = Ride::where('id', $id)->where('status', Status::RIDE_INITIATED)->first();
         if ($ride == null) {
             $notify = 'No Ride Found';
-            return response()->json([
-                'remark' => 'no_request_found',
-                'status' => 'error',
-                'message' => $notify,
-                'data' => [
-                    'ride' => $ride, $driver
-                ]
-            ]);
+            return formatResponse('ride_request_fail', 'error', $notify);
         }
         $ride->status = Status::RIDE_ACTIVE;
-        $ride->driver_id = auth()->user()->id;
+        $ride->driver_id = auth()->id();
         $ride->save();
 
         $driver->is_driving = Status::DRIVING;
         $driver->save();
+
         $notify = 'Ride Accepted Successfully';
-        return response()->json([
-            'remark' => 'ride_request_accept',
-            'status' => 'success',
-            'message' => $notify,
-            'data' => [
-                'ride' => $ride
-            ]
-        ]);
+        return formatResponse('ride_request_accept', 'success', $notify, $ride);
     }
 
     public function rideRequestStart(Request $request, $id)
@@ -104,26 +71,12 @@ class RideRequestController extends Controller
             ->where('status', Status::RIDE_ACTIVE)->find($id);
 
         if ($ride == null) {
-            return response()->json([
-                'remark' => 'no_request_found',
-                'status' => 'error',
-                'message' => [],
-                'data' => [
-                    'ride' => $ride
-                ]
-            ]);
+            return formatResponse('no_ride_found', 'error', 'No ride found');
         }
 
         $otp = $request->otp;
         if ($ride->otp != $otp) {
-            return response()->json([
-                'remark' => 'otp_mismatch',
-                'status' => 'error',
-                'message' => 'Invalid OTP',
-                'data' => [
-                    'otp' => $otp
-                ]
-            ]);
+            return formatResponse('otp_mismatch', 'error', 'Invalid OTP');
         } else {
             $ride->otp = null;
         }
@@ -132,15 +85,8 @@ class RideRequestController extends Controller
         $ride->ride_start_at = Carbon::now();
         $ride->save();
 
-        $notify[] = 'Ride Started Successfully';
-        return response()->json([
-            'remark' => 'ride_start',
-            'status' => 'success',
-            'message' => $notify,
-            'data' => [
-                'ride' => $ride
-            ]
-        ]);
+        $notify[] = 'Ride started successfully';
+        return formatResponse('ride_start', 'success', $notify, $ride);
     }
 
     public function rideRequestEnd(Request $request, $id)
@@ -151,14 +97,7 @@ class RideRequestController extends Controller
 
         if ($ride == null) {
             $notify[] = 'No Ride Found';
-            return response()->json([
-                'remark' => 'no_request_found',
-                'status' => 'error',
-                'message' => $notify,
-                'data' => [
-                    'ride' => $ride
-                ]
-            ]);
+            return formatResponse('no_request_found', 'error', $notify);
         }
 
         $ride->status = Status::RIDE_END;
@@ -169,15 +108,8 @@ class RideRequestController extends Controller
         $driver->is_driving = Status::IDLE;
         $driver->save();
 
-        $notify[] = 'Ride End Successfully';
-        return response()->json([
-            'remark' => 'ride_complete',
-            'status' => 'success',
-            'message' => $notify,
-            'data' => [
-                'ride' => $ride
-            ]
-        ]);
+        $notify[] = 'Ride end successfully';
+        return formatResponse('ride_end', 'success', $notify, $ride);
     }
 
     public function rideRequestCancel(Request $request, $id)
@@ -198,45 +130,25 @@ class RideRequestController extends Controller
         $ride = Ride::where('driver_id', $driver->id)->where('status', [Status::RIDE_ACTIVE])->find($id);
 
         if ($ride == null) {
-            $notify[] = 'No Ride Found';
-            return response()->json([
-                'remark' => 'no_request_found',
-                'status' => 'error',
-                'message' => $notify,
-                'data' => [
-                    'ride' => $ride
-                ]
-            ]);
+            $notify[] = 'No ride found';
+            return formatResponse('no_request_found', 'error', $notify);
         }
 
         if ($ride->status == Status::RIDE_CANCELED) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Ride Already Cancelled',
-                'data' => $ride,
-            ]);
+
+            return formatResponse('ride_cancel', 'error', 'Ride Already Cancelled', $ride);
         }
 
         if ($ride->status == Status::RIDE_ONGOING) {
-            $notify = 'You can not cancel ongoing ride';
-            return response()->json([
-                'remark' => 'ride_cancel_fail',
-                'status' => 'error',
-                'message' => $notify,
-            ]);
+
+            return formatResponse('ride_cancel', 'error', 'You can not cancel ongoing ride', $ride);
         }
 
         $this->cancelRide($ride->id, Status::DRIVER_TYPE, $driver->id, $request->cancel_reason);
 
         $notify[] = 'Ride Cancelled Successfully';
-        return response()->json([
-            'remark' => 'ride_cancel',
-            'status' => 'success',
-            'message' => $notify,
-            'data' => [
-                'ride' => $ride
-            ]
-        ]);
+
+        return formatResponse('ride_cancel', 'success', $notify, $ride);
     }
 
     public function rideRequestCashAccept(Request $request, $id)
@@ -244,15 +156,7 @@ class RideRequestController extends Controller
         $ride = Ride::where('status', Status::RIDE_END)->find($id);
 
         if (!$ride) {
-            $notify[] = 'No Ride Found';
-            return response()->json([
-                'remark' => 'no_request_found',
-                'status' => 'error',
-                'message' => $notify,
-                'data' => [
-                    'ride' => $ride
-                ]
-            ]);
+            return formatResponse('no_request_found', 'error', 'No ride found');
         }
 
         $deposit = Deposit::where('ride_id', $ride->id)->orderBy('id', 'desc')->first();
@@ -285,24 +189,15 @@ class RideRequestController extends Controller
 
 
         try {
-          GatewayPaymentController::userDataUpdate($deposit);
+            GatewayPaymentController::userDataUpdate($deposit);
         } catch (\Exception $e) {
-            return response()->json([
-                'remark'  => 'driver_data_update_error',
-                'status'  => 'error',
-                'message' => ['error' => $e->getMessage()],
-            ]);
+
+            return formatResponse('driver_data_update_error', 'error', $e->getMessage());
         }
 
         $notify[] = 'Payment Accepted Successfully';
-        return response()->json([
-            'remark' => 'ride_request_accept',
-            'status' => 'success',
-            'message' => $notify,
-            'data' => [
-                'ride' => $ride
-            ]
-        ]);
+
+        return formatResponse('ride_request_accept', 'success', $notify, $ride);
 
     }
 
