@@ -36,8 +36,8 @@
                                     <div class="col-lg-10 col-md-9">
                                         <select class="form-control" name="discount_type" required>
                                             <option value="" selected hidden>@lang('Select One')</option>coupon_amount>
-                                            <option value="{{ Status::DISCOUNT_FIXED }}" @selected($coupon->discount_type == Status::DISCOUNT_FIXED)>@lang('Fixed')</option>
-                                            <option value="{{ Status::DISCOUNT_PERCENT }}" @selected($coupon->discount_type == Status::DISCOUNT_PERCENT)>@lang('Percentage')</option>
+                                            <option value="{{ Status::DISCOUNT_FIXED }}" @selected(($coupon->discount_type ?? null) == Status::DISCOUNT_FIXED)>@lang('Fixed')</option>
+                                            <option value="{{ Status::DISCOUNT_PERCENT }}" @selected(($coupon->discount_type ?? null) == Status::DISCOUNT_PERCENT)>@lang('Percentage')</option>
                                         </select>
                                     </div>
                                 </div>

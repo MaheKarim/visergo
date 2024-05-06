@@ -55,7 +55,7 @@ class CouponController extends Controller
         $coupon->usage_limit_per_user    = $request->usage_limit_per_customer;
         $coupon->save();
 
-        return back()->withNotify($notify);
+        return to_route('admin.coupon.index')->withNotify($notify);
     }
 
     public function changeStatus(Request $request)
@@ -66,7 +66,7 @@ class CouponController extends Controller
 
         $message = $coupon->status ? 'Coupon activated successfully' : 'Coupon deactivated successfully';
 
-        return successResponse($message);
+        return formatResponse('coupon_activation_status','success', $message);
     }
 
     private function validation(Request $request, int $id)
