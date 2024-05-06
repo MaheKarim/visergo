@@ -51,9 +51,15 @@ class Ride extends Model
     {
         return $this->hasOne(DriverReview::class);
     }
+
     public function rideCancels()
     {
         return $this->hasMany(RideCancel::class, 'ride_id', 'id');
+    }
+
+    public function appliedCoupon()
+    {
+        return $this->belongsTo(AppliedCoupon::class);
     }
     // Scope
 

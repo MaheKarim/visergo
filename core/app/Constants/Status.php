@@ -44,11 +44,10 @@ class Status{
     const RIDE_SERVICE = 1;
     const INTER_CITY_SERVICE = 2;
     const RESERVE_SERVICE = 3;
-
     const RENTAL_SERVICE = 4;
 
-    const FIXED = 1;
-    const PERCENTAGE = 2;
+    const DISCOUNT_FIXED = 1;
+    const DISCOUNT_PERCENT = 2;
 
     const RIDER = 1;
     const DRIVER = 2;

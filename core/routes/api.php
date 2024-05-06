@@ -161,8 +161,8 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('ride/accepted', 'acceptedRides');
                     });
                     // Coupon List For User
-                    Route::controller('CouponListController')->name('coupon.')->group(function () {
-                        Route::get('coupons', 'index')->name('coupon');
+                    Route::controller('CouponListController')->name('coupons.')->group(function () {
+                        Route::get('coupons', 'index')->name('coupons');
                     });
                     // Gateway List For User
                     Route::controller('PaymentController')->name('payment.')->group(function () {

@@ -309,10 +309,13 @@ Route::middleware('admin')->group(function () {
         Route::post('status/{id}', 'status')->name('status');
     });
     // Coupon Management
-    Route::controller('CouponController')->name('coupon.')->prefix('coupon')->group(function () {
+    Route::controller('CouponController')->prefix('coupon')->name('coupon.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::post('edit/{id?}', 'store')->name('store');
-        Route::post('status/{id?}', 'status')->name('status');
+        Route::get('create', 'create')->name('create');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('save/{id}', 'save')->name('store');
+        Route::get('detail/{id}', 'detail')->name('detail');
+        Route::post('change-status/{id}', 'changeStatus')->name('status.change');
     });
     // Cancellation Reason
     Route::controller('CancellationReasonController')->name('cancellation.')->prefix('cancellation')->group(function () {

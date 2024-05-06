@@ -2,66 +2,105 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Coupon;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use App\Models\AppliedCoupon;
 
 class CouponController extends Controller
 {
     public function index()
     {
-        $pageTitle = 'Coupon Management';
-        $coupons = Coupon::where('expired_at', '>=', Carbon::now()->format('Y-m-d'))
-            ->searchable(['name'])->paginate(getPaginate());
-
-        return view('admin.coupon.index', compact('pageTitle', 'coupons'));
+        $pageTitle = "All Coupons";
+        $coupons   = Coupon::paginate(getPaginate());
+        return view('admin.coupons.index', compact('pageTitle', 'coupons'));
     }
 
-    public function store(Request $request, $id = 0)
+    public function create()
     {
-        $request->validate([
-            'name' => [
-                'required',
-                'max:40',
-                'min:3',
-                Rule::unique('coupons')->where(function ($query) {
-                    return $query->where('expired_at', '>=', Carbon::now()->format('Y-m-d'))
-                        ->where('id', '!=', request()->id);
-                })
-            ],
-            'discount_value' => 'required|numeric|gt:0|lt:100',
-            'discount_type' => 'required',
-            'start_at' => 'required|date|after_or_equal:'.Carbon::now()->format('Y-m-d'),
-            'expired_at' => 'required|date|after:start_at|after_or_equal:'.Carbon::now()->format('Y-m-d'),
-            'points_deduct' => 'required|numeric|min:0',
-        ]);
+        $pageTitle  = "Create New Coupon";
+        return view('admin.coupons.create', compact('pageTitle'));
+    }
 
-        if(!$id) {
-            $coupon = new Coupon();
-            $notification = 'Coupon added successfully';
+    public function edit($id)
+    {
+        $coupon = Coupon::whereId($id)->firstOrFail();
+        $pageTitle  = "Edit Coupon";
+        return view('admin.coupons.create', compact('pageTitle', 'coupon'));
+    }
+
+    public function save(Request $request, $id)
+    {
+
+        $this->validation($request, $id);
+
+        if ($id == 0) {
+            $coupon   = new Coupon();
+            $notify[] = ['success', 'Coupon created successfully'];
         } else {
-            $coupon = Coupon::findOrFail($id);
-            $notification = 'Coupon updated successfully';
+            $coupon   = Coupon::findOrFail($id);
+            $notify[] = ['success', 'Coupon updated successfully'];
         }
-        $coupon->name = strtoupper($request->name);
-        $coupon->discount_value = $request->discount_value;
-        $coupon->discount_type = $request->discount_type;
-        $coupon->start_at = $request->start_at;
-        $coupon->expired_at = $request->expired_at;
-        $coupon->description = $request->description;
-        $coupon->points_deduct = $request->points_deduct;
-        $coupon->save();
 
-        $notify[] = ['success', $notification];
+        $coupon->coupon_name             = $request->coupon_name;
+        $coupon->coupon_code             = $request->coupon_code;
+        $coupon->discount_type           = $request->discount_type;
+        $coupon->coupon_amount           = $request->amount;
+        $coupon->description             = $request->description;
+        $coupon->starts_from             = $request->starts_from;
+        $coupon->ends_at                 = $request->ends_at;
+        $coupon->minimum_spend           = $request->minimum_spend;
+        $coupon->maximum_spend           = $request->maximum_spend;
+        $coupon->usage_limit_per_coupon  = $request->usage_limit_per_coupon;
+        $coupon->usage_limit_per_user    = $request->usage_limit_per_customer;
+        $coupon->save();
 
         return back()->withNotify($notify);
     }
 
-    public function status($id)
+    public function changeStatus(Request $request)
     {
-        return Coupon::changeStatus($id);
+        $coupon         = Coupon::findOrFail($request->id);
+        $coupon->status = !$coupon->status;
+        $coupon->save();
+
+        $message = $coupon->status ? 'Coupon activated successfully' : 'Coupon deactivated successfully';
+
+        return successResponse($message);
     }
 
+    private function validation(Request $request, int $id)
+    {
+        $request->validate([
+            "coupon_name"              => 'required|string|max:40',
+            "coupon_code"              => 'required|string|max:40|unique:coupons,coupon_code,' . $id,
+            "discount_type"            => 'required|in:1,2',
+            "amount"                   => 'required|numeric',
+            "starts_from"              => 'required|date|date_format:Y-m-d',
+            "ends_at"                  => 'required|date|date_format:Y-m-d|after:starts_from',
+            "description"              => 'nullable|string',
+            "minimum_spend"            => 'nullable|numeric|gt:0',
+            "maximum_spend"            => 'nullable|numeric|gte:minimum_spend',
+            "usage_limit_per_coupon"   => 'nullable|integer',
+            "usage_limit_per_customer" => 'nullable|integer',
+        ]);
+    }
+
+    public function detail($id)
+    {
+        $coupon    = Coupon::find($id);
+        $pageTitle = 'Applied Coupons Details - ' . $coupon->coupon_name;
+        $query     = AppliedCoupon::where('coupon_id', $id);
+
+        $querySum    = clone $query;
+        $totalAmount = $querySum->sum('amount');
+
+        $queryCount  = clone $query;
+        $couponCount = $querySum->count();
+
+        $queryAppliedCoupon = clone $query;
+        $appliedCoupons     = $queryAppliedCoupon->with(['user', 'ride'])->where('coupon_id', $id)->paginate(getPaginate());
+
+        return view('admin.coupons.detail', compact('pageTitle', 'appliedCoupons', 'totalAmount', 'couponCount'));
+    }
 }
