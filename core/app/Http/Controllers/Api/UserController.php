@@ -274,49 +274,41 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'message' => 'required|string|max:191',
         ]);
+
         if ($validator->fails()) {
             $notify[] = ['error', $validator->errors()->all()];
 
-            return response()->json([
-                'remark'=>'validation_error',
-                'status'=>'error',
-                'message'=>$notify,
-            ]);
+            return formatResponse('validation_error', 'error', 'Validation error', $notify);
         }
-
 
         $user = auth()->user();
-        $ride = Ride::find($request->ride_id);
+        $ride = Ride::where('user_id', $user->id)->with('driver')->find($request->ride_id);
 
-        // Check if the ride status is not 2
-        if ($ride->status != Status::RIDE_ACTIVE) {
-            return response()->json([
-                'remark' => 'sos_not_allowed',
-                'status' => 'error',
-                'message' => ['SOS request not allowed for this ride'],
-            ]);
+        if (!$ride) {
+            return formatResponse('ride_not_found', 'error', 'Ride not found', $ride);
         }
 
-        $sos = new SOSAlert();
-        $sos->user_id = $user->id;
-        $sos->ride_id = $request->ride_id;
-        $sos->lat = $request->lat;
-        $sos->long = $request->long;
-        $sos->message = $request->message;
-        $sos->save();
+        if ($ride->status == Status::RIDE_ONGOING  || $ride->status == Status::RIDE_END)  {
+            $sos = new SOSAlert();
+            $sos->user_id = $user->id;
+            $sos->ride_id = $request->ride_id;
+            $sos->lat = $request->lat;
+            $sos->long = $request->long;
+            $sos->message = $request->message;
+            $sos->save();
 
-        $adminNotification = new AdminNotification();
-        $adminNotification->user_id = $user;
-        $adminNotification->title = 'SOSAlert message sent by '.$user->username;
-        $adminNotification->click_url = urlPath('admin.sos.details',$sos->id);
-        $adminNotification->save();
+            $adminNotification = new AdminNotification();
+            $adminNotification->user_id = $user;
+            $adminNotification->title = 'SOSAlert message sent by '.$user->username;
+            $adminNotification->click_url = urlPath('admin.sos.details',$sos->id);
+            $adminNotification->save();
 
-        $notify[] = 'SOSAlert message sent successfully';
+           return formatResponse('sos_sent', 'success', 'SOSAlert message sent successfully', $sos);
 
-        return response()->json([
-            'remark' => 'sos_sent',
-            'message' => ['success' => $notify],
-        ]);
+        } else {
+            return formatResponse('sos_not_allowed', 'error', 'SOS request not allowed for this ride', );
+        }
+
     }
 
     public function services()

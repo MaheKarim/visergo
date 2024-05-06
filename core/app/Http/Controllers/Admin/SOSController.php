@@ -11,7 +11,7 @@ class SOSController extends Controller
     public function index()
     {
         $pageTitle = 'SOS Alerts';
-        $soss = SOSAlert::latest()->with('ride')->paginate(getPaginate(10));
+        $soss = SOSAlert::latest()->with(['ride', 'ride.user', 'ride.driver'])->paginate(getPaginate(10));
 
         return view('admin.sos.index', compact('pageTitle','soss'));
     }

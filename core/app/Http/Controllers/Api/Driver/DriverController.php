@@ -261,9 +261,7 @@ class DriverController extends Controller
         $notify[] = 'Deposit data';
         return response()->json([
             'remark'=>'deposits',
-            'status'=>
-
-                'success',
+            'status'=> 'success',
             'message'=>['success'=>$notify],
             'data'=>[
                 'deposits'=>$deposits
@@ -401,32 +399,24 @@ class DriverController extends Controller
     {
         $reason = CancellationReason::where('for', Status::DRIVER)->get();
 
-        $notify[] = 'Driver Cancellation reason';
-        return response()->json([
-            'remark'=>'cancellation_reason',
-            'status'=>'success',
-            'message'=>['success'=>$notify],
-            'data'=>[
-                'reason'=>$reason
-            ]
-        ]);
+        return formatResponse('cancellation_reason', 'success', 'Driver cancellation reason', $reason);
     }
 
-    public function depositHistory(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $deposits = auth()->user('driver')->deposits();
-        if ($request->search) {
-            $deposits = $deposits->where('trx', $request->search);
-        }
-        $deposits = $deposits->with(['gateway'])->orderBy('id', 'desc')->paginate(getPaginate());
-        $notify[] = 'Deposit data';
-        return response()->json([
-            'remark' => 'deposits',
-            'status' => 'success',
-            'message' => ['success' => $notify],
-            'data' => [
-                'deposits' => $deposits
-            ]
-        ]);
-    }
+//    public function depositHistory(Request $request): \Illuminate\Http\JsonResponse
+//    {
+//        $deposits = auth()->user('driver')->deposits();
+//        if ($request->search) {
+//            $deposits = $deposits->where('trx', $request->search);
+//        }
+//        $deposits = $deposits->with(['gateway'])->orderBy('id', 'desc')->paginate(getPaginate());
+//        $notify[] = 'Deposit data';
+//        return response()->json([
+//            'remark' => 'deposits',
+//            'status' => 'success',
+//            'message' => ['success' => $notify],
+//            'data' => [
+//                'deposits' => $deposits
+//            ]
+//        ]);
+//    }
 }
