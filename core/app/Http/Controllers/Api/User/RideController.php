@@ -81,13 +81,10 @@ class RideController extends Controller
         );
 
         if ($fareDetails['error']) {
-            return response()->json([
-                'remark' => 'ride_search_error',
-                'message' =>  $fareDetails['message']
-            ]);
+            return formatResponse('ride_search_error', 'error', $fareDetails['message'], null);
         }
 
-        return response()->json($fareDetails['data']);
+        return formatResponse('ride_search', 'success', 'Ride Search', $fareDetails['data']);
     }
 
     /**
@@ -288,7 +285,7 @@ class RideController extends Controller
             'destinations.*.long' => 'required_unless:service_id,' . Status::RENTAL_SERVICE,
             'ride_for' => 'required',
             'service_id' => 'required',
-            'vehicle_type_id' => 'required',
+            'vehicle_type_id' => 'nullable',
             'departure_time' => [
                 'required_if:service_id,' .  Status::RESERVE_SERVICE .',' . Status::INTER_CITY_SERVICE . ',' . Status::RENTAL_SERVICE .'date_format:Y-m-d H:i',
                 function ($attribute, $value, $fail) {
@@ -300,7 +297,7 @@ class RideController extends Controller
             ],
             'rental_type' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
             'rental_time' => 'required_if:service_id,' . Status::RENTAL_SERVICE, 'numeric',
-            'payment_type' => 'required',
+            'payment_type' => 'nullable',
         ]);
     }
 
