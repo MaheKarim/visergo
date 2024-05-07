@@ -161,9 +161,11 @@ Route::namespace('Api')->name('api.')->group(function () {
                         Route::get('ride/details/{id}', 'rideDetails');
                         Route::get('ride/accepted', 'acceptedRides');
                     });
-                    // Coupon List For User
-                    Route::controller('CouponListController')->name('coupons.')->group(function () {
+                    // Coupon  For User
+                    Route::controller('CouponController')->name('coupons.')->group(function () {
                         Route::get('coupons', 'index')->name('coupons');
+                        Route::post('apply-coupon/{id}', 'applyCoupon');
+                        Route::post('remove-coupon/{id}', 'removeCoupon');
                     });
                     // Gateway List For User
                     Route::controller('PaymentController')->name('payment.')->group(function () {

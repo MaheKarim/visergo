@@ -70,7 +70,7 @@ class RidePaymentManager
         $transaction               = new Transaction();
         $transaction->user_id      = $ride->user->id;
         $transaction->amount       = $ride->total;
-        $transaction->post_balance = $driver->balance;
+        $transaction->post_balance = 0;
         $transaction->charge       = 0;
         $transaction->trx_type     = '+';
         $transaction->trx          = $this->deposit->trx;
@@ -93,8 +93,10 @@ class RidePaymentManager
     {
         $driver = $this->driver;
         $ride = $this->ride;
+        $ride->save();
+
         $driver->total_earning += $ride->driver_amount;
-        $driver->balance += $ride->driver_amount;
+        $driver->balance += $ride->total;
         $driver->save();
 
         $transaction               = new Transaction();
@@ -124,15 +126,32 @@ class RidePaymentManager
         $driver = $this->driver;
         $ride = $this->ride;
 
+        $driver->balance -= $ride->admin_commission;
+        $driver->save();
+
         $transaction               = new Transaction();
         $transaction->driver_id    = $driver->id;
-        $transaction->amount       = $ride->admin_commission + $ride->vat_amount;
+        $transaction->amount       = $ride->admin_commission ;
         $transaction->post_balance = $driver->balance;
         $transaction->charge       = 0;
-        $transaction->trx_type     = '+';
+        $transaction->trx_type     = '-';
         $transaction->trx          = $this->deposit->trx;
         $transaction->remark       = 'ride_commission';
         $transaction->details      = 'Ride commission paid';
+        $transaction->save();
+
+        $driver->balance -= $ride->vat_amount;
+        $driver->save();
+
+        $transaction               = new Transaction();
+        $transaction->driver_id    = $driver->id;
+        $transaction->amount       = $ride->vat_amount ;
+        $transaction->post_balance = $driver->balance;
+        $transaction->charge       = 0;
+        $transaction->trx_type     = '-';
+        $transaction->trx          = $this->deposit->trx;
+        $transaction->remark       = 'ride_vat';
+        $transaction->details      = 'Ride VAT paid';
         $transaction->save();
 
         notify($driver, 'RIDE_COMMISSION_GIVEN', [

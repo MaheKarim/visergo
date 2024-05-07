@@ -58,9 +58,10 @@ class PaymentController extends Controller
             return formatResponse('ride_not_found', 'error', 'No Ride Found', $ride);
         }
 
-        $amount = $request->tips ? $ride->total + $request->tips : $ride->total;
+        $tipsAmount = $request->tips ? $ride->total + $request->tips : $ride->total;
         // $ride->appliedCoupon ? $ride->amount - $ride->appliedCoupon->amount : $ride->amount;
         /* Coupon Disbursement Task Incomplete */
+        $amount = $ride->appliedCoupon ? $tipsAmount - $ride->appliedCoupon->amount : $tipsAmount;
 
         // TODO:: Coupon + Tips API Check
         $gateway = $this->paymentGateway($request, $amount, $ride);
@@ -72,10 +73,12 @@ class PaymentController extends Controller
         $deposit->user_id = $ride->user_id;
         $deposit->ride_id = $ride->id;
         $deposit->amount = $amount;
-        $deposit->detail = 'Payment sent by ' . $ride->user->fullName;
+        $deposit->detail = 'Payment sent by ' . $ride->user->fullName . ' via ' . $gateway->name . 'for ride #' . getOrderId($ride->uuid);
         $deposit->saveDeposit($gateway);
 
         $ride->payment_type = $request->payment_type;
+        $ride->tips = $request->tips;
+        $ride->total = $ride->total + $request->tips;
         $ride->save();
 
         if ($request->payment_type == Status::CASH_PAYMENT) {
@@ -127,7 +130,7 @@ class PaymentController extends Controller
     {
         $notify[] =  'Cash payment request placed successfully';
 
-        return formatResponse('cash_payment', 'success', $notify, []);
+        return formatResponse('cash_payment', 'success', $notify);
     }
 
     private function gatewayPayment($deposit)

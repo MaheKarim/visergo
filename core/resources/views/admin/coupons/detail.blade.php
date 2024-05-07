@@ -26,18 +26,18 @@
                             <tbody class="list">
                                 @forelse($appliedCoupons as $appliedCoupon)
                                     <tr>
-{{--                                        <td>--}}
+                                        <td>
 {{--                                            <a href="{{ route('admin.rides.detail', @$appliedCoupon->ride->id) }}">--}}
-{{--                                                {{ $appliedCoupon->ride->uid }}--}}
+                                                {{ getOrderId($appliedCoupon->ride->uuid) }}
 {{--                                            </a>--}}
-{{--                                        </td>--}}
+                                        </td>
                                         <td>
 
-{{--                                            <span class="fw-bold">{{ __(@$appliedCoupon->user->fullname) }}</span>--}}
+                                            <span class="fw-bold">{{ __(@$appliedCoupon->user->fullname) }}</span>
                                             <br>
-{{--                                            <span class="small">--}}
-{{--                                                <a href="{{ route('admin.users.detail', @$appliedCoupon->user->id) }}"><span>@</span>{{ @$appliedCoupon->user->username }}</a>--}}
-{{--                                            </span>--}}
+                                            <span class="small">
+                                                <a href="{{ route('admin.users.detail', @$appliedCoupon->user->id) }}"><span>@</span>{{ @$appliedCoupon->user->username }}</a>
+                                            </span>
 
                                         </td>
                                         <td>
@@ -46,7 +46,7 @@
                                         <td>
                                             {{ showDateTime($appliedCoupon->ends_at, 'd M, Y') }}
                                             <br>
-                                            {{ diffForHumans($appliedCoupon->ends_at, 'd M, Y') }}
+                                            {{ diffForHumans($appliedCoupon->created_at) }}
                                         </td>
                                     </tr>
                                 @empty
