@@ -370,10 +370,22 @@ Route::middleware('admin')->group(function () {
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
     });
     // SOSAlert Notification
+    // SOSAlert Notification
     Route::controller('SOSController')->name('sos.')->prefix('sos')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('details/{id?}', 'details')->name('details');
         Route::post('status/{id}', 'status')->name('status');
+    });
+    // Manage Ride Request
+    Route::controller('ManageRideController')->name('rides.')->prefix('rides')->group(function () {
+        Route::get('/', 'allRides')->name('all');
+        Route::get('pending', 'pending')->name('pending');
+        Route::get('accepted', 'accepted')->name('accepted');
+        Route::get('running', 'running')->name('running');
+        Route::get('completed', 'completed')->name('completed');
+        Route::get('canceled', 'canceled')->name('canceled');
+        Route::get('detail/{id}', 'detail')->name('detail');
+        Route::get('messages/{id}', 'messages')->name('messages');
     });
 
 });

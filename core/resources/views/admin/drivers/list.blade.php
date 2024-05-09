@@ -23,7 +23,7 @@
                                     <span class="fw-bold">{{$driver->fullname}}</span>
                                     <br>
                                     <span class="small">
-                                    <a href="{{ route('admin.users.detail', $driver->id) }}"><span>@</span>{{ $driver->username }}</a>
+                                    <a href="{{ route('admin.drivers.detail', $driver->id) }}"><span>@</span>{{ $driver->username }}</a>
                                     </span>
                                 </td>
 

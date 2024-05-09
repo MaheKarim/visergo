@@ -275,6 +275,55 @@
                 </li>
                 <li class="sidebar__menu-header">@lang('Ride Management')</li>
 
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a class="{{ menuActive('admin.rides*', 3) }}" href="javascript:void(0)">
+                        <i class="menu-icon las la-car"></i>
+                        <span class="menu-title">@lang('Manage Rides')</span>
+                    </a>
+                    <div class="sidebar-submenu {{ menuActive('admin.rides*', 2) }}">
+                        <ul>
+                            <li class="sidebar-menu-item {{ menuActive('admin.rides.all') }}">
+                                <a class="nav-link" href="{{ route('admin.rides.all') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('All Rides')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{ menuActive('admin.rides.pending') }}">
+                                <a class="nav-link" href="{{ route('admin.rides.pending') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Pending Rides')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{ menuActive('admin.rides.accepted') }}">
+                                <a class="nav-link" href="{{ route('admin.rides.accepted') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Accepted Rides')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{ menuActive('admin.rides.running') }}">
+                                <a class="nav-link" href="{{ route('admin.rides.running') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Running Rides')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{ menuActive('admin.rides.completed') }}">
+                                <a class="nav-link" href="{{ route('admin.rides.completed') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Completed Rides')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{ menuActive('admin.rides.canceled') }}">
+                                <a class="nav-link" href="{{ route('admin.rides.canceled') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Cancelled Rides')</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
                 <li class="sidebar-menu-item {{menuActive('admin.zone.*')}}">
                     <a href="{{route('admin.zone.index')}}" class="nav-link"
                        data-default-url="{{ route('admin.zone.index') }}">

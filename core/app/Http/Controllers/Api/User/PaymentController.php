@@ -73,7 +73,7 @@ class PaymentController extends Controller
         $deposit->user_id = $ride->user_id;
         $deposit->ride_id = $ride->id;
         $deposit->amount = $amount;
-        $deposit->detail = 'Payment sent by ' . $ride->user->fullName . ' via ' . $gateway->name . 'for ride #' . getOrderId($ride->uuid);
+        $deposit->detail = 'Payment sent by ' . $ride->user->username . ' via ' . $gateway->name . ' for ride #' . getOrderId($ride->uuid);
         $deposit->saveDeposit($gateway);
 
         $ride->payment_type = $request->payment_type;
