@@ -99,7 +99,7 @@ class CouponController extends Controller
         $couponCount = $querySum->count();
 
         $queryAppliedCoupon = clone $query;
-        $appliedCoupons     = $queryAppliedCoupon->with(['user', 'ride'])->where('coupon_id', $id)->paginate(getPaginate());
+        $appliedCoupons     = $queryAppliedCoupon->with(['user', 'ride'])->where('coupon_id', $id)->latest()->paginate(getPaginate());
 
         return view('admin.coupons.detail', compact('pageTitle', 'appliedCoupons', 'totalAmount', 'couponCount'));
     }

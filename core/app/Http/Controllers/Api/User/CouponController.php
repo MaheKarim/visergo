@@ -101,19 +101,12 @@ class CouponController extends Controller
 
     private function getCouponByCode(string $code)
     {
-        $currentDate = today();
-
-        $couponGet = Coupon::where('status', Status::ENABLE)
-            ->where('starts_from', '<=', $currentDate)
-            ->where('ends_at', '>=', $currentDate)
+        return Coupon::activeAndValid()->where('coupon_code', $code)
             ->withCount('appliedCoupons')
             ->withCount(['appliedCoupons as user_applied_count' => function ($appliedCoupon) {
                 $appliedCoupon->where('user_id', auth()->id());
             }])
             ->first();
-
-        return $couponGet;
-
     }
 
     public function removeCoupon($id)

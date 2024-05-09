@@ -21,6 +21,17 @@ class ReportController extends Controller
         return view('admin.reports.transactions', compact('pageTitle', 'transactions','remarks'));
     }
 
+    public function transactionDriver(Request $request)
+    {
+        $pageTitle = 'Driver Transaction Logs';
+
+        $remarks = Transaction::distinct('remark')->orderBy('remark')->get('remark');
+
+        $transactions = Transaction::searchable(['trx','driver:username'])->filter(['trx_type','remark'])->dateFilter()->orderBy('id','desc')->where('driver_id', '!=', null)->with('driver')->paginate(getPaginate());
+
+        return view('admin.reports.driver_transactions', compact('pageTitle', 'transactions','remarks'));
+    }
+
     public function loginHistory(Request $request)
     {
         $pageTitle = 'User Login History';

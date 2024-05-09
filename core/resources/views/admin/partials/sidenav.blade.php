@@ -111,6 +111,55 @@
                     </div>
                 </li>
 
+
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a href="javascript:void(0)" class="{{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],3)}}">
+                        <i class="menu-icon la la-automobile"></i>
+                        <span class="menu-title">@lang('Vehicle Settings')</span>
+                    </a>
+                    <div class="sidebar-submenu {{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],2)}} ">
+                        <ul>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.class.*')}} ">
+                                <a href="{{route('admin.vehicle.class.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Class')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.type.*')}} ">
+                                <a href="{{route('admin.vehicle.type.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Type')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.brands.*')}} ">
+                                <a href="{{route('admin.brands.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Brands')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.color.*')}} ">
+                                <a href="{{route('admin.vehicle.color.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Vehicle Color')</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item {{menuActive('admin.model.index')}} ">
+                                <a href="{{route('admin.model.index')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Model Management')</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="sidebar__menu-header">@lang('Driver Management')</li>
+
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{menuActive('admin.drivers*',3)}}">
                         <i class="menu-icon las la-user-friends"></i>
@@ -218,51 +267,13 @@
                     </div>
                 </li>
 
-                <li class="sidebar-menu-item sidebar-dropdown">
-                    <a href="javascript:void(0)" class="{{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],3)}}">
-                        <i class="menu-icon la la-automobile"></i>
-                        <span class="menu-title">@lang('Vehicle Settings')</span>
+                <li class="sidebar-menu-item {{menuActive(['admin.report.transaction.driver'])}}">
+                    <a href="{{route('admin.report.transaction.driver')}}" class="nav-link">
+                        <i class="menu-icon las la-dot-circle"></i>
+                        <span class="menu-title">@lang('Driver Transaction Log')</span>
                     </a>
-                    <div class="sidebar-submenu {{menuActive(['admin.vehicle.*', 'admin.brands.*', 'admin.model.*'],2)}} ">
-                        <ul>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.class.*')}} ">
-                                <a href="{{route('admin.vehicle.class.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Class')</span>
-                                </a>
-                            </li>
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.type.*')}} ">
-                                <a href="{{route('admin.vehicle.type.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Type')</span>
-                                </a>
-                            </li>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.brands.*')}} ">
-                                <a href="{{route('admin.brands.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Brands')</span>
-                                </a>
-                            </li>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.vehicle.color.*')}} ">
-                                <a href="{{route('admin.vehicle.color.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Vehicle Color')</span>
-                                </a>
-                            </li>
-
-                            <li class="sidebar-menu-item {{menuActive('admin.model.index')}} ">
-                                <a href="{{route('admin.model.index')}}" class="nav-link">
-                                    <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Model Management')</span>
-                                </a>
-                            </li>
-
-                        </ul>
-                    </div>
                 </li>
+                <li class="sidebar__menu-header">@lang('Ride Management')</li>
 
                 <li class="sidebar-menu-item {{menuActive('admin.zone.*')}}">
                     <a href="{{route('admin.zone.index')}}" class="nav-link"
@@ -483,7 +494,7 @@
                             <li class="sidebar-menu-item {{menuActive(['admin.report.transaction','admin.report.transaction.search'])}}">
                                 <a href="{{route('admin.report.transaction')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title">@lang('Transaction Log')</span>
+                                    <span class="menu-title">@lang('Rider Transaction Log')</span>
                                 </a>
                             </li>
 
@@ -529,7 +540,6 @@
                         <span class="menu-title">@lang('General Setting')</span>
                     </a>
                 </li>
-
 
 
                 <li class="sidebar-menu-item sidebar-dropdown">
@@ -631,7 +641,6 @@
                         </ul>
                     </div>
                 </li>
-
 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{menuActive('admin.setting.notification*',3)}}">

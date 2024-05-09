@@ -49,7 +49,7 @@
                     <table class="table table--light style--two">
                         <thead>
                             <tr>
-                                <th>@lang('User')</th>
+                                <th>@lang('Driver')</th>
                                 <th>@lang('TRX')</th>
                                 <th>@lang('Transacted')</th>
                                 <th>@lang('Amount')</th>
@@ -61,9 +61,9 @@
                             @forelse($transactions as $trx)
                                 <tr>
                                     <td>
-                                        <span class="fw-bold">{{ $trx->user->fullname }}</span>
+                                        <span class="fw-bold">{{ $trx->driver->fullname }}</span>
                                         <br>
-                                        <span class="small"> <a href="{{ appendQuery('search',$trx->user->username) }}"><span>@</span>{{ $trx->user->username }}</a> </span>
+                                        <span class="small"> <a href="{{ appendQuery('search',$trx->driver->username) }}"><span>@</span>{{ $trx->driver->username }}</a> </span>
                                     </td>
 
                                     <td>

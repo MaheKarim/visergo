@@ -141,6 +141,7 @@ Route::middleware('admin')->group(function () {
     // Report
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
         Route::get('transaction/user', 'transaction')->name('transaction');
+        Route::get('transaction/driver', 'transactionDriver')->name('transaction.driver');
         Route::get('login/history', 'loginHistory')->name('login.history');
         Route::get('login/ipHistory/{ip}', 'loginIpHistory')->name('login.ipHistory');
         Route::get('notification/history', 'notificationHistory')->name('notification.history');
