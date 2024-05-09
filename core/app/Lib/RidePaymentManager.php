@@ -5,6 +5,7 @@ namespace App\Lib;
 use App\Constants\Status;
 use App\Models\Driver;
 use App\Models\Transaction;
+use App\Models\User;
 
 class RidePaymentManager
 {
@@ -100,7 +101,8 @@ class RidePaymentManager
         $driver->save();
 
         $transaction               = new Transaction();
-        $transaction->driver_id    = $driver->id;
+        $transaction->user_id      = auth()->user() instanceof User ? auth()->user()->id : null;
+        $transaction->driver_id    = auth()->user() instanceof Driver ? auth()->guard('driver')->id() : null;
         $transaction->amount       = $ride->total;
         $transaction->post_balance = $driver->balance;
         $transaction->charge       = 0;

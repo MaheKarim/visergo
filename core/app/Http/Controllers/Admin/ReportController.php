@@ -16,7 +16,7 @@ class ReportController extends Controller
 
         $remarks = Transaction::distinct('remark')->orderBy('remark')->get('remark');
 
-        $transactions = Transaction::searchable(['trx','user:username'])->filter(['trx_type','remark'])->dateFilter()->orderBy('id','desc')->with('user')->paginate(getPaginate());
+        $transactions = Transaction::searchable(['trx','user:username'])->filter(['trx_type','remark'])->dateFilter()->orderBy('id','desc')->where('user_id', '!=', null)->with('user')->paginate(getPaginate());
 
         return view('admin.reports.transactions', compact('pageTitle', 'transactions','remarks'));
     }
