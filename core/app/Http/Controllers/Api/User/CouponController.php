@@ -22,7 +22,6 @@ class CouponController extends Controller
 
     public function applyCoupon(Request $request, $id)
     {
-        // Coupon Controller User API
         $validator = Validator::make($request->all(), [
             'coupon_code' => 'required|string',
         ]);
@@ -102,18 +101,11 @@ class CouponController extends Controller
 
     private function getCouponByCode(string $code)
     {
-//       return Coupon::activeAndValid()->matchCode($code)
-//            ->withCount('appliedCoupons')
-//            ->withCount(['appliedCoupons as user_applied_count' => function ($appliedCoupon) {
-//                $appliedCoupon->where('user_id', auth()->id());
-//            }])->first();
-
         $currentDate = today();
 
         $couponGet = Coupon::where('status', Status::ENABLE)
             ->where('starts_from', '<=', $currentDate)
             ->where('ends_at', '>=', $currentDate)
-//            ->whereRaw("UPPER(coupon_code) = ?", $code)
             ->withCount('appliedCoupons')
             ->withCount(['appliedCoupons as user_applied_count' => function ($appliedCoupon) {
                 $appliedCoupon->where('user_id', auth()->id());
@@ -122,6 +114,27 @@ class CouponController extends Controller
 
         return $couponGet;
 
+    }
+
+    public function removeCoupon($id)
+    {
+        $ride = Ride::ongoingRide()->where('user_id', auth()->id())->find($id);
+
+        if (!$ride) {
+            return response()->json(errorResponse('ride_not_found','The ride is invalid'));
+        }
+
+        $exitsCoupon = AppliedCoupon::where('ride_id', $id)->first();
+
+        if (!$exitsCoupon) {
+            return response()->json(errorResponse('coupon_not_found','You have not applied the coupon for this ride'));
+        }
+
+        $exitsCoupon->delete();
+
+        $notify[] =  'Coupon delete successfully';
+
+        return formatResponse('coupon_removed', 'success', $notify, $ride);
     }
 
 }
