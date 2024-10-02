@@ -25,7 +25,7 @@ class ManageRideController extends Controller
     public function accepted()
     {
         $pageTitle = 'Accepted Rides';
-        $rides = $this->RideData(['initiated', 'accepted', 'notRunning']);
+        $rides = $this->RideData(['initiated', 'accepted']);
         return view('admin.rides.list', compact('pageTitle', 'rides'));
     }
 
