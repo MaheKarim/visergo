@@ -20,7 +20,15 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text--muted">@lang('Driver')</span>
-                            <h6 class="text--primary"><a href="{{ route('admin.drivers.detail', $ride->driver_id) }}"><span>@</span>{{ $ride->driver->username }}</a></h6>
+                                @if($ride->driver_id)
+                                <h6 class="text--primary">
+                                    <a href="{{ route('admin.drivers.detail', $ride->driver_id) }}"><span>@</span>{{ $ride->driver->username }}</a>
+                                </h6>
+                                @else
+                                <h6 class="text--danger">
+                                    @lang('No Driver Assigned')
+                                </h6>
+                                @endif
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text--muted">@lang('Service')</span>
@@ -76,12 +84,10 @@
                             @endforeach
                         </li>
 
-
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text--muted">@lang('Ride Start At')</span>
                             <h6> {{ showDateTime($ride->ride_start_at, 'd M Y i:s A') }} </h6>
                         </li>
-
 
                         @if ($ride->status !== Status::RIDE_COMPLETED)
                             <li class="list-group-item d-flex justify-content-between">
@@ -89,10 +95,12 @@
                                 <h6> @php echo $ride->paymentTypes @endphp </h6>
                             </li>
                         @endif
+                        @if($ride->driver_id)
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text--muted">@lang('Messages')</span>
                             <h6><a class="badge badge--primary" href="{{ route('admin.rides.messages', $ride->id) }}"> {{ $ride->messages_count }} </a> </h6>
-                        </li>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </div>

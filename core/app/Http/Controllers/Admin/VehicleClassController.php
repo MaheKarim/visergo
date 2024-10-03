@@ -12,7 +12,6 @@ class VehicleClassController extends Controller
     {
         $pageTitle = 'All Vehicle Classes';
         $vehicleClasses = VehicleClass::latest()->searchable(['name'])->paginate(getPaginate());
-
         return view('admin.vehicle_class.index', compact('pageTitle', 'vehicleClasses'));
     }
 

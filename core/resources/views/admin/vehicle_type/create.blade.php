@@ -15,7 +15,6 @@
                                         value="{{ old('name', @$vehicleType->name) }}" required>
                                 </div>
                             </div>
-                            {{-- @dd($vehicleType) --}}
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div class="row">

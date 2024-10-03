@@ -21,7 +21,7 @@
                                 @forelse($rides as $ride)
                                     <tr>
                                         <td>
-                                            #{{ getOrderId($ride->uuid) }}
+                                            #{{ getOrderId($ride->uuid) }} / {{ $ride->id }}
                                         </td>
                                         <td>
                                             <span class="fw-bold">{{ $ride->user->fullname }}</span>
