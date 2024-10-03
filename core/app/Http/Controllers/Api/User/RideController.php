@@ -25,7 +25,7 @@ class RideController extends Controller
 
     use RideCancelTrait;
 
-    public function rideSearch(Request $request)
+    public function search(Request $request)
     {
         $validator = $this->validateRequest($request);
         if ($validator->fails()) {
@@ -90,7 +90,7 @@ class RideController extends Controller
     /**
      * @throws Exception
      */
-    public function rideRequest(Request $request)
+    public function request(Request $request)
     {
         $validator = $this->validateRequest($request);
 
@@ -307,7 +307,7 @@ class RideController extends Controller
         return formatResponse('validation_error', 'error', $validator->errors()->first());
     }
 
-    public function rideTips(Request $request, $id)
+    public function tips(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'tips' => 'required|numeric|min:0',
@@ -334,7 +334,7 @@ class RideController extends Controller
         return formatResponse('ride_tips', 'success', 'Ride tips added successfully', $ride);
     }
 
-    public function rideOngoing()
+    public function ongoing()
     {
         $ride = Ride::where('user_id', auth()->id())->with('destinations', 'driver')->ongoingRide()->first();
 
@@ -345,7 +345,7 @@ class RideController extends Controller
         return formatResponse('ride_ongoing', 'success', 'Ride Ongoing', $ride);
     }
 
-    public function rideCancel(Request $request, $id)
+    public function cancel(Request $request, $id)
     {
 
         $validator = Validator::make($request->all(), [
@@ -377,7 +377,7 @@ class RideController extends Controller
         return formatResponse('ride_cancel', 'success', 'Ride Cancelled Successfully', $ride);
     }
 
-    public function rideReview(Request $request, $id)
+    public function review(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'rating' => 'required|numeric|min:0|max:5',
@@ -416,7 +416,7 @@ class RideController extends Controller
         return formatResponse('ride_review_added', 'success', 'Ride Review Added Successfully', $review);
     }
 
-    public function rideHistory(Request $request, $flag = 0)
+    public function history(Request $request, $flag = 0)
     {
         $user = auth()->user();
 
@@ -443,7 +443,7 @@ class RideController extends Controller
         return formatResponse('ride_history', $message, 'Ride history', $rides);
     }
 
-    public function rideDetails($id)
+    public function details($id)
     {
         $ride = Ride::with(['destinations', 'driver:id,firstname,lastname,avg_rating,mobile,reward_points'])->where('user_id', auth()->id())->find($id);
 
@@ -454,7 +454,7 @@ class RideController extends Controller
         return formatResponse('ride_details', 'success', 'Ride Details', $ride->load('destinations'));
     }
 
-    public function acceptedRides()
+    public function accepted()
     {
         $rides = Ride::where('user_id', auth()->id())->accepted()->with('destinations', 'driver:id,firstname,lastname,avg_rating,mobile,reward_points,license_expire')->paginate(10);
 

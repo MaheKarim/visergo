@@ -148,18 +148,18 @@ Route::namespace('Api')->name('api.')->group(function () {
                     });
                     // Ride Request Controller
                     Route::controller('RideController')->name('ride.')->group(function () {
-                        Route::post('ride-search', 'rideSearch');
+                        Route::post('ride-search', 'search');
                         //TODO:: Apply Middleware For Do Not Create Multiple Req Under Same Service
-                        Route::post('ride/create/', 'rideRequest');
-                        Route::post('ride/tips/add/{id}', 'rideTips');
-                        Route::get('ride/history/{flag}', 'rideHistory');
-                        Route::get('ride/ongoing/history', 'rideOngoing');
+                        Route::post('ride/create/', 'request');
+                        Route::post('ride/tips/add/{id}', 'tips');
+                        Route::get('ride/history/{flag}', 'history');
+                        Route::get('ride/ongoing/history', 'ongoing');
                         Route::middleware('userRideCancel')->group(function () {
-                            Route::post('ride/cancel/{id}', 'rideCancel');
+                            Route::post('ride/cancel/{id}', 'cancel');
                         });
-                        Route::post('ride/review/{id}', 'rideReview');
-                        Route::get('ride/details/{id}', 'rideDetails');
-                        Route::get('ride/accepted', 'acceptedRides');
+                        Route::post('ride/review/{id}', 'review');
+                        Route::get('ride/details/{id}', 'details');
+                        Route::get('ride/accepted', 'accepted');
                     });
                     // Coupon  For User
                     Route::controller('CouponController')->name('coupons.')->group(function () {

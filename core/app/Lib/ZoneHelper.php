@@ -32,15 +32,9 @@ class ZoneHelper {
 
     public static function getZone(float $pickupLat, float $pickupLong): ?Zone
     {
-        $zones = Zone::active()->get();
-
-        foreach ($zones as $zone) {
-            if (self::underZone($pickupLat, $pickupLong, $zone)) {
-                return $zone;
-            }
-        }
-
-        return null;
+        return Zone::active()->get()->first(function ($zone) use ($pickupLat, $pickupLong) {
+            return self::underZone($pickupLat, $pickupLong, $zone);
+        });
     }
 
     public static function getDestinationZones(array $destinations): array
