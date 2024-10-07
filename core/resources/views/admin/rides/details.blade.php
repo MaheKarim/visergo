@@ -89,13 +89,13 @@
                             <h6> {{ showDateTime($ride->ride_start_at, 'd M Y i:s A') }} </h6>
                         </li>
 
-                        @if ($ride->status !== Status::RIDE_COMPLETED)
+                        @if ($ride->status == Status::RIDE_COMPLETED)
                             <li class="list-group-item d-flex justify-content-between">
                                 <span class="text--muted">@lang('Payment Type')</span>
                                 <h6> @php echo $ride->paymentTypes @endphp </h6>
                             </li>
                         @endif
-                        @if($ride->driver_id)
+                        @if($ride->driver_id && $ride->messages_count > 1)
                         <li class="list-group-item d-flex justify-content-between">
                             <span class="text--muted">@lang('Messages')</span>
                             <h6><a class="badge badge--primary" href="{{ route('admin.rides.messages', $ride->id) }}"> {{ $ride->messages_count }} </a> </h6>
@@ -107,7 +107,7 @@
         </div>
         <div class="col-lg-6">
             @if ($ride->status == Status::RIDE_COMPLETED)
-                <div class="card mt-4">
+                <div class="card mt-0">
                     <div class="card-body">
                         <h5 class="card-title">@lang('Completed Ride Information')</h5>
                         <ul class="list-group list-group-flush">

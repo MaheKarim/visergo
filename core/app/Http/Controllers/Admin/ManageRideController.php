@@ -32,7 +32,7 @@ class ManageRideController extends Controller
     public function running()
     {
         $pageTitle = 'Running Rides';
-        $rides = $this->RideData(['initiated', 'ongoingRide']);
+        $rides = $this->RideData(['ongoingRide']);
         return view('admin.rides.list', compact('pageTitle', 'rides'));
     }
 

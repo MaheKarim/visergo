@@ -237,7 +237,8 @@ Route::namespace('Api')->name('api.')->group(function () {
                     Route::any('deposit/history', 'depositHistory')->name('deposit.history');
                     Route::get('transactions', 'transactions')->name('transactions');
                     Route::get('/cancellation-reasons', 'driverCancelReason')->name('driver.cancel.reason');
-                    Route::get('trip/history', 'tripHistory')->name('trip.history');;
+                    Route::get('trip/history', 'tripHistory')->name('trip.history');
+                    Route::get('leaderboard', 'leaderboard')->name('leaderboard');
                 });
 
                 // Driver Online Status Middleware

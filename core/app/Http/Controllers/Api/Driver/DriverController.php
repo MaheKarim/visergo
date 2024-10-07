@@ -13,6 +13,7 @@ use App\Models\Transaction;
 use App\Models\Vehicle;
 use App\Models\VehicleModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -427,5 +428,37 @@ class DriverController extends Controller
         $trips = $driver->completedTrips()->latest()->paginate(getPaginate());
 
         return formatResponse('trip_history', 'success', 'Trip history', $trips);
+    }
+
+    public function leaderboard()
+    {
+        $today = now()->toDateString();
+
+        $leaderboard = Ride::query()
+            ->select('driver_id')
+            ->selectRaw('SUM(driver_amount) as total_earnings')
+            ->whereDate('created_at', $today)
+            ->whereNotNull('driver_id')
+            ->groupBy('driver_id')
+            ->orderByDesc('total_earnings')
+            ->limit(5)
+            ->with(['driver:id,username'])
+            ->get();
+
+        if ($leaderboard->isEmpty()) {
+            return formatResponse('leaderboard', 'success', 'No rides found for today.', []);
+        } else {
+            $formattedLeaderboard = $leaderboard->map(function ($item) {
+                return [
+                    'driver_id' => $item->driver_id,
+                    'driver_name' => $item->driver->username ?? 'Unknown Driver',
+                    'total_earnings' => getAmount($item->total_earnings),
+                ];
+            })->filter(function ($item) {
+                return $item['driver_name'] !== 'Unknown Driver';
+            })->values();
+
+            return formatResponse('leaderboard', 'success', 'Leaderboard', $formattedLeaderboard);
+        }
     }
 }
