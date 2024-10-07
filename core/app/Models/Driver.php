@@ -55,6 +55,12 @@ class Driver extends Authenticatable
         return $this->hasOne(Vehicle::class);
     }
 
+    public function completedTrips()
+    {
+        return $this->hasMany(Ride::class, 'driver_id')->whereNotIn('status', [Status::RIDE_INITIATED, Status::RIDE_CANCELED])->with('destinations');
+    }
+
+
     public function conversation()
     {
         return $this->hasMany(Conversation::class);

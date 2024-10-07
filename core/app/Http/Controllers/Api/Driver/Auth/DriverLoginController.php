@@ -71,17 +71,17 @@ class DriverLoginController extends Controller
 
         $user = auth()->user();
         $tokenResult = $user->createToken('auth_token')->plainTextToken;
-        $this->authenticated($request,$user);
-        $response[] = 'Login Successful';
+        $this->authenticated($request, $user);
+
         return response()->json([
-            'remark'=>'login_success',
-            'status'=>'success',
-            'message'=>['success'=>$response],
-            'data'=>[
-                'user' => auth()->user(),
-                'access_token'=>$tokenResult,
-                'token_type'=>'Bearer'
-            ]
+            'remark'  => 'login_success',
+            'status'  => 'success',
+            'message' => ['success' => ['Login Successful']],
+            'data'    => [
+                'user'        => $user,
+                'access_token'=> $tokenResult,
+                'token_type'  => 'Bearer',
+            ],
         ]);
     }
 

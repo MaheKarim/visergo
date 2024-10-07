@@ -7,7 +7,6 @@ Route::get('/clear', function(){
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
 
-$vehicleTypes = VehicleType::where('status', 500)->get();
 Route::get('cron', 'CronController@cron')->name('cron');
 
 // User Support Ticket
@@ -25,7 +24,9 @@ Route::get('app/deposit/confirm/{hash}', 'Gateway\PaymentController@appDepositCo
 
 Route::controller('SiteController')->group(function () {
     Route::get('/contact', 'contact')->name('contact');
+
     Route::post('/contact', 'contactSubmit');
+
     Route::get('/change/{lang?}', 'changeLanguage')->name('lang');
 
     Route::get('cookie-policy', 'cookiePolicy')->name('cookie.policy');
@@ -37,7 +38,6 @@ Route::controller('SiteController')->group(function () {
     Route::get('policy/{slug}/{id}', 'policyPages')->name('policy.pages');
 
     Route::get('placeholder-image/{size}', 'placeholderImage')->name('placeholder.image');
-
 
     Route::get('/{slug}', 'pages')->name('pages');
     Route::get('/', 'index')->name('home');

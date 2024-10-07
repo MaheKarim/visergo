@@ -8,6 +8,7 @@ use App\Lib\FormProcessor;
 use App\Models\CancellationReason;
 use App\Models\Form;
 use App\Models\GeneralSetting;
+use App\Models\Ride;
 use App\Models\Transaction;
 use App\Models\Vehicle;
 use App\Models\VehicleModel;
@@ -419,4 +420,12 @@ class DriverController extends Controller
 //            ]
 //        ]);
 //    }
+
+    public function tripHistory()
+    {
+        $driver = auth()->user('driver');
+        $trips = $driver->completedTrips()->latest()->paginate(getPaginate());
+
+        return formatResponse('trip_history', 'success', 'Trip history', $trips);
+    }
 }
